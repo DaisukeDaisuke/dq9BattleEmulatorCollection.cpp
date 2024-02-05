@@ -9,16 +9,19 @@
 #include <iostream>
 #include <unordered_map>
 #include <functional>
+#include <cmath>
 #include "BattleEmulator.h"
 #include "lcg.h"
 #include "Player.h"
-#include "attack/BoltCutter/BoltCutter.h"
 
 uint64_t previousState = 0;
 
-void BattleEmulator::Main(int *position, int Gene[], const Player players[4]) {
+void BattleEmulator::Main(int *position, int Gene[], const Player players[5]) {
     int genePosition = 0;
-    std::array<double, 5> speed = {34, 30, 30, 30, 45};
+    std::array<double, 5> speed{};
+    for (int i = 0; i < 5; ++i) {
+        speed[i] = players[i].speed;
+    }
     for (double &element: speed) {
         element *= lcg::floatRand(position, 0.51, 1.0);
     }
@@ -44,13 +47,13 @@ void BattleEmulator::Main(int *position, int Gene[], const Player players[4]) {
         (*position) += 3;
     }
 
-    int actionTable[4] = {0, 0, 0, 0};
+    int actionTable[5] = {0, 0, 0, 0};
     for (int &i: actionTable) {
         i = Gene[genePosition++];
     }
 
 
-    std::cout << AITarget << std::endl;
+    //std::cout << AITarget << std::endl;
 
     // ソートされた結果を出力
     for (const auto &element: indexed_speed) {
@@ -59,32 +62,64 @@ void BattleEmulator::Main(int *position, int Gene[], const Player players[4]) {
             //--------start_FUN_02158dfc-------
             (*position) += 5;
             //--------end_FUN_02158dfc-------
-            callAttackFun(AITarget, position, players);
+            callAttackFun(enemyAction, position, players, 4, AITarget);
+            (*position) += 1;
         }
     }
 
 }
 
-void BattleEmulator::callAttackFun(int Id, int* position, const Player players1[4]) {
-    std::unordered_map<int, std::function<void(int* pos, const Player players[4])>> jumpTable;
-    // idに対応するクラスの関数を登録
-    jumpTable[0xfe] = [](int* pos, const Player players[4]) { BoltCutter::onRun(pos, players); };
-    //jumpTable[0x49] = [](int* pos, Player players[4]) { DerivedClass2().onRun(); };
-
-    auto it = jumpTable.find(Id);
-
-    if (it != jumpTable.end()) {
-        // idが見つかった場合
-        it->second(position, players1);
-    } else {
-        // idが見つからなかった場合のデフォルト処理
-        std::cout << "Default action for unknown id: " << Id << std::endl;
+void BattleEmulator::callAttackFun(int Id, int *position, const Player players[5], int attacker, int defender) {
+    std::cout << Id << std::endl;
+    switch (Id) {
+        case 0xF9://稲妻突き
+            std::cout << (*position) << std::endl;
+            (*position) += 2;
+            (*position)++;//関係ない
+            (*position)++;//会心
+            (*position)++;//みわかし
+            (*position)++;//盾ガード
+            (*position)++;//回避
+            auto baseDamage = FUN_0207564c(position,players[attacker].atk, players[defender].def);
+            (*position)++;//目を覚ました判定
+            (*position)++;//不明
+            break;
     }
 }
 
-int BattleEmulator::AttackTargetSelection(int *position, const Player players[4]) {
+int BattleEmulator::FUN_0207564c(int *position, int atk, int def) {
+    auto atk5 = static_cast<double>(atk);
+    auto def5 = static_cast<double>(def);
+
+    auto atk1 = (atk5 - (def5 / 2)) / 2;
+    std::cout << atk1 << std::endl;
+    if (atk1 <= 0) {
+        return 0;
+    } else {
+        auto atk2 = atk / 16.0000;
+        if (atk1 > atk2) {
+            auto atk4 = atk1 / 16;
+            auto atk3 = -atk4;
+            auto result = atk1 + lcg::floatRand(position, atk3, atk4);
+            result = result + lcg::floatRand(position, -1, 1);
+            if (result <= 0) {
+                result = 0.0;
+            }
+            return static_cast<int>(floor(result));
+        } else {
+            double result = lcg::floatRand(position, 0.0, atk2);
+            if (result <= 0) {
+                result = 0.0;
+            }
+            return static_cast<int>(floor(result));
+        }
+    }
+    //return 0;
+}
+
+int BattleEmulator::AttackTargetSelection(int *position, const Player players[5]) {
     int max = 0;
-    int tmp[4] = {0, 0, 0, 0};
+    int tmp[5] = {0, 0, 0, 0};
     for (int i = 0; i < 4; ++i) {
         if (!Player::isPlayerAlive(players[i])) {
             continue;
@@ -122,6 +157,5 @@ int BattleEmulator::FUN_0208aecc(int *position) {
     uint64_t r3_var9 = r1_var7 + r2_var5;
     previousState = r0_var8;
     uint64_t r3_var12 = r3_var9 & 0xff;
-    std::cout << r3_var12 << std::endl;
     return attack[r3_var12];
 }

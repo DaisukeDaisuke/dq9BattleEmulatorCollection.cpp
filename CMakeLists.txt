@@ -10,6 +10,4 @@ add_executable(newDirectory main.cpp
         BattleEmulator.h
         Player.cpp
         Player.h
-        attack/BoltCutter/BoltCutter.cpp
-        attack/BoltCutter/BoltCutter.h
 )

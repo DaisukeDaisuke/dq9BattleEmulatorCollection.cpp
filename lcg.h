@@ -25,8 +25,6 @@ public:
 
     static uint64_t getSeed(int *position);
 
-    static double floatRand(int *position, int min, int max);
-
     static double floatRand(int *position, double min, double max);
 };
 

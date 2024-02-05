@@ -14,6 +14,9 @@ struct Player {
     int playerId;
     int guard = FRONT;
     int hp = 0;
+    int atk;
+    int def;
+    int speed;
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 
     static bool isPlayerAlive(Player obj) {

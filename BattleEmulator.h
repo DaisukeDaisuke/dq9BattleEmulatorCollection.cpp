@@ -17,7 +17,9 @@ public:
 
     static int AttackTargetSelection(int *position, const Player *players);
 
-    static void callAttackFun(int Id, int *position, const Player *players1);
+    static int FUN_0207564c(int *position, int atk, int def);
+
+    static void callAttackFun(int Id, int *position, const Player *players, int attacker, int defender);
 };
 
 
