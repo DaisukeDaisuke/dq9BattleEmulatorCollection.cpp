@@ -92,6 +92,10 @@ double lcg::floatRand(int * position, double min, double max){
     return min + result * (max - min);
 }
 
+int lcg::intRangeRand(int * position, int min, int max){
+    return min + getPercent(position, max - min + 1);
+}
+
 uint64_t lcg::getSeed(int *position){
     if (position == nullptr) {
         throw std::invalid_argument("Null pointer passed to incrementPosition.");

@@ -28,12 +28,18 @@ int main() {
     for (int i = 0; i < 5; ++i) {
         players[i].playerId = i;
         players[i].hp = hps[i];
+        players[i].maxHp = hps[i];
         players[i].atk = atks[i];
         players[i].def = defs[i];
         players[i].speed = speeds[i];
     }
 
-    int gene[100] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    uint32_t gene[100] = {
+            BattleEmulator::FIRE_BLOWING_ART,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::DO_YOUR_BEST
+            , 0, 0, 0, 0, 0};
     BattleEmulator::Main(position, gene, players);
 
 
@@ -48,7 +54,13 @@ int main() {
     std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms"
               << std::endl;
     std::cout << (*position) << std::endl;
+
+    cout << "hp" << endl;
+    for (auto & player : players) {
+        std::cout << player.hp << std::endl;
+    }
     lcg::release();
+    std::cout << "Size of int: " << sizeof(int) * 8 << " bits" << std::endl;
 
 
     return 0;
