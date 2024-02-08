@@ -23,7 +23,7 @@ int actionsPosition = 0;
 int preHP[5] = {0, 0, 0, 0, 0};
 
 void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) {
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 5; ++i) {
         DEBUG_COUT("> turn: " + std::to_string(i + 1));
         resetCombo();
         for (int32_t &action: actions) {
@@ -68,6 +68,8 @@ void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) 
         } else if (enemyAction == ATTACK) {
             AITarget[0] = AttackTargetSelection(position, players);
             (*position) += 3;
+        } else if (enemyAction == HEAL) {
+            (*position) += 4;
         }
 
         int32_t actionTable[5] = {0, 0, 0, 0};
@@ -109,7 +111,7 @@ void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) 
 
                     int minIndex = 0;
                     for (int i = 1; i < 4; ++i) {
-                        if (players[i].hp < players[minIndex].hp) {
+                        if (players[i].hp < players[minIndex].hp&&players[i].hp != 0) {
                             minIndex = i;
                         }
                     }
@@ -137,7 +139,16 @@ void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) 
         }
         (*position) += 1;
         camera::Main(position, actions);
+        for (int k = 0; k < 5; ++k) {
+            if (players[i].hp == 0) {
+                return;
+            }
+        }
     }
+}
+
+bool isGameEnd(){
+
 }
 
 void BattleEmulator::ProcessFUN_021db2a0(int *position, const int attacker, Player *players) {
@@ -206,6 +217,15 @@ void BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, i
             Player::reduceHp(players[defenders[0]], baseDamage);
             resetCombo();
             break;
+        case HEAL:
+            (*position) += 2;
+            (*position)++;//関係ない
+            (*position)++;//会心
+            (*position)++;//回避
+            baseDamage = FUN_021e8458_typeD(position, 5, 35);
+            (*position)++;
+            Player::heel(players[4], baseDamage);//必殺チャージ
+            break;
         case MULTITHRUST:
             attackCount = lcg::intRangeRand(position, 3, 4);
             (*position)++;
@@ -250,8 +270,12 @@ void BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, i
             }
             (*position)++;//回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defenders[0]].def);
+            if (!kaihi) {
+                Player::reduceHp(players[defenders[0]], baseDamage);
+            }
             (*position)++;//目を覚ました
             (*position)++;//必殺チャージ
+
             break;
         case FIRE_BLOWING_ART:
             if (defender == -1) {
@@ -277,6 +301,7 @@ void BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, i
             tmp *= 1.25;//レオコーン火軸性1.25倍
             baseDamage = static_cast<int>(floor(tmp));
             Player::reduceHp(players[defender], baseDamage);
+            ProcessFUN_021db2a0(position, attacker, players);
 #ifdef DEBUG
             DEBUG_COUT(" hihuki: " + std::to_string(baseDamage));
 #endif
@@ -311,9 +336,7 @@ void BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, i
 
             (*position)++;//必殺チャージ
             //30
-#ifdef DEBUG
             DEBUG_COUT(" mera: " + std::to_string(baseDamage));
-#endif
             Player::reduceHp(players[defender], baseDamage);
             ProcessFUN_021db2a0(position, attacker, players);
             //会心時不明処理
@@ -442,7 +465,10 @@ int BattleEmulator::AttackTargetSelection(int *position, Player *players) {
 }
 
 int BattleEmulator::FUN_0208aecc(int *position) {
-    int attack[6] = {BOLT_CUTTER, 1, MULTITHRUST, 0x1e, BOLT_CUTTER, MULTITHRUST};
+    if (previousState == 3) {
+        previousState = 0;
+    }
+    int attack[6] = {BOLT_CUTTER, ATTACK, MULTITHRUST, HEAL, BOLT_CUTTER, MULTITHRUST};
     uint64_t r0_var2 = lcg::getSeed(position);
     uint64_t r3_var3 = previousState;
     uint64_t r2_var5 = r0_var2 & 0x1;
@@ -452,5 +478,6 @@ int BattleEmulator::FUN_0208aecc(int *position) {
     uint64_t r3_var9 = r1_var7 + r2_var5;
     previousState = r0_var8;
     uint64_t r3_var12 = r3_var9 & 0xff;
+    DEBUG_COUT1(previousState);
     return attack[r3_var12];
 }

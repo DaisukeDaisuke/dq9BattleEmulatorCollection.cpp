@@ -15,6 +15,16 @@
 #define DEBUG_COUT(x)
 #endif
 
+#define DEBUG1 1
+
+// DEBUGモードが有効な場合にのみデバッグ出力を有効にする
+#ifdef DEBUG1
+#define DEBUG_COUT1(x) std::cout << x << std::endl
+#else
+#define DEBUG_COUT1(x)
+#endif
+
+
 class debug {
 
 };

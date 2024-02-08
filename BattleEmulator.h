@@ -18,6 +18,7 @@ public:
     static const int FIRE_BLOWING_ART = 0x1001;//火吹き芸
     static const int MEDICINAL_HERBS = 0x1002;
     static const int MERA = 0x1003;
+    static const int HEAL = 0x1E;
 
     static void Main(int *position, const int32_t *Gene, Player *players);
 
