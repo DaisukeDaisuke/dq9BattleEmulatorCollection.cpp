@@ -32,6 +32,11 @@ struct Player {
         obj.hp = std::max(0, obj.hp);
     }
 
+    static void heel(Player& obj, int amount){
+        obj.hp += amount;
+        obj.hp = std::min(static_cast<int>(obj.maxHp), obj.hp);
+    }
+
     static bool isHPBelow40Percent(const Player& player) {
         // HPが最大HPの40%未満であるかどうかを判別
         return static_cast<double>(player.hp) < 0.4 * player.maxHp;

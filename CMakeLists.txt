@@ -12,6 +12,8 @@ add_executable(newDirectory main.cpp
         Player.h
         camera.cpp
         camera.h
+        debug.cpp
+        debug.h
 )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")

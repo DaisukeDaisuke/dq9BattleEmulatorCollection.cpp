@@ -12,17 +12,21 @@
 #include "lcg.h"
 #include "Player.h"
 #include "camera.h"
+#include "debug.h"
 
 uint64_t previousState = 0;
-uint32_t previousAttack = -1;
+int32_t previousAttack = -1;
 int comboCounter = 0;
 bool isEnemyCombo = false;
-uint32_t actions[5];
+int32_t actions[5];
 int actionsPosition = 0;
+int preHP[5] = {0, 0, 0, 0, 0};
 
-void BattleEmulator::Main(int *position, const uint32_t Gene[], Player *players) {
-    for (int i = 0; i < 2; ++i) {
-        for (uint32_t &action: actions) {
+void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) {
+    for (int i = 0; i < 4; ++i) {
+        DEBUG_COUT("> turn: " + std::to_string(i + 1));
+        resetCombo();
+        for (int32_t &action: actions) {
             action = -1;
         }
         actionsPosition = 0;
@@ -61,15 +65,19 @@ void BattleEmulator::Main(int *position, const uint32_t Gene[], Player *players)
                 (*position)++;
             }
             (*position)++;
+        } else if (enemyAction == ATTACK) {
+            AITarget[0] = AttackTargetSelection(position, players);
+            (*position) += 3;
         }
 
-        uint32_t actionTable[5] = {0, 0, 0, 0};
+        int32_t actionTable[5] = {0, 0, 0, 0};
         for (auto &j: actionTable) {
             j = Gene[genePosition++];
         }
 
         // ソートされた結果を出力
         for (const auto &element: indexed_speed) {
+            DEBUG_COUT("start: " + std::to_string(*position));
             //std::cout << "元の位置: " << element.second << ", 値: " << element.first << std::endl;
             if (element.second == 4) {
                 //--------start_FUN_02158dfc-------
@@ -80,7 +88,7 @@ void BattleEmulator::Main(int *position, const uint32_t Gene[], Player *players)
                 (*position) += 1;
                 //--------end_FUN_021594bc-------
             } else if (element.second == 0) {
-                uint32_t action = actionTable[element.second] & 0xffff;
+                int32_t action = actionTable[element.second] & 0xffff;
                 if (action == FIRE_BLOWING_ART || action == DO_YOUR_BEST) {
                     //--------start_FUN_02158dfc-------
                     (*position) += 1;
@@ -91,7 +99,7 @@ void BattleEmulator::Main(int *position, const uint32_t Gene[], Player *players)
                     //--------end_FUN_021594bc-------
                 }
             } else {
-                uint32_t action = actionTable[element.second] & 0xffff;
+                int32_t action = actionTable[element.second] & 0xffff;
                 if (action == FIRE_BLOWING_ART) {
                     action = DO_YOUR_BEST;
                 }
@@ -106,18 +114,18 @@ void BattleEmulator::Main(int *position, const uint32_t Gene[], Player *players)
                         }
                     }
                     if (Player::isHPBelow40Percent(players[minIndex])) {
-                        action = (minIndex << 4) | MEDICINAL_HERBS;
+                        action = (minIndex << 16) | MEDICINAL_HERBS;
                     } else {
                         action = MERA;
                     }
                     //--------end_FUN_02158dfc-------
 
-                    uint32_t action1 = action & 0xffff;
+                    int32_t action1 = action & 0xffff;
                     if (action1 == MERA) {
                         callAttackFun(action1, position, players, static_cast<int>(element.second), 4, nullptr);
                     } else if (action1 == MEDICINAL_HERBS) {
-                        auto tmp1 = static_cast<int>((action1 >> 16) & 0xFFFF);
-                        callAttackFun(action1, position, players, static_cast<int>(element.second),tmp1, nullptr);
+                        auto tmp1 = static_cast<int>((action >> 16) & 0xFFFF);
+                        callAttackFun(action1, position, players, static_cast<int>(element.second), tmp1, nullptr);
                     }
 
 
@@ -132,8 +140,44 @@ void BattleEmulator::Main(int *position, const uint32_t Gene[], Player *players)
     }
 }
 
-void BattleEmulator::callAttackFun(uint32_t Id, int *position, Player *players, int attacker, int defender,
+void BattleEmulator::ProcessFUN_021db2a0(int *position, const int attacker, Player *players) {
+    double percent = FUN_021dbc04(players[4].hp, players[4].maxHp);
+    double percent1 = FUN_021dbc04(preHP[4], players[4].maxHp);
+    DEBUG_COUT(std::to_string(percent1) + ", " + std::to_string(percent));
+    DEBUG_COUT("hp: " + std::to_string(preHP[4]) + ", " + std::to_string(players[4].hp));
+//    std::cout << percent << ", " << percent1 << std::endl;
+//    std::cout << attacker << std::endl;
+    if (percent1 > 0.25) {
+        if (percent < 0.25) {
+            //std::cout << "test1" << std::endl;
+            (*position) += 2;
+            return;
+        }
+    }
+    if (percent1 > 0.5) {
+        if (percent < 0.5) {
+            DEBUG_COUT(" ProcessFUN_021db2a0");
+            (*position) += 2;
+            //FUN_021eb858
+            return;
+        }
+    }
+
+}
+
+double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
+    auto hp = static_cast<double>(baseHp);
+    if (hp == 0) {
+        return 0;
+    }
+    return hp / maxHp;
+}
+
+void BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender,
                                    const int defenders[4]) {
+    for (int j = 0; j < 5; ++j) {
+        preHP[j] = players[j].hp;
+    }
     actions[actionsPosition++] = Id;
     int baseDamage;
     double tmp;
@@ -160,6 +204,7 @@ void BattleEmulator::callAttackFun(uint32_t Id, int *position, Player *players, 
             (*position)++;//目を覚ました判定
             (*position)++;//不明
             Player::reduceHp(players[defenders[0]], baseDamage);
+            resetCombo();
             break;
         case MULTITHRUST:
             attackCount = lcg::intRangeRand(position, 3, 4);
@@ -169,26 +214,44 @@ void BattleEmulator::callAttackFun(uint32_t Id, int *position, Player *players, 
                 target[j] = list[lcg::getPercent(position, 4)];
             }
             for (const auto &target1: target) {
-                if (target1 == -1){
+                if (target1 == -1) {
                     break;
                 }
                 (*position)++;//関係ない
                 (*position)++;//会心判定
 
-                if (lcg::getPercent(position, 100) < 2){
+                if (lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
-                }else{
+                } else {
                     (*position)++;//盾ガード
                 }
                 (*position)++;//回避
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[target1].def);
                 baseDamage *= 0.5;
-                if (!kaihi){
+                if (!kaihi) {
                     Player::reduceHp(players[target1], baseDamage);
                 }
                 (*position)++;//目を覚ました
                 (*position)++;//必殺チャージ
             }
+            resetCombo();
+            break;
+        case ATTACK:
+            if (defenders == nullptr) {
+                return;
+            }
+            (*position) += 2;
+            (*position)++;//関係ない
+            (*position)++;//会心
+            if (lcg::getPercent(position, 100) < 2) {
+                kaihi = true;
+            } else {
+                (*position)++;//盾ガード
+            }
+            (*position)++;//回避
+            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defenders[0]].def);
+            (*position)++;//目を覚ました
+            (*position)++;//必殺チャージ
             break;
         case FIRE_BLOWING_ART:
             if (defender == -1) {
@@ -202,6 +265,9 @@ void BattleEmulator::callAttackFun(uint32_t Id, int *position, Player *players, 
             (*position)++;//回避
 
             baseDamage = FUN_021e8458_typeC(position, 20.0, 20.0, 3.0);
+#ifdef DEBUG
+            DEBUG_COUT(" hihuki_baseDamage: " + std::to_string(*position));
+#endif
             //会心
             tmp = static_cast<double>(baseDamage);
             if (kaisinn) {
@@ -211,11 +277,15 @@ void BattleEmulator::callAttackFun(uint32_t Id, int *position, Player *players, 
             tmp *= 1.25;//レオコーン火軸性1.25倍
             baseDamage = static_cast<int>(floor(tmp));
             Player::reduceHp(players[defender], baseDamage);
+#ifdef DEBUG
+            DEBUG_COUT(" hihuki: " + std::to_string(baseDamage));
+#endif
             (*position)++;//必殺チャージ
             //会心時不明処理
             if (kaisinn) {
                 (*position) += 2;
             }
+            resetCombo();
             break;
         case MERA:
             if (defender == -1) {
@@ -237,28 +307,43 @@ void BattleEmulator::callAttackFun(uint32_t Id, int *position, Player *players, 
             tmp *= 1.25;//レオコーン火軸性1.25倍
             tmp = processCombo(Id, tmp);
             baseDamage = static_cast<int>(floor(tmp));
+
+
             (*position)++;//必殺チャージ
             //30
+#ifdef DEBUG
+            DEBUG_COUT(" mera: " + std::to_string(baseDamage));
+#endif
             Player::reduceHp(players[defender], baseDamage);
+            ProcessFUN_021db2a0(position, attacker, players);
             //会心時不明処理
             if (kaisinn) {
                 (*position) += 2;
             }
             break;
         case MEDICINAL_HERBS:
+            if (defender == -1) {
+                return;
+            }
             (*position) += 2;
             (*position)++; // 関係ない
             (*position)++; // 会心判定
             (*position)++; // 回避
             baseDamage = FUN_021e8458_typeC(position, 35.0, 35.0, 5.0);
             (*position)++; // 必殺チャージ
-
+            Player::heel(players[defender], baseDamage);
+            resetCombo();
             break;
     }
 
 }
 
-double BattleEmulator::processCombo(uint32_t Id, double damage) {
+void BattleEmulator::resetCombo() {
+    previousAttack = -1;
+    comboCounter = 0;
+}
+
+double BattleEmulator::processCombo(int32_t Id, double damage) {
     if (previousAttack != -1) {
         if (previousAttack == Id) {
             comboCounter++;
@@ -274,6 +359,8 @@ double BattleEmulator::processCombo(uint32_t Id, double damage) {
                     break;
             }
             return damage;
+        } else {
+            resetCombo();
         }
     }
     previousAttack = Id;

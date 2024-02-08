@@ -10,10 +10,11 @@
 
 class camera {
 
-    static void onFreeCameraMove(int *position);
-
 public:
-    static void Main(int *position, const uint32_t *actions);
+    static void Main(int *position, const int32_t *actions);
+
+private:
+    static void onFreeCameraMove(int *position, int action);
 };
 
 

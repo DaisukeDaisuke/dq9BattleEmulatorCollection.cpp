@@ -34,12 +34,23 @@ int main() {
         players[i].speed = speeds[i];
     }
 
-    uint32_t gene[100] = {
+    int32_t gene[100] = {
             BattleEmulator::FIRE_BLOWING_ART,
             BattleEmulator::DO_YOUR_BEST,
             BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::DO_YOUR_BEST
-            , 0, 0, 0, 0, 0};
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::FIRE_BLOWING_ART,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::FIRE_BLOWING_ART,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::FIRE_BLOWING_ART,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::DO_YOUR_BEST,
+            BattleEmulator::DO_YOUR_BEST};
     BattleEmulator::Main(position, gene, players);
 
 
