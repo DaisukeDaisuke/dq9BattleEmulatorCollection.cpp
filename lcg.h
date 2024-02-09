@@ -13,7 +13,7 @@ public:
     lcg(); // コンストラクタ
     ~lcg();
 
-    static void init(uint64_t seed);
+    static void init(uint64_t seed, int size);
 
     static uint64_t lcg_rand(uint64_t seed);
 

@@ -22,8 +22,13 @@ int32_t actions[5];
 int actionsPosition = 0;
 int preHP[5] = {0, 0, 0, 0, 0};
 
-void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,const int damages[]) {
-    for (int i = 0; i < 5; ++i) {
+bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,const int damages[], const std::string speedList[]) {
+    previousState = 0;
+    previousAttack = -1;
+    comboCounter = 0;
+    actionsPosition = 0;
+    int damageCount = 0;
+    for (int i = 0; i < 2; ++i) {
         DEBUG_COUT("> turn: " + std::to_string(i + 1));
         resetCombo();
         for (int32_t &action: actions) {
@@ -52,6 +57,18 @@ void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,c
 
         // ソート
         std::sort(indexed_speed.begin(), indexed_speed.end(), compare_function);
+
+//        if (speedList != nullptr){
+//            int checkcounter = 0;
+//            for (const auto & item:indexed_speed) {
+//                if(speedList[checkcounter] == "a"&&item.second != 0){
+//                    return false;
+//                }else if(speedList[checkcounter] == "z"&&item.second != 4){
+//                    return false;
+//                }
+//                ++checkcounter;
+//            }
+//        }
 
         int enemyAction = FUN_0208aecc(position);
         int AITarget[4] = {-1, -1, -1, -1};
@@ -137,20 +154,28 @@ void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,c
                     //--------end_FUN_021594bc-------
                 }
             }
-            if (basedamage)
+            if (damages != nullptr){
+                if (damages[damageCount] != basedamage){
+                    return false;
+                }
+                damageCount++;
+                if (damageCount == 5){
+                    //std::cout << "a" << std::endl;
+                }
+                if (damages[damageCount] == -1){
+                    return true;
+                }
+            }
         }
         (*position) += 1;
         camera::Main(position, actions);
         for (int k = 0; k < 5; ++k) {
             if (players[i].hp == 0) {
-                return;
+                return false;
             }
         }
     }
-}
-
-bool isGameEnd(){
-
+    return false;
 }
 
 void BattleEmulator::ProcessFUN_021db2a0(int *position, const int attacker, Player *players) {
@@ -204,7 +229,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     switch (Id & 0xffff) {
         case BOLT_CUTTER://稲妻突き
             if (defenders == nullptr) {
-                return;
+                return -1;
             }
             (*position) += 2;
             (*position)++;//関係ない
@@ -263,7 +288,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             break;
         case ATTACK:
             if (defenders == nullptr) {
-                return;
+                return -1;
             }
             (*position) += 2;
             (*position)++;//関係ない
@@ -284,7 +309,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             break;
         case FIRE_BLOWING_ART:
             if (defender == -1) {
-                return;
+                return -1;
             }
             (*position) += 2;
             (*position)++;//関係ない
@@ -319,7 +344,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             break;
         case MERA:
             if (defender == -1) {
-                return;
+                return -1;
             }
             (*position) += 2;
             (*position)++;//関係ない
@@ -351,7 +376,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             break;
         case MEDICINAL_HERBS:
             if (defender == -1) {
-                return;
+                return -1;
             }
             (*position) += 2;
             (*position)++; // 関係ない

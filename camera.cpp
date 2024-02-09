@@ -14,8 +14,7 @@ void camera::Main(int * position, const int32_t actions[5]){
         int32_t after = actions[i];
         if (after == BattleEmulator::ATTACK){
             (*position)++;
-        }
-        if (after == BattleEmulator::FIRE_BLOWING_ART){
+        }else if (after == BattleEmulator::FIRE_BLOWING_ART){
             if (before == BattleEmulator::MERA){
                 onFreeCameraMove(position, after);
             }
@@ -36,6 +35,8 @@ void camera::Main(int * position, const int32_t actions[5]){
             onFreeCameraMove(position, after);
         }else if(after == BattleEmulator::MEDICINAL_HERBS){
 
+        }else{
+            //std::cerr << "test" << std::endl;
         }
         before = after;
     }

@@ -20,8 +20,7 @@ public:
     static const int MERA = 0x1003;
     static const int HEAL = 0x1E;
 
-    static void Main(int *position, const int32_t *Gene, Player *players);
-
+    static bool Main(int *position, const int32_t *Gene, Player *players, const int *damages, const std::string *speedList);
 private:
     static int FUN_0208aecc(int *position);
 

@@ -26,7 +26,7 @@ lcg::~lcg() {
     // メモリの解放やその他のクリーンアップ作業をここで行う
 }
 
-void lcg::init(uint64_t seed) {
+void lcg::init(uint64_t seed, int size) {
     // Calculate and store values in the array
     precalculatedValues = new double[ARRAY_SIZE];
     seeds = new uint64_t[ARRAY_SIZE];
