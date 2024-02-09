@@ -33,7 +33,7 @@ private:
 
     static int FUN_021e8458_typeD(int *position, double difference, double base);
 
-    static void callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender, const int *defenders);
+    static int callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender, const int *defenders);
 
     static void resetCombo();
 

@@ -11,8 +11,13 @@
 using namespace std;
 
 
-int main() {
+int main(int argc, char *argv[]) {
     auto t0 = std::chrono::high_resolution_clock::now();
+    if (argv[1][0] == 'b')
+
+
+        return 0;
+    }
     // Declare and initialize an array to store precalculated values
     uint64_t seed = 0x127578ED;
     lcg::init(seed);
@@ -72,6 +77,8 @@ int main() {
     }
     lcg::release();
     std::cout << "Size of int: " << sizeof(int) * 8 << " bits" << std::endl;
+
+    delete position;
 
 
     return 0;

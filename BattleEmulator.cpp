@@ -22,7 +22,7 @@ int32_t actions[5];
 int actionsPosition = 0;
 int preHP[5] = {0, 0, 0, 0, 0};
 
-void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) {
+void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,const int damages[]) {
     for (int i = 0; i < 5; ++i) {
         DEBUG_COUT("> turn: " + std::to_string(i + 1));
         resetCombo();
@@ -79,13 +79,14 @@ void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) 
 
         // ソートされた結果を出力
         for (const auto &element: indexed_speed) {
+            int basedamage = 0;
             DEBUG_COUT("start: " + std::to_string(*position));
             //std::cout << "元の位置: " << element.second << ", 値: " << element.first << std::endl;
             if (element.second == 4) {
                 //--------start_FUN_02158dfc-------
                 (*position) += 5;
                 //--------end_FUN_02158dfc-------
-                callAttackFun(enemyAction, position, players, 4, -1, AITarget);
+                basedamage = callAttackFun(enemyAction, position, players, 4, -1, AITarget);
                 //--------start_FUN_021594bc-------
                 (*position) += 1;
                 //--------end_FUN_021594bc-------
@@ -95,7 +96,7 @@ void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) 
                     //--------start_FUN_02158dfc-------
                     (*position) += 1;
                     //--------end_FUN_02158dfc-------
-                    callAttackFun(FIRE_BLOWING_ART, position, players, 0, 4, nullptr);
+                    basedamage = callAttackFun(FIRE_BLOWING_ART, position, players, 0, 4, nullptr);
                     //--------start_FUN_021594bc-------
                     (*position) += 1;
                     //--------end_FUN_021594bc-------
@@ -124,10 +125,10 @@ void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) 
 
                     int32_t action1 = action & 0xffff;
                     if (action1 == MERA) {
-                        callAttackFun(action1, position, players, static_cast<int>(element.second), 4, nullptr);
+                        basedamage = callAttackFun(action1, position, players, static_cast<int>(element.second), 4, nullptr);
                     } else if (action1 == MEDICINAL_HERBS) {
                         auto tmp1 = static_cast<int>((action >> 16) & 0xFFFF);
-                        callAttackFun(action1, position, players, static_cast<int>(element.second), tmp1, nullptr);
+                        basedamage = callAttackFun(action1, position, players, static_cast<int>(element.second), tmp1, nullptr);
                     }
 
 
@@ -136,6 +137,7 @@ void BattleEmulator::Main(int *position, const int32_t Gene[], Player *players) 
                     //--------end_FUN_021594bc-------
                 }
             }
+            if (basedamage)
         }
         (*position) += 1;
         camera::Main(position, actions);
@@ -184,7 +186,7 @@ double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
     return hp / maxHp;
 }
 
-void BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender,
+int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender,
                                    const int defenders[4]) {
     for (int j = 0; j < 5; ++j) {
         preHP[j] = players[j].hp;
@@ -207,8 +209,11 @@ void BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, i
             (*position) += 2;
             (*position)++;//関係ない
             (*position)++;//会心
-            (*position)++;//みわかし
-            (*position)++;//盾ガード
+            if (lcg::getPercent(position, 100) < 2) {
+                kaihi = true;
+            } else {
+                (*position)++;//盾ガード
+            }
             (*position)++;//回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defenders[0]].def);
             baseDamage = floor(baseDamage * 1.2);
@@ -358,7 +363,7 @@ void BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, i
             resetCombo();
             break;
     }
-
+    return baseDamage;
 }
 
 void BattleEmulator::resetCombo() {
