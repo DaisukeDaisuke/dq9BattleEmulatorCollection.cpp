@@ -74,13 +74,17 @@ int main(int argc, char *argv[]) {
 
 //        auto time = (static_cast<int>(floor(((48 * 60 + 0) * 0.19)))) << 16;
 //        auto time1 = (static_cast<int>(floor(((50 * 60 + 0) * 0.19)))) << 16;
-        auto time = (static_cast<int>(floor(((40 * 60 + 50) * 0.19)))) << 16;
+        auto time = (static_cast<int>(floor(((50 * 60 + 50) * 0.19)))) << 16;
         auto time1 = (static_cast<int>(floor(((60 * 60 + 50) * 0.19)))) << 16;
-
+        //b 20 17 21 18 21 31 26 22 17
 //        auto time = 0x025C5A0D-2;
 //        auto time1 = 0x025C5A0D+2;
 
+        //int i = 0x025C5A0D;
         //b z 22 A 27 17 19 28
+        //b a 25 16 z 22 16 22 22
+
+        //b z 22 A 27 22 16 22 9 17 21 21 18
         for (int i = time; i <time1; ++i) {
             int *position = new int(1);
             lcg::init(i, 500);
@@ -98,7 +102,8 @@ int main(int argc, char *argv[]) {
     }
     // Declare and initialize an array to store precalculated values
     //b a 25 16 z 22 16 22
-    uint64_t seed = 36434887;
+    //uint64_t seed = 36434887;
+    uint64_t seed = 0x025C5A0D;
     //uint64_t seed = 0x127578ED;
     lcg::init(seed, 2000);
     int *position = new int(1);

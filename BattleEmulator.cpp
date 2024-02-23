@@ -13,6 +13,8 @@
 #include "Player.h"
 #include "camera.h"
 #include "debug.h"
+#include <utility>
+#include <vector>
 
 uint64_t previousState = 0;
 int32_t previousAttack = -1;
@@ -28,7 +30,9 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,c
     comboCounter = 0;
     actionsPosition = 0;
     int damageCount = 0;
-    for (int i = 0; i < 2; ++i) {
+    int doAction = -1;
+    for (int i = 0; i < 3; ++i) {
+        std::vector<std::pair<int, int>> direction;
         DEBUG_COUT("> turn: " + std::to_string(i + 1));
         resetCombo();
         for (int32_t &action: actions) {
@@ -104,16 +108,20 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,c
                 (*position) += 5;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(enemyAction, position, players, 4, -1, AITarget);
+                direction.emplace_back(4, -1);
+                doAction = enemyAction;
                 //--------start_FUN_021594bc-------
                 (*position) += 1;
                 //--------end_FUN_021594bc-------
             } else if (element.second == 0) {
                 int32_t action = actionTable[element.second] & 0xffff;
+                doAction = action;
                 if (action == FIRE_BLOWING_ART || action == DO_YOUR_BEST) {
                     //--------start_FUN_02158dfc-------
                     (*position) += 1;
                     //--------end_FUN_02158dfc-------
                     basedamage = callAttackFun(FIRE_BLOWING_ART, position, players, 0, 4, nullptr);
+                    direction.emplace_back(0, 4);
                     //--------start_FUN_021594bc-------
                     (*position) += 1;
                     //--------end_FUN_021594bc-------
@@ -138,14 +146,17 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,c
                     } else {
                         action = MERA;
                     }
+                    doAction = action & 0xffff;
                     //--------end_FUN_02158dfc-------
 
                     int32_t action1 = action & 0xffff;
                     if (action1 == MERA) {
                         basedamage = callAttackFun(action1, position, players, static_cast<int>(element.second), 4, nullptr);
+                        direction.emplace_back(static_cast<int>(element.second), 4);
                     } else if (action1 == MEDICINAL_HERBS) {
                         auto tmp1 = static_cast<int>((action >> 16) & 0xFFFF);
                         basedamage = callAttackFun(action1, position, players, static_cast<int>(element.second), tmp1, nullptr);
+                        direction.emplace_back(static_cast<int>(element.second), tmp1);
                     }
 
 
@@ -154,21 +165,25 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,c
                     //--------end_FUN_021594bc-------
                 }
             }
-            if (damages != nullptr){
-                if (damages[damageCount] != basedamage){
-                    return false;
-                }
-                damageCount++;
-                if (damageCount == 5){
-                    //std::cout << "a" << std::endl;
-                }
-                if (damages[damageCount] == -1){
-                    return true;
+            if (damages != nullptr) {
+                if (doAction != MEDICINAL_HERBS) {
+                    if (damages[damageCount] != basedamage) {
+                        return false;
+                    }
+                    damageCount++;
+                    if (damageCount == 5) {
+                        //std::cout << "a" << std::endl;
+                    }
+                    if (damages[damageCount] == -1) {
+                        return true;
+                    }
+                }else{
+                    damageCount++;
                 }
             }
         }
         (*position) += 1;
-        camera::Main(position, actions);
+        camera::Main(position, actions, direction);
         for (int k = 0; k < 5; ++k) {
             if (players[i].hp == 0) {
                 return false;
@@ -244,7 +259,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             baseDamage = floor(baseDamage * 1.2);
             (*position)++;//目を覚ました判定
             (*position)++;//不明
-            Player::reduceHp(players[defenders[0]], baseDamage);
+            if (!kaihi) {
+                Player::reduceHp(players[defenders[0]], baseDamage);
+            }
             resetCombo();
             break;
         case HEAL:
