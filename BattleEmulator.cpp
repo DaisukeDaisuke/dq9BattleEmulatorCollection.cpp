@@ -273,7 +273,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;
             Player::heel(players[4], baseDamage);//必殺チャージ
             break;
-        case MULTITHRUST:
+        case MULTITHRUST://五月雨
             attackCount = lcg::intRangeRand(position, 3, 4);
             (*position)++;
 
@@ -303,7 +303,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             resetCombo();
             break;
-        case ATTACK:
+        case ATTACK://通常攻撃
             if (defenders == nullptr) {
                 return -1;
             }
@@ -324,7 +324,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//必殺チャージ
 
             break;
-        case FIRE_BLOWING_ART:
+        case FIRE_BLOWING_ART://火吹き芸
             if (defender == -1) {
                 return -1;
             }
@@ -359,7 +359,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             resetCombo();
             break;
-        case MERA:
+        case MERA://メラ
             if (defender == -1) {
                 return -1;
             }
