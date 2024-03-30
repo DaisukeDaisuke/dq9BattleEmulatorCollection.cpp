@@ -14,7 +14,7 @@ public:
     static void Main(int *position, const int32_t *actions, const std::vector<std::pair<int, int>> &pairs);
 
 private:
-    static void onFreeCameraMove(int *position, int action);
+    static void onFreeCameraMove(int *position, int action, const int param5);
 
 
 };

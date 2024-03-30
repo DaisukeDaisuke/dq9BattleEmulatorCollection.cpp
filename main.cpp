@@ -16,29 +16,18 @@ int main(int argc, char *argv[]) {
     auto t0 = std::chrono::high_resolution_clock::now();
 
     int32_t gene[100] = {
-            BattleEmulator::FIRE_BLOWING_ART,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::FIRE_BLOWING_ART,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::FIRE_BLOWING_ART,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::FIRE_BLOWING_ART,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::DO_YOUR_BEST,
-            BattleEmulator::DO_YOUR_BEST};
+            BattleEmulator::ATTACK_ALLY,
+            BattleEmulator::ATTACK_ALLY,
+            BattleEmulator::ATTACK_ALLY,
+            BattleEmulator::HEAL,
+    };
 
-    Player players[5];
-    int hps[5] = {51, 29, 29, 29, 296};
-    int defs[5] = {31, 16, 16, 15,50};
-    int atks[5] = {36, 10, 10, 10,53};
-    int speeds[5] = {34, 30, 30, 30, 45};
-    for (int i = 0; i < 5; ++i) {
+    Player players[2];
+    int hps[5] = {79,456};
+    int defs[5] = {73, 58};
+    int atks[5] = {67, 56};
+    int speeds[5] = {51, 54};
+    for (int i = 0; i < 2; ++i) {
         players[i].playerId = i;
         players[i].hp = hps[i];
         players[i].maxHp = hps[i];
@@ -46,9 +35,10 @@ int main(int argc, char *argv[]) {
         players[i].def = defs[i];
         players[i].speed = speeds[i];
     }
+    players[0].hp = 70;
 
-    Player copiedPlayers[5];
-    for (int i = 0; i < 5; ++i) {
+    Player copiedPlayers[2];
+    for (int i = 0; i < 2; ++i) {
         copiedPlayers[i] = players[i];
     }
 
@@ -88,7 +78,7 @@ int main(int argc, char *argv[]) {
         for (int i = time; i <time1; ++i) {
             int *position = new int(1);
             lcg::init(i, 500);
-            for (int j = 0; j < 5; ++j) {
+            for (int j = 0; j < 2; ++j) {
                 players[j] = copiedPlayers[j];
             }
             if(BattleEmulator::Main(position, gene, players, damages, speed)){
@@ -103,7 +93,7 @@ int main(int argc, char *argv[]) {
     // Declare and initialize an array to store precalculated values
     //b a 25 16 z 22 16 22
     //uint64_t seed = 36434887;
-    uint64_t seed = 0x025C5A0D;
+    uint64_t seed = 0x31DEF5AB;
     //uint64_t seed = 0x127578ED;
     lcg::init(seed, 2000);
     int *position = new int(1);

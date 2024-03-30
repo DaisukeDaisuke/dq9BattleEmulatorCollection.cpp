@@ -24,14 +24,17 @@ int32_t actions[5];
 int actionsPosition = 0;
 int preHP[5] = {0, 0, 0, 0, 0};
 
-bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,const int damages[], const std::string speedList[]) {
+bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, const int damages[],
+                          const std::string speedList[]) {
     previousState = 0;
     previousAttack = -1;
     comboCounter = 0;
     actionsPosition = 0;
     int damageCount = 0;
     int doAction = -1;
-    for (int i = 0; i < 3; ++i) {
+    bool love = false;
+    int genePosition = 0;
+    for (int i = 0; i < 4; ++i) {
         std::vector<std::pair<int, int>> direction;
         DEBUG_COUT("> turn: " + std::to_string(i + 1));
         resetCombo();
@@ -39,9 +42,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,c
             action = -1;
         }
         actionsPosition = 0;
-        int genePosition = 0;
-        std::array<double, 5> speed{};
-        for (int i = 0; i < 5; ++i) {
+        std::array<double, 2> speed{};
+        for (int i = 0; i < 2; ++i) {
             speed[i] = players[i].speed;
         }
         for (double &element: speed) {
@@ -74,95 +76,69 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,c
 //            }
 //        }
 
-        int enemyAction = FUN_0208aecc(position);
-        int AITarget[4] = {-1, -1, -1, -1};
-        if (enemyAction == BOLT_CUTTER) {
-            AITarget[0] = AttackTargetSelection(position, players);
-            (*position) += 3;
-        } else if (enemyAction == MULTITHRUST) {
-            int attackCount = lcg::intRangeRand(position, 3, 4);
-            (*position)++;
-            for (int j = 0; j < attackCount; ++j) {
-                (*position)++;
-            }
-            (*position)++;
-        } else if (enemyAction == ATTACK) {
-            AITarget[0] = AttackTargetSelection(position, players);
-            (*position) += 3;
-        } else if (enemyAction == HEAL) {
-            (*position) += 4;
-        }
+        (*position)++;//0x02160d64
 
-        int32_t actionTable[5] = {0, 0, 0, 0};
+        int32_t actionTable[1] = {0};
         for (auto &j: actionTable) {
             j = Gene[genePosition++];
         }
+
+        int enemyAction = 0;
 
         // ソートされた結果を出力
         for (const auto &element: indexed_speed) {
             int basedamage = 0;
             DEBUG_COUT("start: " + std::to_string(*position));
             //std::cout << "元の位置: " << element.second << ", 値: " << element.first << std::endl;
-            if (element.second == 4) {
+            if (element.second == 1) {
                 //--------start_FUN_02158dfc-------
-                (*position) += 5;
+                int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK, UNSPEAKABLE_EVIL, PUFF_PUFF};
+                //エッジ 攻撃	まなざし	ヒャド	ぱふぱふ	エッジ	タナトス
+                //バンパイアエッジ(制限行動: タナトスハント) バンパイアエッジ ヒャド 通常攻撃 まなざし ぱふぱふ
+                if (lcg::getPercent(position, 100) < 0.0260) {
+                    love = true;
+                    enemyAction = INACTIVE;
+                    (*position)++;
+                } else {
+                    enemyAction = table[ProcessEnemyRandomAction(position, 0)];
+                    if (enemyAction == UNSPEAKABLE_EVIL){
+                        //randIntRange: 0x0216139c 3 4 90
+                        //randIntRange: 0x021613b0 6 8 91
+                        (*position)++;
+                        (*position)++;
+                    }else{
+                        (*position)++;
+                    }
+                }
+                if (enemyAction == VICTIMISER && !players[0].paralysis){
+                    enemyAction = HP_HOOVER;
+                }
+                (*position)++;
                 //--------end_FUN_02158dfc-------
-                basedamage = callAttackFun(enemyAction, position, players, 4, -1, AITarget);
-                direction.emplace_back(4, -1);
+                basedamage = callAttackFun(enemyAction, position, players, 1, 0);
+                std::cout << "a: " << basedamage << "\n";
+                direction.emplace_back(1, 0);
+                Player::reduceHp(players[0], basedamage);
                 doAction = enemyAction;
                 //--------start_FUN_021594bc-------
                 (*position) += 1;
                 //--------end_FUN_021594bc-------
-            } else if (element.second == 0) {
-                int32_t action = actionTable[element.second] & 0xffff;
-                doAction = action;
-                if (action == FIRE_BLOWING_ART || action == DO_YOUR_BEST) {
-                    //--------start_FUN_02158dfc-------
-                    (*position) += 1;
-                    //--------end_FUN_02158dfc-------
-                    basedamage = callAttackFun(FIRE_BLOWING_ART, position, players, 0, 4, nullptr);
-                    direction.emplace_back(0, 4);
-                    //--------start_FUN_021594bc-------
-                    (*position) += 1;
-                    //--------end_FUN_021594bc-------
-                }
             } else {
                 int32_t action = actionTable[element.second] & 0xffff;
-                if (action == FIRE_BLOWING_ART) {
-                    action = DO_YOUR_BEST;
-                }
-                if (action == DO_YOUR_BEST) {
-                    //--------start_FUN_02158dfc-------
-                    (*position) += 45;
-
-                    int minIndex = 0;
-                    for (int i = 1; i < 4; ++i) {
-                        if (players[i].hp < players[minIndex].hp&&players[i].hp != 0) {
-                            minIndex = i;
-                        }
-                    }
-                    if (Player::isHPBelow40Percent(players[minIndex])) {
-                        action = (minIndex << 16) | MEDICINAL_HERBS;
-                    } else {
-                        action = MERA;
-                    }
-                    doAction = action & 0xffff;
-                    //--------end_FUN_02158dfc-------
-
-                    int32_t action1 = action & 0xffff;
-                    if (action1 == MERA) {
-                        basedamage = callAttackFun(action1, position, players, static_cast<int>(element.second), 4, nullptr);
-                        direction.emplace_back(static_cast<int>(element.second), 4);
-                    } else if (action1 == MEDICINAL_HERBS) {
-                        auto tmp1 = static_cast<int>((action >> 16) & 0xFFFF);
-                        basedamage = callAttackFun(action1, position, players, static_cast<int>(element.second), tmp1, nullptr);
-                        direction.emplace_back(static_cast<int>(element.second), tmp1);
-                    }
-
-
-                    //--------start_FUN_021594bc-------
-                    (*position) += 1;
-                    //--------end_FUN_021594bc-------
+                doAction = action;
+                //--------start_FUN_02158dfc-------
+                (*position) += 1;
+                //--------end_FUN_02158dfc-------
+                basedamage = callAttackFun(action, position, players, 0, 1);
+                std::cout << "youzilyo: " << basedamage << "\n";
+                direction.emplace_back(0, 1);
+                //--------start_FUN_021594bc-------
+                (*position) += 1;
+                //--------end_FUN_021594bc-------
+                if (action == HEAL){
+                    Player::heel(players[0], basedamage);
+                }else{
+                    Player::reduceHp(players[1], basedamage);
                 }
             }
             if (damages != nullptr) {
@@ -177,7 +153,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players,c
                     if (damages[damageCount] == -1) {
                         return true;
                     }
-                }else{
+                } else {
                     damageCount++;
                 }
             }
@@ -226,183 +202,134 @@ double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
     return hp / maxHp;
 }
 
-int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender,
-                                   const int defenders[4]) {
-    for (int j = 0; j < 5; ++j) {
+int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender) {
+    for (int j = 0; j < 2; ++j) {
         preHP[j] = players[j].hp;
     }
     actions[actionsPosition++] = Id;
-    int baseDamage;
-    double tmp;
+    int baseDamage = 0;
+    double tmp = 0;
     bool kaisinn = false;
     bool kaihi = false;
-    //int list[4] = {0,3,2,1};
+    bool tate = false;
+    bool OffensivePower = players[attacker].atk;
+            //int list[4] = {0,3,2,1};
     int list[4] = {0, 1, 2, 3};
     int target[4] = {-1, -1, -1, -1};
     //std::cout << Id << std::endl;
     int attackCount;
     switch (Id & 0xffff) {
-        case BOLT_CUTTER://稲妻突き
-            if (defenders == nullptr) {
-                return -1;
-            }
-            (*position) += 2;
-            (*position)++;//関係ない
-            (*position)++;//会心
-            if (lcg::getPercent(position, 100) < 2) {
-                kaihi = true;
-            } else {
-                (*position)++;//盾ガード
-            }
-            (*position)++;//回避
-            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defenders[0]].def);
-            baseDamage = floor(baseDamage * 1.2);
-            (*position)++;//目を覚ました判定
-            (*position)++;//不明
-            if (!kaihi) {
-                Player::reduceHp(players[defenders[0]], baseDamage);
-            }
-            resetCombo();
-            break;
         case HEAL:
-            (*position) += 2;
+            (*position)+=2;
             (*position)++;//関係ない
-            (*position)++;//会心
+            if (lcg::getPercent(position, 0x2710) < 100) {
+                kaisinn = true;
+            }
             (*position)++;//回避
             baseDamage = FUN_021e8458_typeD(position, 5, 35);
-            (*position)++;
-            Player::heel(players[4], baseDamage);//必殺チャージ
-            break;
-        case MULTITHRUST://五月雨
-            attackCount = lcg::intRangeRand(position, 3, 4);
-            (*position)++;
-
-            for (int j = 0; j < attackCount; ++j) {
-                target[j] = list[lcg::getPercent(position, 4)];
+            if (kaisinn){
+                tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
+                baseDamage = static_cast<int>(floor(tmp));
             }
-            for (const auto &target1: target) {
-                if (target1 == -1) {
-                    break;
-                }
-                (*position)++;//関係ない
-                (*position)++;//会心判定
-
-                if (lcg::getPercent(position, 100) < 2) {
-                    kaihi = true;
-                } else {
-                    (*position)++;//盾ガード
-                }
-                (*position)++;//回避
-                baseDamage = FUN_0207564c(position, players[attacker].atk, players[target1].def);
-                baseDamage *= 0.5;
-                if (!kaihi) {
-                    Player::reduceHp(players[target1], baseDamage);
-                }
-                (*position)++;//目を覚ました
-                (*position)++;//必殺チャージ
-            }
-            resetCombo();
-            break;
-        case ATTACK://通常攻撃
-            if (defenders == nullptr) {
-                return -1;
-            }
-            (*position) += 2;
+            (*position)++;//不明
             (*position)++;//関係ない
+            (*position)+=2;//?
+            if(kaisinn) {
+                (*position) += 2;//会心時特殊処理
+            }
+            if (lcg::getPercent(position, 100) < 1) {
+                players[attacker].specialCharge = true;
+            }
+            break;
+        case UNSPEAKABLE_EVIL:
+            (*position)+=2;
+            (*position)++;//会心
+            (*position)++;//関係ない
+            (*position)++;//回避
+            baseDamage = FUN_021e8458_typeD(position, 4, 12);
+            if (lcg::getPercent(position, 100) < 25){
+                players[defender].paralysis = true;
+            }
+            (*position)++;//不明
+            if (!players[defender].paralysis){
+                (*position)++;// 関係ない
+            }
+            break;
+        case CRACK_ENEMY:
+            (*position)++;
+            (*position)++;
+            (*position)++;
+            (*position)++;//会心
+            if (lcg::getPercent(position, 100) < 0.5) {
+                tate = true;
+            }
+            (*position)++;//回避
+            baseDamage = FUN_021e8458_typeD(position, 5, 17);
+            if (tate){
+                baseDamage = 0;
+            }else{
+                (*position)++;
+            }
+            (*position)++;
+            break;
+        case HP_HOOVER://バンパイアエッジ
+            (*position)++;
+            (*position)++;
+            (*position)++;
             (*position)++;//会心
             if (lcg::getPercent(position, 100) < 2) {
                 kaihi = true;
-            } else {
-                (*position)++;//盾ガード
+            }
+            if (!kaihi&&lcg::getPercent(position, 100) < 0.5) {
+                tate = true;
             }
             (*position)++;//回避
-            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defenders[0]].def);
-            if (!kaihi) {
-                Player::reduceHp(players[defenders[0]], baseDamage);
-            }
-            (*position)++;//目を覚ました
-            (*position)++;//必殺チャージ
 
+            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+            if (kaihi){
+                (*position)++;//0x021ed7a8
+            }else if (tate) {
+                (*position)++;//0x021ed7a8
+            }else{
+                (*position)++;//目を覚ました
+                (*position)++;//不明
+                (*position)++;//必殺チャージ
+                Player::heel(players[attacker], (baseDamage >> 2)); // /4
+            }
             break;
-        case FIRE_BLOWING_ART://火吹き芸
-            if (defender == -1) {
-                return -1;
-            }
-            (*position) += 2;
-            (*position)++;//関係ない
-            if (lcg::getPercent(position, 0x2710) < 100) {
-                kaisinn = true;
-            }
-            (*position)++;//回避
-
-            baseDamage = FUN_021e8458_typeC(position, 20.0, 20.0, 3.0);
-#ifdef DEBUG
-            DEBUG_COUT(" hihuki_baseDamage: " + std::to_string(*position));
-#endif
+        case ATTACK_ALLY:
+            (*position)++;
+            (*position)++;
+            (*position)++;
             //会心
-            tmp = static_cast<double>(baseDamage);
-            if (kaisinn) {
-                tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
-                //baseDamage = static_cast<int>(std::floor(tmp));
-            }
-            tmp *= 1.25;//レオコーン火軸性1.25倍
-            baseDamage = static_cast<int>(floor(tmp));
-            Player::reduceHp(players[defender], baseDamage);
-            ProcessFUN_021db2a0(position, attacker, players);
-#ifdef DEBUG
-            DEBUG_COUT(" hihuki: " + std::to_string(baseDamage));
-#endif
-            (*position)++;//必殺チャージ
-            //会心時不明処理
-            if (kaisinn) {
-                (*position) += 2;
-            }
-            resetCombo();
-            break;
-        case MERA://メラ
-            if (defender == -1) {
-                return -1;
-            }
-            (*position) += 2;
-            (*position)++;//関係ない
-            if (lcg::getPercent(position, 0x2710) < 100) {
+            if (lcg::getPercent(position, 0x2710) < 200) {
                 kaisinn = true;
             }
-            (*position)++;//盾ガード
+
+            //みかわし(相手)
+            if (lcg::getPercent(position, 100) < 2) {
+                kaihi = true;
+            }
+            if (!kaihi) {
+                (*position)++;//盾ガード(幼女は盾を持っていないので0%)
+            }
             (*position)++;//回避
-            baseDamage = FUN_021e8458_typeD(position, 2, 14);
-            tmp = static_cast<double>(baseDamage);
-            if (kaisinn) {
-                tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
-                //baseDamage = static_cast<int>(std::floor(tmp));
+            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+            if (kaisinn){//0x020759ec
+                tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
+                baseDamage = static_cast<int>(floor(tmp));
             }
-            tmp *= 1.25;//レオコーン火軸性1.25倍
-            tmp = processCombo(Id, tmp);
-            baseDamage = static_cast<int>(floor(tmp));
-
-
-            (*position)++;//必殺チャージ
-            //30
-            DEBUG_COUT(" mera: " + std::to_string(baseDamage));
-            Player::reduceHp(players[defender], baseDamage);
-            ProcessFUN_021db2a0(position, attacker, players);
-            //会心時不明処理
-            if (kaisinn) {
-                (*position) += 2;
+            if (!kaihi) {
+                (*position)++;//目を覚ました
+                (*position)++;//不明
             }
-            break;
-        case MEDICINAL_HERBS:
-            if (defender == -1) {
-                return -1;
+            if(kaihi){
+                (*position)++;//会心時特殊処理　0x021e54fc
+                (*position)++;//会心時特殊処理　0x021eb8c8
             }
-            (*position) += 2;
-            (*position)++; // 関係ない
-            (*position)++; // 会心判定
-            (*position)++; // 回避
-            baseDamage = FUN_021e8458_typeC(position, 35.0, 35.0, 5.0);
-            (*position)++; // 必殺チャージ
-            Player::heel(players[defender], baseDamage);
-            resetCombo();
+            if (lcg::getPercent(position, 100) < 1) {
+                players[attacker].specialCharge = true;
+            }
             break;
     }
     return baseDamage;
@@ -509,6 +436,19 @@ int BattleEmulator::AttackTargetSelection(int *position, Player *players) {
         result -= element;
     }
     throw std::logic_error("AttackTargetSelection error");
+}
+
+int BattleEmulator::ProcessEnemyRandomAction(int *position, int pattern) {//0x0208aca8
+    int patternTable[6] = {43, 42, 43, 43, 42, 43};
+    int rand = lcg::getPercent(position, 0x100)+1;
+
+    for (int i = 0; i < 6; ++i) {
+        if (rand < patternTable[i]) {
+            return i;
+        }
+        rand = rand - patternTable[i];
+    }
+    return 5;
 }
 
 int BattleEmulator::FUN_0208aecc(int *position) {
