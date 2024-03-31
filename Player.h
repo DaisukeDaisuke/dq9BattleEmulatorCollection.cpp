@@ -22,8 +22,11 @@ struct Player {
     int def;
     int speed;
     bool specialCharge = false;
+    int specialChargeTurn = 0;
     bool inactive = false;
     bool paralysis = false;
+    int paralysisLevel = 0;
+    int paralysisTurns = -1;
 
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 

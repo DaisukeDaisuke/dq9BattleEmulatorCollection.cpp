@@ -16,6 +16,8 @@ void camera::Main(int * position, const int32_t actions[5], const std::vector<st
         int32_t after = actions[i];
         if (after == BattleEmulator::ATTACK_ALLY){
             onFreeCameraMove(position, after, preemptive ? 1 : 0);
+        }else if(after == BattleEmulator::ATTACK_ENEMY){
+            (*position)++;
         }
         preemptive = false;
         before = after;
@@ -42,10 +44,18 @@ void camera::onFreeCameraMove(int * position, const int action, const int param5
             (*position)++;//引数5が1なら強制的に実行
             return;
         }
-        auto ret = lcg::getPercent(position, 5 - counter);
-        if (ret == 0 || counter == 5) {
-            counter = 0;
-            (*position)++;
-        }
+        (*position)++;
+//        auto ret = lcg::getPercent(position, 5 - counter);
+//        if (ret != 0){
+//            ret = 1;
+//        }else{
+//            ret = 1;
+//        }
+        counter = 0;
+//        if (ret == 0 || counter == 5) {
+//            counter = 0;
+//            //(*position)++;
+//        }
+        (*position)++;
     }
 }

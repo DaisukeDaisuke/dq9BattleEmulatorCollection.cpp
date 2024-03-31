@@ -34,7 +34,18 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int doAction = -1;
     bool love = false;
     int genePosition = 0;
-    for (int i = 0; i < 4; ++i) {
+    for (int counterJ = 0; counterJ < 8; ++counterJ) {
+        players[0].specialChargeTurn--;
+        if (players[0].specialChargeTurn == 0) {
+            players[0].specialCharge = false;
+        }
+        if (players[0].paralysis && players[0].paralysisTurns != 0) {
+            players[0].paralysisTurns--;
+        }
+        if (counterJ == 5) {
+            std::cout << 5 << std::endl;
+        }
+        std::cout << counterJ << std::endl;
         std::vector<std::pair<int, int>> direction;
         DEBUG_COUT("> turn: " + std::to_string(i + 1));
         resetCombo();
@@ -43,8 +54,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         }
         actionsPosition = 0;
         std::array<double, 2> speed{};
-        for (int i = 0; i < 2; ++i) {
-            speed[i] = players[i].speed;
+        for (int k = 0; k < 2; ++k) {
+            speed[k] = players[k].speed;
         }
         for (double &element: speed) {
             element *= lcg::floatRand(position, 0.51, 1.0);
@@ -52,8 +63,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
 
         // インデックスと要素をペアにして保持
         std::vector<std::pair<double, size_t>> indexed_speed;
-        for (size_t i = 0; i < speed.size(); ++i) {
-            indexed_speed.emplace_back(speed[i], i);
+        for (size_t k = 0; k < speed.size(); ++k) {
+            indexed_speed.emplace_back(speed[k], k);
         }
 
         // ラムダ式を使用して要素を比較
@@ -83,6 +94,12 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             j = Gene[genePosition++];
         }
 
+        if (players[0].hp >= 55) {
+            actionTable[0] = ATTACK_ALLY;
+        } else {
+            actionTable[0] = HEAL;
+        }
+
         int enemyAction = 0;
 
         // ソートされた結果を出力
@@ -92,25 +109,26 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             //std::cout << "元の位置: " << element.second << ", 値: " << element.first << std::endl;
             if (element.second == 1) {
                 //--------start_FUN_02158dfc-------
-                int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK, UNSPEAKABLE_EVIL, PUFF_PUFF};
+                int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, UNSPEAKABLE_EVIL, PUFF_PUFF};
                 //エッジ 攻撃	まなざし	ヒャド	ぱふぱふ	エッジ	タナトス
                 //バンパイアエッジ(制限行動: タナトスハント) バンパイアエッジ ヒャド 通常攻撃 まなざし ぱふぱふ
                 if (lcg::getPercent(position, 100) < 0.0260) {
                     love = true;
-                    enemyAction = INACTIVE;
+                    enemyAction = INACTIVE_ENEMY;
                     (*position)++;
                 } else {
+                    //int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, UNSPEAKABLE_EVIL, PUFF_PUFF};
                     enemyAction = table[ProcessEnemyRandomAction(position, 0)];
-                    if (enemyAction == UNSPEAKABLE_EVIL){
+                    if (enemyAction == UNSPEAKABLE_EVIL) {
                         //randIntRange: 0x0216139c 3 4 90
                         //randIntRange: 0x021613b0 6 8 91
                         (*position)++;
                         (*position)++;
-                    }else{
+                    } else {
                         (*position)++;
                     }
                 }
-                if (enemyAction == VICTIMISER && !players[0].paralysis){
+                if (enemyAction == VICTIMISER && !players[0].paralysis) {
                     enemyAction = HP_HOOVER;
                 }
                 (*position)++;
@@ -128,6 +146,16 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 doAction = action;
                 //--------start_FUN_02158dfc-------
                 (*position) += 1;
+                if (players[0].inactive) {
+                    players[0].inactive = false;
+                    action = INACTIVE_ALLY;
+                }
+                if (players[0].paralysis) {
+                    action = PARALYSIS;
+                    if (players[0].paralysisTurns == 0) {
+                        double paralysisTable[4] = {0.6250, 0.7500, 0.8750, 1.0000};
+                    }
+                }
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(action, position, players, 0, 1);
                 std::cout << "youzilyo: " << basedamage << "\n";
@@ -135,9 +163,9 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 //--------start_FUN_021594bc-------
                 (*position) += 1;
                 //--------end_FUN_021594bc-------
-                if (action == HEAL){
+                if (action == HEAL) {
                     Player::heel(players[0], basedamage);
-                }else{
+                } else {
                     Player::reduceHp(players[1], basedamage);
                 }
             }
@@ -158,13 +186,16 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 }
             }
         }
+        std::cout << "end turns: " << (*position) << std::endl;
         (*position) += 1;
+        std::cout << "Before camera: " << (*position) << std::endl;
         camera::Main(position, actions, direction);
-        for (int k = 0; k < 5; ++k) {
-            if (players[i].hp == 0) {
+        for (int k = 0; k < 2; ++k) {
+            if (players[k].hp == 0) {
                 return false;
             }
         }
+        std::cout << "after camera: " << (*position) << std::endl;
     }
     return false;
 }
@@ -213,46 +244,144 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     bool kaihi = false;
     bool tate = false;
     bool OffensivePower = players[attacker].atk;
-            //int list[4] = {0,3,2,1};
+    //int list[4] = {0,3,2,1};
     int list[4] = {0, 1, 2, 3};
     int target[4] = {-1, -1, -1, -1};
     //std::cout << Id << std::endl;
     int attackCount;
     switch (Id & 0xffff) {
+        case VICTIMISER:
+            (*position) += 2;
+            (*position)++;
+            (*position)++;//会心
+            if (!players[0].paralysis) {
+                if (lcg::getPercent(position, 100) < 2) {
+                    kaihi = true;
+                }
+                if (!kaihi && lcg::getPercent(position, 100) < 0.5) {
+                    tate = true;
+                }
+            }
+            (*position)++;//回避
+
+            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+
+            if (kaihi) {
+                (*position)++;//0x021ed7a8
+                baseDamage = 0;
+            } else if (tate) {
+                (*position)++;//0x021ed7a8
+                baseDamage = 0;
+            } else {
+                (*position)++;//目を覚ました
+                (*position)++;//不明
+                if (!players[defender].paralysis) {
+                    if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
+                        players[defender].specialCharge = true;
+                        players[defender].specialChargeTurn = 6;
+                    }
+                }
+            }
+            break;
+        case ATTACK_ENEMY:
+            (*position) += 2;
+            (*position)++;
+            (*position)++;//会心
+            if (!players[0].paralysis) {
+                if (lcg::getPercent(position, 100) < 2) {
+                    kaihi = true;
+                }
+                if (!kaihi && lcg::getPercent(position, 100) < 0.5) {
+                    tate = true;
+                }
+            }
+            (*position)++;//回避
+
+            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+
+            if (kaihi) {
+                (*position)++;//0x021ed7a8
+                baseDamage = 0;
+            } else if (tate) {
+                (*position)++;//0x021ed7a8
+                baseDamage = 0;
+            } else {
+                (*position)++;//目を覚ました
+                (*position)++;//不明
+                if (!players[defender].paralysis) {
+                    if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
+                        players[defender].specialCharge = true;
+                        players[defender].specialChargeTurn = 6;
+                    }
+                }
+            }
+            break;
+        case INACTIVE_ALLY:
+        case PARALYSIS:
+            (*position) += 2;
+            (*position)++;//関係ない
+            (*position)++;//会心
+            (*position)++;//回避
+            FUN_0207564c(position, players[attacker].atk, players[defender].def);
+            (*position)++;//不明
+            break;
+        case PUFF_PUFF:
+            (*position) += 2;
+            (*position)++;//関係ない
+            (*position)++;//会心
+            if (lcg::getPercent(position, 100) < 50) {//なぜか逆だけど回避50%
+                players[defender].inactive = true;
+            }
+            FUN_0207564c(position, players[attacker].atk, players[defender].def);
+            (*position)++;//不明
+            break;
         case HEAL:
-            (*position)+=2;
+            (*position) += 2;
             (*position)++;//関係ない
             if (lcg::getPercent(position, 0x2710) < 100) {
                 kaisinn = true;
             }
             (*position)++;//回避
             baseDamage = FUN_021e8458_typeD(position, 5, 35);
-            if (kaisinn){
+            if (kaisinn) {
                 tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
                 baseDamage = static_cast<int>(floor(tmp));
             }
             (*position)++;//不明
-            (*position)++;//関係ない
-            (*position)+=2;//?
-            if(kaisinn) {
+            if (!players[attacker].specialCharge) {
+                (*position)++;//関係ない
+            }
+            (*position) += 2;//?
+            if (kaisinn) {
                 (*position) += 2;//会心時特殊処理
             }
-            if (lcg::getPercent(position, 100) < 1) {
-                players[attacker].specialCharge = true;
+            if (!players[0].paralysis) {
+                if (!players[attacker].specialCharge && lcg::getPercent(position, 100) < 1) {
+                    players[attacker].specialCharge = true;
+                    players[attacker].specialChargeTurn = 6;
+                }
             }
             break;
         case UNSPEAKABLE_EVIL:
-            (*position)+=2;
+            (*position) += 2;
             (*position)++;//会心
             (*position)++;//関係ない
             (*position)++;//回避
             baseDamage = FUN_021e8458_typeD(position, 4, 12);
-            if (lcg::getPercent(position, 100) < 25){
+            if (lcg::getPercent(position, 100) < 25) {
+                if (players[defender].paralysisLevel == 2){
+                    std::cerr << "paralysisLevel == 2" << std::endl;
+                }
                 players[defender].paralysis = true;
+                players[defender].paralysisTurns = 2;
+                players[defender].paralysisLevel++;
             }
             (*position)++;//不明
-            if (!players[defender].paralysis){
-                (*position)++;// 関係ない
+            if (!players[defender].paralysis) {
+                if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {
+                    players[defender].specialCharge = true;
+                    players[defender].specialChargeTurn = 6;
+                }
             }
             break;
         case CRACK_ENEMY:
@@ -265,35 +394,52 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++;//回避
             baseDamage = FUN_021e8458_typeD(position, 5, 17);
-            if (tate){
+            if (tate) {
                 baseDamage = 0;
-            }else{
                 (*position)++;
+            } else {
+                (*position)++;
+                if (!players[defender].paralysis) {
+                    if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
+                        players[defender].specialCharge = true;
+                        players[defender].specialChargeTurn = 6;
+                    }
+                }
             }
-            (*position)++;
+
             break;
         case HP_HOOVER://バンパイアエッジ
-            (*position)++;
-            (*position)++;
+            (*position) += 2;
             (*position)++;
             (*position)++;//会心
-            if (lcg::getPercent(position, 100) < 2) {
-                kaihi = true;
-            }
-            if (!kaihi&&lcg::getPercent(position, 100) < 0.5) {
-                tate = true;
+            //麻痺時はみかわし、盾ガードの判定が発生しない
+            if (!players[0].paralysis) {
+                if (lcg::getPercent(position, 100) < 2) {
+                    kaihi = true;
+                }
+                if (!kaihi && lcg::getPercent(position, 100) < 0.5) {
+                    tate = true;
+                }
             }
             (*position)++;//回避
 
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
-            if (kaihi){
+
+            if (kaihi) {
                 (*position)++;//0x021ed7a8
-            }else if (tate) {
+                baseDamage = 0;
+            } else if (tate) {
                 (*position)++;//0x021ed7a8
-            }else{
+                baseDamage = 0;
+            } else {
                 (*position)++;//目を覚ました
                 (*position)++;//不明
-                (*position)++;//必殺チャージ
+                if (!players[defender].paralysis) {
+                    if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
+                        players[defender].specialCharge = true;
+                        players[defender].specialChargeTurn = 6;
+                    }
+                }
                 Player::heel(players[attacker], (baseDamage >> 2)); // /4
             }
             break;
@@ -307,15 +453,17 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
 
             //みかわし(相手)
-            if (lcg::getPercent(position, 100) < 2) {
-                kaihi = true;
-            }
-            if (!kaihi) {
-                (*position)++;//盾ガード(幼女は盾を持っていないので0%)
+            if (!players[0].paralysis) {
+                if (lcg::getPercent(position, 100) < 2) {
+                    kaihi = true;
+                }
+                if (!kaihi) {
+                    (*position)++;//盾ガード(幼女は盾を持っていないので0%)
+                }
             }
             (*position)++;//回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
-            if (kaisinn){//0x020759ec
+            if (kaisinn) {//0x020759ec
                 tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
                 baseDamage = static_cast<int>(floor(tmp));
             }
@@ -323,14 +471,18 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 (*position)++;//目を覚ました
                 (*position)++;//不明
             }
-            if(kaihi){
+            if (kaisinn) {
                 (*position)++;//会心時特殊処理　0x021e54fc
                 (*position)++;//会心時特殊処理　0x021eb8c8
             }
-            if (lcg::getPercent(position, 100) < 1) {
+            if (!players[attacker].specialCharge && lcg::getPercent(position, 100) < 1) {
                 players[attacker].specialCharge = true;
+                players[attacker].specialChargeTurn = 6;
             }
+            std::cout << (players[attacker].specialCharge ? "true" : "fa") << std::endl;
             break;
+        default:
+            std::cerr << "error!!!!! " << (Id & 0xffff) << std::endl;
     }
     return baseDamage;
 }
@@ -440,10 +592,12 @@ int BattleEmulator::AttackTargetSelection(int *position, Player *players) {
 
 int BattleEmulator::ProcessEnemyRandomAction(int *position, int pattern) {//0x0208aca8
     int patternTable[6] = {43, 42, 43, 43, 42, 43};
-    int rand = lcg::getPercent(position, 0x100)+1;
+    int rand = lcg::getPercent(position, 0x100) + 1;
+
+    std::cout << "actions rand: " << rand << std::endl;
 
     for (int i = 0; i < 6; ++i) {
-        if (rand < patternTable[i]) {
+        if (rand <= patternTable[i]) {
             return i;
         }
         rand = rand - patternTable[i];
@@ -455,7 +609,7 @@ int BattleEmulator::FUN_0208aecc(int *position) {
     if (previousState == 3) {
         previousState = 0;
     }
-    int attack[6] = {BOLT_CUTTER, ATTACK, MULTITHRUST, HEAL, BOLT_CUTTER, MULTITHRUST};
+    int attack[6] = {BOLT_CUTTER, ATTACK_ENEMY, MULTITHRUST, HEAL, BOLT_CUTTER, MULTITHRUST};
     uint64_t r0_var2 = lcg::getSeed(position);
     uint64_t r3_var3 = previousState;
     uint64_t r2_var5 = r0_var2 & 0x1;

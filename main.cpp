@@ -20,6 +20,13 @@ int main(int argc, char *argv[]) {
             BattleEmulator::ATTACK_ALLY,
             BattleEmulator::ATTACK_ALLY,
             BattleEmulator::HEAL,
+            BattleEmulator::ATTACK_ALLY,
+            BattleEmulator::ATTACK_ALLY,
+            BattleEmulator::HEAL,
+            BattleEmulator::ATTACK_ALLY,
+            BattleEmulator::ATTACK_ALLY,
+            BattleEmulator::ATTACK_ALLY,
+
     };
 
     Player players[2];
@@ -120,6 +127,7 @@ int main(int argc, char *argv[]) {
     for (auto & player : players) {
         std::cout << player.hp << std::endl;
     }
+    std::cout << (players[0].specialCharge ? "hissatu: true" : "hissatu: fa") << std::endl;
     lcg::release();
     std::cout << "Size of int: " << sizeof(int) * 8 << " bits" << std::endl;
 

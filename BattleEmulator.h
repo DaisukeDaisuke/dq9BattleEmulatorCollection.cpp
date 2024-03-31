@@ -16,18 +16,19 @@ public:
     static const int VICTIMISER = 1009;
     static const int CRACK_ENEMY = 1008;
     static const int CRACK_ALLY = 1007;
-    static const int INACTIVE = 1006;
+    static const int INACTIVE_ENEMY = 1013;
+    static const int INACTIVE_ALLY = 1006;
     static const int HP_HOOVER = 1005;
     static const int BOLT_CUTTER = 0xf9;
     static const int ATTACK_ALLY = 1004;
-    static const int ATTACK_ENEMY = 1005;
+    static const int ATTACK_ENEMY = 1016;
     static const int MULTITHRUST = 0x49;
-    static const int ATTACK = 1;
     static const int DO_YOUR_BEST = 1000;//パッチリがんばれ
     static const int FIRE_BLOWING_ART = 1001;//火吹き芸
     static const int MEDICINAL_HERBS = 1002;
     static const int MERA = 1003;
     static const int HEAL = 0x1E;
+    static const int PARALYSIS = 1017;
 
     static bool Main(int *position, const int32_t *Gene, Player *players, const int *damages, const std::string *speedList);
 private:
