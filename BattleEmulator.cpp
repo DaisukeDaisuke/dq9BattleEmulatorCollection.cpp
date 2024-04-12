@@ -106,7 +106,10 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         } else {
             if (players[0].mp >= 2) {
                 actionTable[0] = HEAL;
-            } else {
+            } else if (players[0].medicinal_herbs_count >= 1) {
+                actionTable[0] = MEDICINAL_HERBS;
+                players[0].medicinal_herbs_count--;
+            }else{
                 actionTable[0] = ATTACK_ALLY;
             }
         }
@@ -336,6 +339,21 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     int attackCount;
     int percent_tmp;
     switch (Id & 0xffff) {
+        case MEDICINAL_HERBS:
+            (*position) += 2;
+            (*position)++; // 関係ない
+            (*position)++; // 会心判定
+            (*position)++; // 回避
+            baseDamage = FUN_021e8458_typeC(position, 35.0, 35.0, 5.0);
+            (*position)++; // 不明
+            if (!players[defender].specialCharge) {
+                (*position)++; // 必殺チャージ(敵)　0%
+                if (lcg::getPercent(position, 100) < 1) {//0x021ed7a8
+                    players[defender].specialCharge = true;
+                    players[defender].specialChargeTurn = 6;
+                }
+            }
+            break;
         case CURE_PARALYSIS:
             (*position) += 2;
             (*position)++;//関係ない　0x021ec6f8
