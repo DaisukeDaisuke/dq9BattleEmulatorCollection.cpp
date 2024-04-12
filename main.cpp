@@ -30,10 +30,11 @@ int main(int argc, char *argv[]) {
     };
 
     Player players[2];
-    int hps[5] = {79,456};
-    int defs[5] = {73, 58};
-    int atks[5] = {67, 56};
-    int speeds[5] = {51, 54};
+    int hps[2] = {79,456};
+    int defs[2] = {73, 58};
+    int atks[2] = {67, 56};
+    int speeds[2] = {51, 54};
+    int mps[2] = {27, 255};
     for (int i = 0; i < 2; ++i) {
         players[i].playerId = i;
         players[i].hp = hps[i];
@@ -41,6 +42,7 @@ int main(int argc, char *argv[]) {
         players[i].atk = atks[i];
         players[i].def = defs[i];
         players[i].speed = speeds[i];
+        players[i].mp = mps[i];
     }
     players[0].hp = 70;
 
@@ -100,8 +102,10 @@ int main(int argc, char *argv[]) {
     // Declare and initialize an array to store precalculated values
     //b a 25 16 z 22 16 22
     //uint64_t seed = 36434887;
-    uint64_t seed = 0x31DEF5AB;
-    //uint64_t seed = 0x127578ED;
+    //uint64_t seed = 0x31DEF5AB;
+    //uint64_t seed = 0x30ffea3a;//幼女2回目
+    uint64_t seed = 0x45F7ADf0;//幼女3回目
+            //uint64_t seed = 0x127578ED;
     lcg::init(seed, 2000);
     int *position = new int(1);
     // Now you can use the precalculated values as needed

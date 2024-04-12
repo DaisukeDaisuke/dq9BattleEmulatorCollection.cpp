@@ -13,6 +13,7 @@ void camera::Main(int * position, const int32_t actions[5], const std::vector<st
     int32_t before = -1;
     bool preemptive = true;
     for (int i = 0; i < 2; ++i) {
+        std::cout << "counter1: " << counter << std::endl;
         int32_t after = actions[i];
         if (after == BattleEmulator::ATTACK_ALLY){
             onFreeCameraMove(position, after, preemptive ? 1 : 0);
@@ -21,6 +22,7 @@ void camera::Main(int * position, const int32_t actions[5], const std::vector<st
         }
         preemptive = false;
         before = after;
+        std::cout << "counter2: " << counter << std::endl;
     }
 }
 
@@ -34,7 +36,7 @@ void camera::onFreeCameraMove(int * position, const int action, const int param5
         auto ret = lcg::getPercent(position, 5 - counter);
         if(ret == 0||counter == 5){
             counter = 0;
-            (*position) += 2;
+            (*position) += 1;
         }else{
             counter++;
         }

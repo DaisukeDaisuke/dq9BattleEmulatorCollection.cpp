@@ -29,6 +29,11 @@ public:
     static const int MERA = 1003;
     static const int HEAL = 0x1E;
     static const int PARALYSIS = 1017;
+    static const int DEFENCE = 1020;
+    static const int ACROBATIC_STAR = 1021;
+    static const int COUNTER = 1022;
+    static const int ACROBATSTAR_KAIHI = 1023;
+    static const int CURE_PARALYSIS = 1024;
 
     static bool Main(int *position, const int32_t *Gene, Player *players, const int *damages, const std::string *speedList);
 private:

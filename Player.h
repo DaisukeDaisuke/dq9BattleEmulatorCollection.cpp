@@ -22,11 +22,19 @@ struct Player {
     int def;
     int speed;
     bool specialCharge = false;
+    bool dirtySpecialCharge = false;
+    bool dirtySpecialCharge1 = false;
     int specialChargeTurn = 0;
     bool inactive = false;
     bool paralysis = false;
     int paralysisLevel = 0;
     int paralysisTurns = -1;
+    bool rage = false;
+    int rageTurns = 0;
+    int mp = 0;
+    double defence = 1.0;
+    bool acrobaticStar = false;
+    int acrobaticStarTurn = 0;
 
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 
@@ -43,7 +51,7 @@ struct Player {
         obj.hp = std::max(0, obj.hp);
     }
 
-    static void heel(Player& obj, int amount){
+    static void heal(Player& obj, int amount){
         obj.hp += amount;
         obj.hp = std::min(static_cast<int>(obj.maxHp), obj.hp);
     }
@@ -52,6 +60,9 @@ struct Player {
         // HPが最大HPの40%未満であるかどうかを判別
         return static_cast<double>(player.hp) < 0.4 * player.maxHp;
     }
+
+
+
 };
 
 #endif //NEWDIRECTORY_PLAYER_H
