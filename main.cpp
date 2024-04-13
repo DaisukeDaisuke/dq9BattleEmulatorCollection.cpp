@@ -116,8 +116,7 @@ int main(int argc, char *argv[]) {
 
     // Now you can use the precalculated values as needed
     //int test = 0;
-    for (uint64_t seed = 1272; seed < 1273; ++seed) {
-
+    for (uint64_t seed = 0; seed < 0x10000; ++seed) {
         lcg::init(seed, 5000);
         int *position = new int(1);
         for (int j = 0; j < 2; ++j) {

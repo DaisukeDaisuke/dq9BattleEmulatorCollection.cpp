@@ -127,8 +127,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         }
         int enemyAction = 0;
 
-        if (counterJ == 11) {
-            std::cout << 5 << std::endl;
+        if (counterJ == 1) {
+            //std::cout << 5 << std::endl;
         }
 
         // ソートされた結果を出力
@@ -257,9 +257,9 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         }
         //std::cout << "Before camera: " << (*position) << std::endl;
         camera::Main(position, actions, direction);
-        std::cout << counterJ << std::endl;
-        std::cout << "after camera: " << (*position) << std::endl;
-        std::cout << (players[0].specialCharge ? "hissatu: true" : "hissatu: fa") << std::endl;
+        //std::cout << counterJ << std::endl;
+        //std::cout << "after camera: " << (*position) << std::endl;
+        //std::cout << (players[0].specialCharge ? "hissatu: true" : "hissatu: fa") << std::endl;
 
         if (!Player::isPlayerAlive(players[1])) {
             return true;
@@ -565,7 +565,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             baseDamage = FUN_021e8458_typeD(position, 4, 12);
             if (lcg::getPercent(position, 100) < 25) { // 麻痺判定
                 if (players[defender].paralysisLevel == 3) {
-                    std::cerr << "paralysisLevel == 2" << std::endl;
+                   //std::cerr << "paralysisLevel == 2" << std::endl;
                 }
                 players[defender].paralysis = true;
                 players[defender].paralysisTurns = 4;
