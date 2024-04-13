@@ -43,7 +43,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             players[0].specialCharge = false;
         }
         //std::cout << players[0].specialCharge << std::endl;
-        if (counterJ == 48) {
+        if (counterJ == 6) {
             std::cout << 5 << std::endl;
         }
         std::cout << "hp" << std::endl;
@@ -116,10 +116,6 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         //std::cout << "hiisatu: " << (players[0].specialCharge ? "true" : "fa") << std::endl;
         if (!players[0].acrobaticStar && players[0].specialCharge && players[0].specialChargeTurn >= 0) {
             actionTable[0] = ACROBATIC_STAR;
-            players[0].acrobaticStar = true;
-            players[0].acrobaticStarTurn = 6;
-            players[0].dirtySpecialCharge = true;
-            players[0].specialChargeTurn = 0;
         }
         //actionTable[0] = DEFENCE;
 
@@ -128,7 +124,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         }
         int enemyAction = 0;
 
-        if (counterJ == 61) {
+        if (counterJ == 7) {
             std::cout << 5 << std::endl;
         }
 
@@ -404,6 +400,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             return 0;
             break;
         case ACROBATIC_STAR:
+            players[0].acrobaticStar = true;
+            players[0].acrobaticStarTurn = 6;
+            players[0].dirtySpecialCharge = true;
+            players[0].specialChargeTurn = 0;
             (*position) += 2;
             (*position)++;//関係ない
             (*position)++;//会心
