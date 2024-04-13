@@ -6,6 +6,7 @@
 #include <omp.h>
 #include <chrono>
 #include <cmath>
+#include <sstream>
 #include "lcg.h"
 #include "BattleEmulator.h"
 
@@ -115,25 +116,35 @@ int main(int argc, char *argv[]) {
 
     // Now you can use the precalculated values as needed
     //int test = 0;
-    for (uint64_t seed = 0; seed < 0x1000; ++seed) {
-        std::cout << seed << std::endl;
+    for (uint64_t seed = 1272; seed < 1273; ++seed) {
+
         lcg::init(seed, 5000);
         int *position = new int(1);
         for (int j = 0; j < 2; ++j) {
             players[j] = copiedPlayers[j];
         }
         BattleResult result;
-        BattleEmulator::Main(position, gene, players, result);
+        BattleEmulator::Main(position, gene, players, result, seed);
+        std::stringstream ss;
+        ss << seed << " ";
         for (int i = 0; i < result.position; ++i) {
             auto action = result.actions[i];
             auto damage = result.damages[i];
             if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
-                std::cout << "h ";
+                ss << "h ";
             } else if (damage != 0) {
-                std::cout << damage << " ";
+                ss << damage << " ";
             }
         }
-        std::cout << std::endl;
+        std::string resultStr = ss.str();
+
+        if (resultStr.size() <= 150) {
+            int paddingSize = 150 - resultStr.size();
+            std::string padding(paddingSize, '-');
+            resultStr += padding;
+        }
+
+        std::cout << resultStr << std::endl;
         lcg::release();
         delete position;
     }

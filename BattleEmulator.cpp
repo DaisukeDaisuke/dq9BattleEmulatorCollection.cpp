@@ -23,8 +23,10 @@ bool isEnemyCombo = false;
 int32_t actions[5];
 int actionsPosition = 0;
 int preHP[5] = {0, 0, 0, 0, 0};
+uint64_t seed1 = 0;
 
-bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, BattleResult &result) {
+bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, BattleResult &result, uint64_t seed) {
+    seed1 = seed;
     previousState = 0;
     previousAttack = -1;
     comboCounter = 0;
@@ -32,7 +34,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
-    for (int counterJ = 0; counterJ < 20; ++counterJ) {
+    for (int counterJ = 0; counterJ < 25; ++counterJ) {
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
             players[0].dirtySpecialCharge = false;
@@ -125,7 +127,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         }
         int enemyAction = 0;
 
-        if (counterJ == 61) {
+        if (counterJ == 11) {
             std::cout << 5 << std::endl;
         }
 
@@ -255,7 +257,10 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         }
         //std::cout << "Before camera: " << (*position) << std::endl;
         camera::Main(position, actions, direction);
-        //std::cout << "after camera: " << (*position) << std::endl;
+        std::cout << counterJ << std::endl;
+        std::cout << "after camera: " << (*position) << std::endl;
+        std::cout << (players[0].specialCharge ? "hissatu: true" : "hissatu: fa") << std::endl;
+
         if (!Player::isPlayerAlive(players[1])) {
             return true;
         }
@@ -415,10 +420,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//アクロバットスターは絶対に発動しない
             (*position)++;//会心
             if (!players[0].paralysis && !players[0].inactive) {
-                if (!players[0].paralysis && lcg::getPercent(position, 100) < 2) {
+                //アクロバットスターが外れた場合でもみかわしの処理は行わない
+                if (!players[0].acrobaticStar && lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
-                if (!players[0].paralysis && !kaihi && lcg::getPercent(position, 100) < 0.5) {
+                if ( !kaihi && lcg::getPercent(position, 100) < 0.5) {
                     tate = true;
                 }
             }
@@ -460,10 +466,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             (*position)++;//会心
             if (!players[0].paralysis && !players[0].inactive) {
-                if (!players[0].paralysis && lcg::getPercent(position, 100) < 2) {
+                if (!players[0].acrobaticStar && lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
-                if (!players[0].paralysis && !kaihi && lcg::getPercent(position, 100) < 0.5) {
+                if (!kaihi && lcg::getPercent(position, 100) < 0.5) {
                     tate = true;
                 }
             }
@@ -615,7 +621,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//会心
             //麻痺時はみかわし、盾ガードの判定が発生しない
             if (!players[0].paralysis && !players[0].inactive) {
-                if (lcg::getPercent(position, 100) < 2) {
+                if (!players[0].acrobaticStar&&lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
                 if (!kaihi && lcg::getPercent(position, 100) < 0.5) {

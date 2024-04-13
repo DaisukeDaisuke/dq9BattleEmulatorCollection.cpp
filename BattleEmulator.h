@@ -36,7 +36,7 @@ public:
     static const int ACROBATSTAR_KAIHI = 1023;
     static const int CURE_PARALYSIS = 1024;
 
-    static bool Main(int *position, const int32_t *Gene, Player *players, BattleResult &result);
+    static bool Main(int *position, const int32_t *Gene, Player *players, BattleResult &result, uint64_t seed);
 private:
     static int FUN_0208aecc(int *position);
 
