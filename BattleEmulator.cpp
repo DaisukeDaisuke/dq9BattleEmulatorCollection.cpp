@@ -33,7 +33,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int doAction = -1;
     bool love = false;
     int genePosition = 0;
-    for (int counterJ = 0; counterJ < 55; ++counterJ) {
+    for (int counterJ = 0; counterJ < 100; ++counterJ) {
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
             players[0].dirtySpecialCharge = false;
@@ -42,8 +42,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         if (players[0].specialChargeTurn == -1) {
             players[0].specialCharge = false;
         }
-        std::cout << players[0].specialCharge << std::endl;
-        if (counterJ == 7) {
+        //std::cout << players[0].specialCharge << std::endl;
+        if (counterJ == 48) {
             std::cout << 5 << std::endl;
         }
         std::cout << "hp" << std::endl;
@@ -113,7 +113,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 actionTable[0] = ATTACK_ALLY;
             }
         }
-        std::cout << "hiisatu: " << (players[0].specialCharge ? "true" : "fa") << std::endl;
+        //std::cout << "hiisatu: " << (players[0].specialCharge ? "true" : "fa") << std::endl;
         if (!players[0].acrobaticStar && players[0].specialCharge && players[0].specialChargeTurn >= 0) {
             actionTable[0] = ACROBATIC_STAR;
             players[0].acrobaticStar = true;
@@ -128,7 +128,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         }
         int enemyAction = 0;
 
-        if (counterJ == 7) {
+        if (counterJ == 61) {
             std::cout << 5 << std::endl;
         }
 
@@ -143,7 +143,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
 
             int basedamage = 0;
             DEBUG_COUT("start: " + std::to_string(*position));
-            //std::cout << "元の位置: " << element.second << ", 値: " << element.first << std::endl;
+            ////std::cout << "元の位置: " << element.second << ", 値: " << element.first << std::endl;
             if (element.second == 1) {
                 //--------start_FUN_02158dfc-------
                 int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, UNSPEAKABLE_EVIL, PUFF_PUFF};
@@ -183,7 +183,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 (*position)++;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(enemyAction, position, players, 1, 0);
-                std::cout << "a: " << basedamage << "\n";
+                //std::cout << "a: " << basedamage << "\n";
                 direction.emplace_back(1, 0);
                 Player::reduceHp(players[0], basedamage);
                 doAction = enemyAction;
@@ -191,7 +191,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
                     (*position) += 1;
                 }
-                std::cout << "attack pos: " << (*position) << "\n";
+                //std::cout << "attack pos: " << (*position) << "\n";
                 //--------end_FUN_021594bc-------
             } else {
                 int32_t action = actionTable[element.second] & 0xffff;
@@ -210,6 +210,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                         auto probability2 = lcg::getPercent(position, 100) * 0.01;
                         if (probability1 >= probability2) {// 0.5 < 0.65
                             players[0].paralysis = false;
+                            players[0].paralysisLevel = 0;
                             action = CURE_PARALYSIS;
                         }
                     } else {
@@ -223,15 +224,15 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(action, position, players, 0, 1);
 
-                std::cout << "youzilyo: " << basedamage << std::endl;
+                //std::cout << "youzilyo: " << basedamage << std::endl;
                 direction.emplace_back(0, 1);
-                if (action == HEAL) {
+                if (action == HEAL||action == MEDICINAL_HERBS) {
                     Player::heal(players[0], basedamage);
                 } else {
                     Player::reduceHp(players[1], basedamage);
                 }
                 //--------start_FUN_021594bc-------
-                std::cout << "youzilyo pos: " << (*position) << "\n";
+                //std::cout << "youzilyo pos: " << (*position) << "\n";
                 if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
                     (*position) += 1;
                     players[0].acrobaticStarTurn--;
@@ -254,7 +255,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                     }
                     damageCount++;
                     if (damageCount == 5) {
-                        //std::cout << "a" << std::endl;
+                        ////std::cout << "a" << std::endl;
                     }
                     if (damages[damageCount] == -1) {
                         return true;
@@ -264,14 +265,14 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 }
             }
         }
-        std::cout << "end turns: " << (*position) << std::endl;
+        //std::cout << "end turns: " << (*position) << std::endl;
         if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
             (*position) += 1;
         }
         if (counterJ == 46) {
-            std::cout << 5 << std::endl;
+            //std::cout << 5 << std::endl;
         }
-        std::cout << "Before camera: " << (*position) << std::endl;
+        //std::cout << "Before camera: " << (*position) << std::endl;
         camera::Main(position, actions, direction);
         std::cout << "after camera: " << (*position) << std::endl;
         if (!Player::isPlayerAlive(players[1])) {
@@ -289,11 +290,11 @@ void BattleEmulator::ProcessFUN_021db2a0(int *position, const int attacker, Play
     double percent1 = FUN_021dbc04(preHP[1], players[1].maxHp);
     DEBUG_COUT(std::to_string(percent1) + ", " + std::to_string(percent));
     DEBUG_COUT("hp: " + std::to_string(preHP[4]) + ", " + std::to_string(players[4].hp));
-//    std::cout << percent << ", " << percent1 << std::endl;
-//    std::cout << attacker << std::endl;
+//    //std::cout << percent << ", " << percent1 << std::endl;
+//    //std::cout << attacker << std::endl;
     if (percent1 > 0.25) {
         if (percent < 0.25) {
-            //std::cout << "test1" << std::endl;
+            ////std::cout << "test1" << std::endl;
             (*position) += 2;
             return;
         }
@@ -333,7 +334,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     //int list[4] = {0,3,2,1};
     int list[4] = {0, 1, 2, 3};
     int target[4] = {-1, -1, -1, -1};
-    //std::cout << Id << std::endl;
+    ////std::cout << Id << std::endl;
     double percent = FUN_021dbc04(players[1].hp, players[1].maxHp);
     double percent1 = 0.0;
     int attackCount;
@@ -425,9 +426,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             break;
         case VICTIMISER:
             (*position) += 2;
-            (*position)++;
+            (*position)++;//アクロバットスターは絶対に発動しない
             (*position)++;//会心
-            if (!players[0].paralysis) {
+            if (!players[0].paralysis&&!players[0].inactive) {
                 if (!players[0].paralysis && lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
@@ -460,7 +461,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             break;
         case ATTACK_ENEMY:
             (*position) += 2;
-            if (players[0].acrobaticStar) {
+            if (players[0].acrobaticStar&&!players[0].paralysis&&!players[0].inactive) {
                 percent_tmp = lcg::getPercent(position, 100);
                 if (percent_tmp >= 0 && percent_tmp <= 49) {
                     return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender);
@@ -472,7 +473,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
 
             (*position)++;//会心
-            if (!players[0].paralysis) {
+            if (!players[0].paralysis&&!players[0].inactive) {
                 if (!players[0].paralysis && lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
@@ -615,7 +616,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             break;
         case HP_HOOVER://バンパイアエッジ
             (*position) += 2;
-            if (players[0].acrobaticStar) {
+            if (players[0].acrobaticStar&&!players[0].paralysis&&!players[0].inactive) {
                 percent_tmp = lcg::getPercent(position, 100);
                 if (percent_tmp >= 0 && percent_tmp <= 49) {
                     return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender);
@@ -627,7 +628,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++;//会心
             //麻痺時はみかわし、盾ガードの判定が発生しない
-            if (!players[0].paralysis) {
+            if (!players[0].paralysis&&!players[0].inactive) {
                 if (lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
@@ -668,7 +669,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
 
             //みかわし(相手)
-            if (!players[0].paralysis) {
+            if (!players[0].paralysis&&!players[0].inactive) {
                 if (lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
@@ -713,7 +714,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[attacker].specialChargeTurn = 6;
                 }
             }
-            std::cout << (players[attacker].specialCharge ? "true" : "fa") << std::endl;
+            //std::cout << (players[attacker].specialCharge ? "true" : "fa") << std::endl;
             break;
         default:
             std::cout << "error!!!!! " << (Id & 0xffff) << std::endl;
@@ -826,6 +827,9 @@ int BattleEmulator::AttackTargetSelection(int *position, Player *players) {
 
 int BattleEmulator::ProcessEnemyRandomAction(int *position, int pattern) {//0x0208aca8
     int patternTable[6] = {43, 42, 43, 43, 42, 43};
+    if ((*position) == 2000){
+        std::cout << "a" << std::endl;
+    }
     //125
     //43+42+43+43
     int rand = lcg::getPercent(position, 0x100) + 1;

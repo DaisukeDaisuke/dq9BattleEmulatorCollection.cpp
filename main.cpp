@@ -104,7 +104,8 @@ int main(int argc, char *argv[]) {
     //uint64_t seed = 36434887;
     //uint64_t seed = 0x31DEF5AB;
     //uint64_t seed = 0x30ffea3a;//幼女2回目
-    uint64_t seed = 0x45F7ADf0;//幼女3回目
+    //uint64_t seed = 0x45F7ADf0;//幼女3回目、2ターン目必殺チャージ
+    uint64_t seed = 0x30f24ab7;//幼女4回目
             //uint64_t seed = 0x127578ED;
     lcg::init(seed, 2000);
     int *position = new int(1);
