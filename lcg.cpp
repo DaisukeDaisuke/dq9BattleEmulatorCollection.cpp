@@ -10,7 +10,7 @@
 #include <chrono>
 
 // Define the size of the array
-const int ARRAY_SIZE = 1500;
+const int ARRAY_SIZE = 1000;
 
 double *precalculatedValues;
 uint64_t *seeds;
@@ -91,6 +91,13 @@ int lcg::getPercent(int *position, int max) {
 }
 
 double lcg::floatRand(int * position, double min, double max){
+    if (position == nullptr) {
+        throw std::invalid_argument("Null pointer passed to incrementPosition.");
+    }
+    if ((*position) >= ARRAY_SIZE){
+        std::cerr << "out of range!!!" << std::endl;
+        return 0;
+    }
     double result = precalculatedValues[*position];
     (*position)++;
     return min + result * (max - min);

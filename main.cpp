@@ -98,17 +98,20 @@ int main() {
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     std::cout << totalSeconds << std::endl;
     std::cout << totalSeconds + 60 << std::endl;
-    auto time1 = static_cast<int>(floor((totalSeconds - 10) * (1 / 0.20)));
+    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.1255909558)));
     time1 = (time1 & 0xffff) << 16;
     std::cout << time1 << std::endl;
 
-    auto time2 = static_cast<int>(floor((totalSeconds + 10) * (1 / 0.20)));
+    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.1255909558)));
     time2 = (time2 & 0xffff) << 16;
     std::cout << time2  << std::endl;
     // Now you can use the precalculated values as needed
     //int test = 0;
-    std::vector<std::stringstream> streams(100);
+    //std::vector<std::stringstream> streams(100);
     //for (uint64_t seed = 0; seed < 100000; ++seed) {
+    std::string str2 = "19 9 9 17 h 13 15 10 10";
+//    time1 = 0x98087FD0;
+//    time2 = 0x98087FD0+1;
     for (uint64_t seed = time1; seed < time2; ++seed) {
         if (seed % 10000 == 0) {
             std::cout << seed << std::endl;
@@ -133,27 +136,32 @@ int main() {
         }
         std::string resultStr = ss.str();
 
+        if(resultStr.find(str2)!=std::string::npos){
+            //std::cout << seed << std::endl;
+            std::cout << resultStr << std::endl;
+        }
+
 //        if (resultStr.size() <= 149) {
 //            int paddingSize = 149 - resultStr.size();
 //            std::string padding(paddingSize, '-');
 //            resultStr += padding;
 //        }
-        if (result.position >= 2) {
-            int damage1;
-            for (int i = 0; i < result.position; ++i) {
-                auto action1 = result.actions[i];
-                damage1 = result.damages[i];
-                if (damage1 == 0) {
-                    continue;
-                }
-                if (damage1 == 1) {
-                    std::cout << "a" << std::endl;
-                }
-                if (action1 == BattleEmulator::HEAL || action1 == BattleEmulator::MEDICINAL_HERBS) {
-                    damage1 = 0;
-                }
-                break;
-            }
+//        if (result.position >= 2) {
+//            int damage1;
+//            for (int i = 0; i < result.position; ++i) {
+//                auto action1 = result.actions[i];
+//                damage1 = result.damages[i];
+//                if (damage1 == 0) {
+//                    continue;
+//                }
+//                if (damage1 == 1) {
+//                    std::cout << "a" << std::endl;
+//                }
+//                if (action1 == BattleEmulator::HEAL || action1 == BattleEmulator::MEDICINAL_HERBS) {
+//                    damage1 = 0;
+//                }
+//                break;
+//            }
 
 
 //            auto action2 = result.actions[1];
@@ -161,29 +169,29 @@ int main() {
 //            if (action2 == BattleEmulator::HEAL || action2 == BattleEmulator::MEDICINAL_HERBS) {
 //                damage2 = 0;
 //            }
-            streams.at(damage1) << resultStr << std::endl;
-        }
+//            streams.at(damage1) << resultStr << std::endl;
+//        }
         //std::cout << resultStr << std::endl;
         lcg::release();
         delete position;
     }
 
     // ファイルに記録する
-    for (int i = 0; i < 100; ++i) {
-        //for (int j = 0; j < 100; ++j) {
-        if (!streams[i].str().empty()) {
-            std::string filename = "output/output_" + std::to_string(i) + ".txt";
-            std::ofstream outfile(filename);
-            if (outfile.is_open()) {
-                // 空のストリームは無視
-                outfile << streams[i].str() << std::endl;
-                outfile.close();
-            } else {
-                std::cerr << "file error " << filename << std::endl;
-                return 1;
-            }
-        }
-    }
+//    for (int i = 0; i < 100; ++i) {
+//        //for (int j = 0; j < 100; ++j) {
+//        if (!streams[i].str().empty()) {
+//            std::string filename = "output/output_" + std::to_string(i) + ".txt";
+//            std::ofstream outfile(filename);
+//            if (outfile.is_open()) {
+//                // 空のストリームは無視
+//                outfile << streams[i].str() << std::endl;
+//                outfile.close();
+//            } else {
+//                std::cerr << "file error " << filename << std::endl;
+//                return 1;
+//            }
+//        }
+//    }
 
 //    for (int i = 0; i < 100; ++i) {
 //        //test += lcg::getPercent(position, 100);
