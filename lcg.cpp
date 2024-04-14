@@ -10,7 +10,7 @@
 #include <chrono>
 
 // Define the size of the array
-const int ARRAY_SIZE = 5000;
+const int ARRAY_SIZE = 1500;
 
 double *precalculatedValues;
 uint64_t *seeds;

@@ -92,12 +92,24 @@ int main() {
     //uint64_t seed = 0x31D66981;
     //uint64_t seed = 0x127578ED;
 
+    int hours = 1;
+    int minutes = 21;
+    int seconds = 28;
+    int totalSeconds = hours * 3600 + minutes * 60 + seconds;
+    std::cout << totalSeconds << std::endl;
+    std::cout << totalSeconds + 60 << std::endl;
+    auto time1 = static_cast<int>(floor((totalSeconds - 10) * (1 / 0.20)));
+    time1 = (time1 & 0xffff) << 16;
+    std::cout << time1 << std::endl;
 
+    auto time2 = static_cast<int>(floor((totalSeconds + 10) * (1 / 0.20)));
+    time2 = (time2 & 0xffff) << 16;
+    std::cout << time2  << std::endl;
     // Now you can use the precalculated values as needed
     //int test = 0;
     std::vector<std::stringstream> streams(100);
     //for (uint64_t seed = 0; seed < 100000; ++seed) {
-    for (uint64_t seed = 100000000; seed < 100010000; ++seed) {
+    for (uint64_t seed = time1; seed < time2; ++seed) {
         if (seed % 10000 == 0) {
             std::cout << seed << std::endl;
         }
@@ -156,7 +168,7 @@ int main() {
         delete position;
     }
 
-//    // ファイルに記録する
+    // ファイルに記録する
     for (int i = 0; i < 100; ++i) {
         //for (int j = 0; j < 100; ++j) {
         if (!streams[i].str().empty()) {
