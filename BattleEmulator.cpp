@@ -115,7 +115,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             }
         }
         //std::cout << "hiisatu: " << (players[0].specialCharge ? "true" : "fa") << std::endl;
-        if (players[0].hp >= 20) {
+        if (players[0].hp >= 30) {
             if (!players[0].acrobaticStar && players[0].specialCharge && players[0].specialChargeTurn >= 0) {
                 actionTable[0] = ACROBATIC_STAR;
             }
@@ -316,7 +316,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     bool kaisinn = false;
     bool kaihi = false;
     bool tate = false;
-    bool OffensivePower = players[attacker].atk;
+    int OffensivePower = players[attacker].atk;
     //int list[4] = {0,3,2,1};
     int list[4] = {0, 1, 2, 3};
     int target[4] = {-1, -1, -1, -1};
