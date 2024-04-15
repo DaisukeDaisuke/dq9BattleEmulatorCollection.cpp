@@ -50,12 +50,8 @@ int main() {
         players[i].speed = speeds[i];
         players[i].mp = mps[i];
     }
-    players[0].hp = 70;
 
-    Player copiedPlayers[2];
-    for (int i = 0; i < 2; ++i) {
-        copiedPlayers[i] = players[i];
-    }
+
 
 //        auto time = (static_cast<int>(floor(((48 * 60 + 0) * 0.19)))) << 16;
 //        auto time1 = (static_cast<int>(floor(((50 * 60 + 0) * 0.19)))) << 16;
@@ -101,6 +97,15 @@ int main() {
     int hours = 1;
     int minutes = 24;
     int seconds = 48;
+
+    int startHP = 74;
+    players[0].hp = startHP;
+
+    Player copiedPlayers[2];
+    for (int i = 0; i < 2; ++i) {
+        copiedPlayers[i] = players[i];
+    }
+
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 17;
     std::cout << totalSeconds << std::endl;

@@ -44,9 +44,9 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             players[0].specialCharge = false;
         }
         //std::cout << players[0].specialCharge << std::endl;
-        if (counterJ == 48) {
-            //std::cout << 5 << std::endl;
-        }
+//        if (counterJ == 48) {
+//            //std::cout << 5 << std::endl;
+//        }
 //        std::cout << "hp" << std::endl;
 //        std::cout << players[0].hp << std::endl;
 //        std::cout << players[1].hp << std::endl;
@@ -262,7 +262,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         //std::cout << (players[0].specialCharge ? "hissatu: true" : "hissatu: fa") << std::endl;
 
         if (!Player::isPlayerAlive(players[1])) {
-            return true;
+            return false;
         }
         if (!Player::isPlayerAlive(players[0])) {
             return false;
