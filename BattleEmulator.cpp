@@ -34,7 +34,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
-    for (int counterJ = 0; counterJ < 15; ++counterJ) {
+    for (int counterJ = 0; counterJ < 10; ++counterJ) {
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
             players[0].dirtySpecialCharge = false;
@@ -181,7 +181,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 (*position)++;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(enemyAction, position, players, 1, 0);
-                BattleResult::add(result, enemyAction, basedamage);
+                BattleResult::add(result, enemyAction, basedamage, true);
                 //std::cout << "a: " << basedamage << "\n";
                 direction.emplace_back(1, 0);
                 Player::reduceHp(players[0], basedamage);
@@ -222,7 +222,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 }
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(action, position, players, 0, 1);
-                BattleResult::add(result, action, basedamage);
+                BattleResult::add(result, action, basedamage, false);
                 //std::cout << "youzilyo: " << basedamage << std::endl;
                 direction.emplace_back(0, 1);
                 if (action == HEAL || action == MEDICINAL_HERBS) {
