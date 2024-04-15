@@ -95,26 +95,31 @@ int main() {
     int hours = 1;
     int minutes = 21;
     int seconds = 28;
+//    int hours = 1;
+//    int minutes = 27;
+//    int seconds = 58;
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
+    totalSeconds = totalSeconds - 17;
     std::cout << totalSeconds << std::endl;
-    std::cout << totalSeconds + 60 << std::endl;
-    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.1255909558)));
+    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.12515)));
     time1 = (time1 & 0xffff) << 16;
     std::cout << time1 << std::endl;
 
-    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.1255909558)));
+    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
     std::cout << time2  << std::endl;
     // Now you can use the precalculated values as needed
     //int test = 0;
     //std::vector<std::stringstream> streams(100);
     //for (uint64_t seed = 0; seed < 100000; ++seed) {
-    std::string str2 = "19 9 9 17 h 13 15 10 10";
+    //std::string str2 = "10 18 19 10 h 9 17 8 18 11 9 h 18";
+    std::string str2 = "19 9 9 17 h 13 15 10 10 11 11 h 15";
+
 //    time1 = 0x98087FD0;
 //    time2 = 0x98087FD0+1;
     for (uint64_t seed = time1; seed < time2; ++seed) {
         if (seed % 10000 == 0) {
-            std::cout << seed << std::endl;
+            //std::cout << seed << std::endl;
         }
         lcg::init(seed, 5000);
         int *position = new int(1);
