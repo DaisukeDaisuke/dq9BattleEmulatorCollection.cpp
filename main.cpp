@@ -92,12 +92,15 @@ int main() {
     //uint64_t seed = 0x31D66981;
     //uint64_t seed = 0x127578ED;
 
-    int hours = 1;
-    int minutes = 21;
-    int seconds = 28;
+//    int hours = 1;
+//    int minutes = 21;
+//    int seconds = 28;
 //    int hours = 1;
 //    int minutes = 27;
 //    int seconds = 58;
+    int hours = 1;
+    int minutes = 24;
+    int seconds = 48;
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 17;
     std::cout << totalSeconds << std::endl;
@@ -113,7 +116,8 @@ int main() {
     //std::vector<std::stringstream> streams(100);
     //for (uint64_t seed = 0; seed < 100000; ++seed) {
     //std::string str2 = "10 18 19 10 h 9 17 8 18 11 9 h 18";
-    std::string str2 = "19 9 9 17 h 13 15 10 10 11 11 h 15";
+    //std::string str2 = "19 9 9 17 h 13 15 10 10 11 11 h 15";
+    std::string str2 = "18 9 15 18 15 h 19 9 14";
 
 //    time1 = 0x98087FD0;
 //    time2 = 0x98087FD0+1;
