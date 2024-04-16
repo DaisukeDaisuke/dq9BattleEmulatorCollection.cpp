@@ -12,10 +12,16 @@
 #include "lcg.h"
 #include "BattleEmulator.h"
 
+int toint(char *string);
+
 using namespace std;
 
 
 int main(int argc, char *argv[]) {
+    if (argc < 6){
+        std::cerr << "argc!!" << std::endl;
+        return 1;
+    }
     //https://zenn.dev/reputeless/books/standard-cpp-for-competitive-programming/viewer/library-ios-iomanip#3.1-c-%E8%A8%80%E8%AA%9E%E3%81%AE%E5%85%A5%E5%87%BA%E5%8A%9B%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%E3%83%A0%E3%81%A8%E3%81%AE%E5%90%8C%E6%9C%9F%E3%82%92%E7%84%A1%E5%8A%B9%E3%81%AB%E3%81%99%E3%82%8B
     std::cin.tie(0)->sync_with_stdio(0);
 
@@ -94,11 +100,11 @@ int main(int argc, char *argv[]) {
 //    int hours = 1;
 //    int minutes = 27;
 //    int seconds = 58;
-    int hours = 1;
-    int minutes = 24;
-    int seconds = 48;
+    int hours = toint(argv[2]);
+    int minutes = toint(argv[3]);
+    int seconds = toint(argv[4]);
 
-    int startHP = 74;
+    int startHP = toint(argv[1]);
     players[0].hp = startHP;
 
     Player copiedPlayers[2];
@@ -122,7 +128,7 @@ int main(int argc, char *argv[]) {
     //for (uint64_t seed = 0; seed < 100000; ++seed) {
     //std::string str2 = "10 18 19 10 h 9 17 8 18 11 9 h 18";
     //std::string str2 = "19 9 9 17 h 13 15 10 10 11 11 h 15";
-    std::string str2 = "18 9 15 18 15 h 19 9 14";
+    std::string str2 = argv[5];//"18 9 15 18 15 h 19 9 14";
 
 //    time1 = 0x98087FD0;
 //    time2 = 0x98087FD0+1;
@@ -150,7 +156,8 @@ int main(int argc, char *argv[]) {
         }
         std::string resultStr = ss.str();
 
-        if (resultStr.find(str2) != std::string::npos) {
+        //if (resultStr.find(str2) != std::string::npos) {
+        if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
             //std::cout << seed << std::endl;
             std::cout << resultStr << std::endl;
         }
@@ -175,4 +182,16 @@ int main(int argc, char *argv[]) {
 
 
     return 0;
+}
+int toint(char * str){
+    try {
+        int number = std::stoi(str);
+        return number;
+    } catch (const std::invalid_argument& e) {
+        std::cerr << "Invalid argument: " << e.what() << std::endl;
+        return -1;
+    } catch (const std::out_of_range& e) {
+        std::cerr << "Out of range: " << e.what() << std::endl;
+        return -1;
+    }
 }
