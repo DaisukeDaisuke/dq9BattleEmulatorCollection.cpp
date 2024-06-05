@@ -34,7 +34,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
-    for (int counterJ = 0; counterJ < 10; ++counterJ) {
+    for (int counterJ = 0; counterJ < 15; ++counterJ) {
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
             players[0].dirtySpecialCharge = false;
@@ -744,6 +744,7 @@ double BattleEmulator::processCombo(int32_t Id, double damage) {
     return damage;
 }
 
+//パーセントは絶対に100%にならないから誤差-1
 int BattleEmulator::FUN_021e8458_typeC(int *position, double min, double max, double base) {
     //0x02075724
     auto result = lcg::floatRand(position, min, max);
@@ -751,6 +752,7 @@ int BattleEmulator::FUN_021e8458_typeC(int *position, double min, double max, do
     return static_cast<int>(floor(result));
 }
 
+//パーセントは絶対に100%にならないから誤差-1
 int BattleEmulator::FUN_021e8458_typeD(int *position, double difference, double base) {
     //0x021e8668
     auto result = lcg::floatRand(position, -difference, difference);
