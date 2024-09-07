@@ -16,9 +16,9 @@ public:
     }
 
     int position = 0;
-    int actions[1000] = {};
-    int damages[1000] = {};
-    int isEnemy[1000] = {};
+    int actions[20000] = {};
+    int damages[20000] = {};
+    int isEnemy[20000] = {};
 };
 
 #endif //NEWDIRECTORY_BATTLERESULT_H
