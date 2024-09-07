@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     }
 
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    totalSeconds = totalSeconds - 17;
+    totalSeconds = totalSeconds - 14;
     //std::cout << totalSeconds << std::endl;
     auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.12515)));
     time1 = (time1 & 0xffff) << 16;
@@ -153,6 +153,12 @@ int main(int argc, char *argv[]) {
             } else if (damage != 0) {
                 ss << damage << " ";
             }
+        }
+        if (players[0].hp <= 0){
+            ss << "L ";
+        }
+        if (players[1].hp <= 0){
+            ss << "W ";
         }
         std::string resultStr = ss.str();
 
