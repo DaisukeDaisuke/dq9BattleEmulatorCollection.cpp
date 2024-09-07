@@ -117,11 +117,11 @@ int main(int argc, char *argv[]) {
     //std::cout << totalSeconds << std::endl;
     auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.12515)));
     time1 = (time1 & 0xffff) << 16;
-    //std::cout << time1 << std::endl;
+    std::cout << time1 << std::endl;
 
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
-    time2 = (time2 & 0xffff) << 16;
-    //std::cout << time2  << std::endl;
+    time2 = ((time2 & 0xffff) << 16) + 100000;
+    std::cout << time2  << std::endl;
     // Now you can use the precalculated values as needed
     //int test = 0;
     //std::vector<std::stringstream> streams(100);
@@ -130,11 +130,16 @@ int main(int argc, char *argv[]) {
     //std::string str2 = "19 9 9 17 h 13 15 10 10 11 11 h 15";
     std::string str2 = argv[5];//"18 9 15 18 15 h 19 9 14";
 
+
 //    time1 = 0x98087FD0;
 //    time2 = 0x98087FD0+1;
+    int tryCount = 0;
+    int lost = 0;
+    int win = 0;
+    int turn = 0;
     for (uint64_t seed = time1; seed < time2; ++seed) {
-        if (seed % 10000 == 0) {
-            //std::cout << seed << std::endl;
+        if (seed % 100000 == 0) {
+            std::cout << seed << std::endl;
         }
         lcg::init(seed, 5000);
         int *position = new int(1);
@@ -154,22 +159,24 @@ int main(int argc, char *argv[]) {
                 ss << damage << " ";
             }
         }
+
+        tryCount++;
         if (players[0].hp <= 0){
+
             ss << "L ";
+            lost++;
         }
         if (players[1].hp <= 0){
+            turn += result.turn;
             ss << "W ";
+            win++;
         }
         std::string resultStr = ss.str();
 
-        //if (resultStr.find(str2) != std::string::npos) {
-        if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
-            //std::cout << seed << std::endl;
-            std::cout << resultStr << std::endl;
-        }
         lcg::release();
         delete position;
     }
+    cout << "turn: " << turn << ", try: " << tryCount << ", win: " << win << ", lost: " << lost << std::endl;
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
