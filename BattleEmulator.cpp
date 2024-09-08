@@ -25,7 +25,7 @@ int actionsPosition = 0;
 int preHP[5] = {0, 0, 0, 0, 0};
 uint64_t seed1 = 0;
 
-bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, BattleResult &result, uint64_t seed) {
+bool BattleEmulator::Main(int *position, std::vector<int32_t> Gene, Player *players, BattleResult &result, uint64_t seed) {
     seed1 = seed;
     previousState = 0;
     previousAttack = -1;
@@ -83,6 +83,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         // ソート
         std::sort(indexed_speed.begin(), indexed_speed.end(), compare_function);
 
+        bool player0_has_initiative = (indexed_speed[0].second == 0);
+
 //        if (speedList != nullptr){
 //            int checkcounter = 0;
 //            for (const auto & item:indexed_speed) {
@@ -98,26 +100,31 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         (*position)++;//0x02160d64
 
         int32_t actionTable[1] = {0};
-        for (auto &j: actionTable) {
-            j = Gene[genePosition++];
-        }
+//        for (auto &j: actionTable) {
+//            j = Gene[genePosition++];
+//            actionTable[0] = j;
+//        }
 
-        if (players[0].hp >= 55) {
-            actionTable[0] = ATTACK_ALLY;
-        } else {
-            if (players[0].mp >= 2) {
-                actionTable[0] = HEAL;
-            } else if (players[0].medicinal_herbs_count >= 1) {
-                actionTable[0] = MEDICINAL_HERBS;
-                players[0].medicinal_herbs_count--;
-            } else {
+        if (Gene.size() > genePosition) {
+            actionTable[0] = Gene[genePosition++];
+        }else {
+            if (players[0].hp >= 55) {
                 actionTable[0] = ATTACK_ALLY;
+            } else {
+                if (players[0].mp >= 2) {
+                    actionTable[0] = HEAL;
+                } else if (players[0].medicinal_herbs_count >= 1) {
+                    actionTable[0] = MEDICINAL_HERBS;
+                    players[0].medicinal_herbs_count--;
+                } else {
+                    actionTable[0] = ATTACK_ALLY;
+                }
             }
-        }
-        //std::cout << "hiisatu: " << (players[0].specialCharge ? "true" : "fa") << std::endl;
-        if (players[0].hp >= 30) {
-            if (!players[0].acrobaticStar && players[0].specialCharge && players[0].specialChargeTurn >= 0) {
-                actionTable[0] = ACROBATIC_STAR;
+            //std::cout << "hiisatu: " << (players[0].specialCharge ? "true" : "fa") << std::endl;
+            if (players[0].hp >= 30) {
+                if (!players[0].acrobaticStar && players[0].specialCharge && players[0].specialChargeTurn >= 0) {
+                    actionTable[0] = ACROBATIC_STAR;
+                }
             }
         }
         //actionTable[0] = DEFENCE;
@@ -181,10 +188,10 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 (*position)++;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(enemyAction, position, players, 1, 0);
-                BattleResult::add(result, enemyAction, basedamage, true);
                 //std::cout << "a: " << basedamage << "\n";
                 direction.emplace_back(1, 0);
                 Player::reduceHp(players[0], basedamage);
+                BattleResult::add(result, enemyAction, basedamage, true, counterJ, players[0], players[1], player0_has_initiative);
                 doAction = enemyAction;
                 //--------start_FUN_021594bc-------
                 if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
@@ -222,7 +229,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 }
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(action, position, players, 0, 1);
-                BattleResult::add(result, action, basedamage, false);
+
                 //std::cout << "youzilyo: " << basedamage << std::endl;
                 direction.emplace_back(0, 1);
                 if (action == HEAL || action == MEDICINAL_HERBS) {
@@ -230,6 +237,9 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 } else {
                     Player::reduceHp(players[1], basedamage);
                 }
+
+                BattleResult::add(result, action, basedamage, false, counterJ, players[0], players[1], player0_has_initiative);
+
                 //--------start_FUN_021594bc-------
                 //std::cout << "youzilyo pos: " << (*position) << "\n";
                 if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {

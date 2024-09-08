@@ -33,7 +33,7 @@ public:
     static const int ACROBATIC_STAR = 1021;
     static const int DEFENCE = 1020;
 
-    static bool Main(int *position, const int32_t *Gene, Player *players, BattleResult &result, uint64_t seed);
+    static bool Main(int *position, std::vector<int32_t> Gene, Player *players, BattleResult &result, uint64_t seed);
 private:
     static int FUN_0208aecc(int *position);
 
@@ -56,6 +56,7 @@ private:
     static double FUN_021dbc04(int baseHp, double maxHp);
 
     static int ProcessEnemyRandomAction(int *position, int pattern);
+
 };
 
 
