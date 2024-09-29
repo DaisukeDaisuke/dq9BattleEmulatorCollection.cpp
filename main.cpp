@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
     //uint64_t seed = 0x2ee97e2;
     //uint64_t seed = 0x3add9cd;
     //uint64_t seed = 0x225ff835;
-    uint64_t seed = 0x34670043;
+    uint64_t seed = 0x3467000A;
 
 
 //    int hours = 1;
