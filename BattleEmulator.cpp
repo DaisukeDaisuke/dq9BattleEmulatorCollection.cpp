@@ -35,6 +35,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
+    bool debugFlag = false;
     for (int counterJ = 0; counterJ < 10; ++counterJ) {
         players[0].defence = 1.0;
 
@@ -79,10 +80,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         int table[6] = {ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, ATTACK_ENEMY};
         int enemyAction = table[ProcessEnemyRandomAction(position, 0)];
 
-        if (indexed_speed[0].second == 1&&counterJ >= 4&&enemyAction == RUBBLE&&doAction == RUBBLE) {
-            std::cout << "0個目の要素のsecondが1です！" << std::endl;
-            // ここで分岐処理を記述
-        }
+
 
 
         if (enemyAction == ATTACK_ENEMY){
@@ -122,6 +120,15 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             players[0].defence = 0.5;
         }
 
+
+        if (debugFlag&&actionTable[0] == HEAL){
+            debugFlag = false;
+        }
+        if (indexed_speed[0].second == 1&&counterJ >= 4&&enemyAction == ATTACK_ENEMY) {
+            debugFlag = true;
+            //std::cout << "0個目の要素のsecondが1です！" << std::endl;
+            // ここで分岐処理を記述
+        }
 
         if (counterJ == 1) {
             //std::cout << 5 << std::endl;
