@@ -44,7 +44,8 @@ int main(int argc, char *argv[]) {
     Player players[2];
     int hps[2] = {79, 456};
     int defs[2] = {73, 58};
-    int atks[2] = {67, 56};
+    //int atks[2] = {67, 56};
+    int atks[2] = {67+2, 56};
     int speeds[2] = {51, 54};
     int mps[2] = {27, 255};
     for (int i = 0; i < 2; ++i) {
@@ -137,6 +138,8 @@ int main(int argc, char *argv[]) {
     int lost = 0;
     int win = 0;
     int turn = 0;
+    int winturn = 0;
+    int lostturn = 0;
     for (uint64_t seed = time1; seed < time2; ++seed) {
         if (seed % 100000 == 0) {
             std::cout << seed << std::endl;
@@ -161,13 +164,14 @@ int main(int argc, char *argv[]) {
         }
 
         tryCount++;
+        turn += result.turn;
         if (players[0].hp <= 0){
-
+            lostturn += result.turn;
             ss << "L ";
             lost++;
         }
         if (players[1].hp <= 0){
-            turn += result.turn;
+            winturn += result.turn;
             ss << "W ";
             win++;
         }
@@ -176,7 +180,7 @@ int main(int argc, char *argv[]) {
         lcg::release();
         delete position;
     }
-    cout << "turn: " << turn << ", try: " << tryCount << ", win: " << win << ", lost: " << lost << std::endl;
+    cout << "turn: " << turn << ", try: " << tryCount << ", win: " << win << ", lost: " << lost << ", winturn: " << winturn << ", lostturn: " << lostturn << std::endl;
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
