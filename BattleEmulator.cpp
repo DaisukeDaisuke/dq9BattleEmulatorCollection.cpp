@@ -121,10 +121,10 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         }
 
 
-        if (debugFlag&&actionTable[0] == HEAL){
+        if (debugFlag&&indexed_speed[0].second == 1&&enemyAction == RUBBLE){
             debugFlag = false;
         }
-        if (indexed_speed[0].second == 1&&counterJ >= 4&&enemyAction == ATTACK_ENEMY) {
+        if (indexed_speed[0].second == 1&&counterJ >= 4&&enemyAction == RUBBLE) {
             debugFlag = true;
             //std::cout << "0個目の要素のsecondが1です！" << std::endl;
             // ここで分岐処理を記述
