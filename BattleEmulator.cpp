@@ -79,7 +79,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         int table[6] = {ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, ATTACK_ENEMY};
         int enemyAction = table[ProcessEnemyRandomAction(position, 0)];
 
-        if (indexed_speed[0].second == 1&&counterJ >= 4&&enemyAction == RUBBLE) {
+        if (indexed_speed[0].second == 1&&counterJ >= 4&&enemyAction == RUBBLE&&doAction == RUBBLE) {
             std::cout << "0個目の要素のsecondが1です！" << std::endl;
             // ここで分岐処理を記述
         }
