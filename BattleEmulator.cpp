@@ -35,7 +35,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
-    for (int counterJ = 0; counterJ < 20; ++counterJ) {
+    for (int counterJ = 0; counterJ < 10; ++counterJ) {
         players[0].defence = 1.0;
 
         //std::cout << counterJ << std::endl;
@@ -45,10 +45,10 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         for (int32_t &action: actions) {
             action = -1;
         }
-        std::cout << "!!" <<  (*position) << std::endl;
-        if ((*position) == 293){
-            std::cout << "!!" << std::endl;
-        }
+//        std::cout << "!!" <<  (*position) << std::endl;
+//        if ((*position) == 293){
+//            std::cout << "!!" << std::endl;
+//        }
 
         actionsPosition = 0;
         std::array<double, 2> speed{};
@@ -72,6 +72,11 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
 
         // ソート
         std::sort(indexed_speed.begin(), indexed_speed.end(), compare_function);
+
+        if (indexed_speed[0].second == 1&&counterJ >= 4) {
+            std::cout << "0個目の要素のsecondが1です！" << std::endl;
+            // ここで分岐処理を記述
+        }
 
 
         int table[6] = {ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, ATTACK_ENEMY};
@@ -129,10 +134,10 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 break;
             }
 
-            std::cout << (*position) << std::endl;
-            if ((*position) == 21){
-                std::cout << "!!" << std::endl;
-            }
+            //std::cout << (*position) << std::endl;
+//            if ((*position) == 21){
+//                std::cout << "!!" << std::endl;
+//            }
             int basedamage = 0;
             DEBUG_COUT("start: " + std::to_string(*position));
             ////std::cout << "元の位置: " << element.second << ", 値: " << element.first << std::endl;

@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
     //uint64_t seed = 0x2ee97e2;
     //uint64_t seed = 0x3add9cd;
     //uint64_t seed = 0x225ff835;
-    uint64_t seed = 0x237e96b4;
+    //uint64_t seed = 0x237e96b4;
 
 
 //    int hours = 1;
@@ -139,38 +139,47 @@ int main(int argc, char *argv[]) {
 
 //    time1 = 0x98087FD0;
 //    time2 = 0x98087FD0+1;
-//    for (uint64_t seed = time1; seed < time2; ++seed) {
-//        if (seed % 10000 == 0) {
-//            //std::cout << seed << std::endl;
-//        }
-    lcg::init(seed, 5000);
-    int *position = new int(1);
-    for (int j = 0; j < 2; ++j) {
-        players[j] = copiedPlayers[j];
-    }
-    BattleResult result;
-    BattleEmulator::Main(position, gene, players, result, seed);
-    std::stringstream ss;
-    ss << seed << " ";
-    for (int i = 0; i < result.position; ++i) {
-        auto action = result.actions[i];
-        auto damage = result.damages[i];
-        if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
-            ss << "h ";
-        } else if (damage != 0) {
-            ss << damage << " ";
-        }
-    }
-    if (players[0].hp <= 0) {
-        ss << "L ";
-    }
-    if (players[1].hp <= 0) {
-        ss << "W ";
-    }
-    cout << ss.str() << std::endl;
+    int minutes = 28;
+    int seconds = 0;
+    int totalSeconds = minutes * 60 + seconds;
 
-    lcg::release();
-    delete position;
+    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.12515)));
+    time1 = (time1 & 0xffff) << 16;
+
+    auto time2 = time1 + 10000000;
+
+    for (uint64_t seed = time1; seed < time2; ++seed) {
+        if (seed % 10000 == 0) {
+            //std::cout << seed << std::endl;
+        }
+        lcg::init(seed, 5000);
+        int *position = new int(1);
+        for (int j = 0; j < 2; ++j) {
+            players[j] = copiedPlayers[j];
+        }
+        BattleResult result;
+        BattleEmulator::Main(position, gene, players, result, seed);
+        std::stringstream ss;
+        ss << seed << " ";
+        for (int i = 0; i < result.position; ++i) {
+            auto action = result.actions[i];
+            auto damage = result.damages[i];
+            if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
+                ss << "h ";
+            } else if (damage != 0) {
+                ss << damage << " ";
+            }
+        }
+        if (players[0].hp <= 0) {
+            ss << "L ";
+        }
+        if (players[1].hp <= 0) {
+            ss << "W ";
+        }
+        lcg::release();
+        delete position;
+        //cout << ss.str() << std::endl;
+    }
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
