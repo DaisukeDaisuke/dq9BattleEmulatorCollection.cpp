@@ -259,7 +259,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     double percent1 = 0.0;
     int attackCount;
     int percent_tmp;
-    bool isRage;
     switch (Id & 0xffff) {
         case MEDICINAL_HERBS:
             (*position) += 2;
