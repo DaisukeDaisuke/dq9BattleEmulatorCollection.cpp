@@ -9,6 +9,10 @@
 
 int counter = 0;
 
+bool BeforePreemptive = false;
+
+
+
 void camera::Main(int * position, const int32_t actions[5], const std::vector<std::pair<int, int>>& pairs){
     int32_t before = -1;
     bool preemptive = true;
@@ -16,7 +20,18 @@ void camera::Main(int * position, const int32_t actions[5], const std::vector<st
         //std::cout << "counter1: " << counter << std::endl;
         int32_t after = actions[i];
         if (after == BattleEmulator::ATTACK_ALLY){
-            onFreeCameraMove(position, after, preemptive ? 1 : 0);
+            if (preemptive){
+                if (!BeforePreemptive){
+                    (*position) += 2;
+                }else{
+                    BeforePreemptive = false;
+                    (*position) += 3;
+                }
+            }else{
+                BeforePreemptive = true;
+                (*position)++;
+            }
+            //onFreeCameraMove(position, after, preemptive ? 1 : 0);
         }else if(after == BattleEmulator::ATTACK_ENEMY){
             (*position)++;
         }
@@ -60,4 +75,8 @@ void camera::onFreeCameraMove(int * position, const int action, const int param5
 //        }
         (*position)++;
     }
+}
+
+void camera::reset() {
+    BeforePreemptive = false;
 }

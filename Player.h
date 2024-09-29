@@ -32,7 +32,7 @@ struct Player {
     bool rage = false;
     int rageTurns = 0;
     int mp = 0;
-    int medicinal_herbs_count = 8;
+    int medicinal_herbs_count = 1;
     double defence = 1.0;
     bool acrobaticStar = false;
     int acrobaticStarTurn = 0;

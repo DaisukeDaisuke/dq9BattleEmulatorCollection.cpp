@@ -32,6 +32,7 @@ public:
     static const int HEAL = 0x1E;
     static const int ACROBATIC_STAR = 1021;
     static const int DEFENCE = 1020;
+    static const int RUBBLE = 1030;
 
     static bool Main(int *position, const int32_t *Gene, Player *players, BattleResult &result, uint64_t seed);
 private:

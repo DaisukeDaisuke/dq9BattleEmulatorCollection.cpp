@@ -11,6 +11,7 @@
 class camera {
 
 public:
+    static void reset();
     static void Main(int *position, const int32_t *actions, const std::vector<std::pair<int, int>> &pairs);
 
 private:
