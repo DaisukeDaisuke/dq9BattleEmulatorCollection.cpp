@@ -102,7 +102,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             j = Gene[genePosition++];
         }
 
-        if (players[0].hp >= 10 || players[1].hp <= 8) {
+        if (players[0].hp > 10 || players[1].hp <= 8) {
             actionTable[0] = ATTACK_ALLY;
         } else {
             if (players[0].mp >= 2) {
@@ -401,15 +401,15 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (!players[0].paralysis && !players[0].inactive) {
                 if (!players[0].acrobaticStar && lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
+                }else{
+                    (*position)++;//盾
                 }
-                (*position)++;//盾
             }
             (*position)++;//回避
-
             baseDamage = FUN_021e8458_typeD(position, 1, 6);
 
             if (kaihi) {
-                (*position)++;//0x021ed7a8
+                //(*position)++;//0x021ed7a8
                 baseDamage = 0;
             } else if (tate) {
                 (*position)++;//0x021ed7a8
