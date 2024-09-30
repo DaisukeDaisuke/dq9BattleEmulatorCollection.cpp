@@ -623,7 +623,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (kaisinn) {//0x020759ec
                 tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
                 baseDamage = static_cast<int>(floor(tmp));
-                (*position) += 2;
+//                if (players[0].rage) {
+//                    (*position) += 2;
+//                }
             }
             if (percent1 < 0.5) {
                 if (percent > 0.5) {
@@ -639,20 +641,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[1].rageTurns = lcg::intRangeRand(position, 2, 4);
                 }
             }
-//            if (isRage){
-//                (*position) += 2;
-//            }
-//            ProcessFUN_021db2a0(position, attacker, players);
-            if (!kaihi) {
-                (*position)++;//目を覚ました
-                (*position)++;//不明
-            } else {
-                baseDamage = 0;
-            }
+            (*position)++;//目を覚ました
+            (*position)++;//不明
 
             if (kaisinn) {
-                (*position)++;//会心時特殊処理　0x021e54fc
                 (*position)++;//会心時特殊処理　0x021eb8c8
+                (*position)++;//会心時特殊処理　0x021eb8f0
             }
             //std::cout << (players[attacker].specialCharge ? "true" : "fa") << std::endl;
             break;
