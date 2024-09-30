@@ -120,6 +120,11 @@ int main(int argc, char *argv[]) {
         copiedPlayers[i] = players[i];
     }
 
+    if (minutes < 25||minutes > 32){
+        std::cout << "out of range!" << std::endl;
+        return 1;
+    }
+
     int totalSeconds = minutes * 60 + seconds;
     totalSeconds = totalSeconds - 14;
     //std::cout << totalSeconds << std::endl;
