@@ -35,7 +35,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
-    for (int counterJ = 0; counterJ < 1000; ++counterJ) {
+    for (int counterJ = 0; counterJ < 100; ++counterJ) {
         players[0].defence = 1.0;
 
         //std::cout << counterJ << std::endl;
