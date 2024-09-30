@@ -35,8 +35,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
-    bool debugFlag = false;
-    for (int counterJ = 0; counterJ < 200; ++counterJ) {
+    for (int counterJ = 0; counterJ < 20; ++counterJ) {
         players[0].defence = 1.0;
 
         //std::cout << counterJ << std::endl;
@@ -75,13 +74,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         std::sort(indexed_speed.begin(), indexed_speed.end(), compare_function);
 
 
-
-
         int table[6] = {ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, ATTACK_ENEMY};
         int enemyAction = table[ProcessEnemyRandomAction(position, 0)];
-
-
-        bool player0_has_initiative = (indexed_speed[0].second == 0);
 
 
         if (enemyAction == ATTACK_ENEMY){
@@ -121,15 +115,6 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             players[0].defence = 0.5;
         }
 
-
-//        if (debugFlag&&indexed_speed[0].second == 1&&enemyAction == RUBBLE){
-//            debugFlag = false;
-//        }
-//        if (indexed_speed[0].second == 1&&counterJ >= 4&&enemyAction == RUBBLE) {
-//            debugFlag = true;
-//            //std::cout << "0個目の要素のsecondが1です！" << std::endl;
-//            // ここで分岐処理を記述
-//        }
 
         if (counterJ == 1) {
             //std::cout << 5 << std::endl;
@@ -274,7 +259,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     double percent1 = 0.0;
     int attackCount;
     int percent_tmp;
-    bool isRage;
     switch (Id & 0xffff) {
         case MEDICINAL_HERBS:
             (*position) += 2;
@@ -503,7 +487,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)+= 2;//不明
             //0x021eb8c8, randIntRange: 0x021eb8f0 怒り狂っている場合←の消費が発生しない。
             //if (!players[1].rage) {
-                (*position)++;
+            (*position)++;
             //}
             if (kaisinn) {
                 (*position) += 2;//会心時特殊処理
@@ -518,7 +502,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             baseDamage = FUN_021e8458_typeD(position, 4, 12);
             if (lcg::getPercent(position, 100) < 25) { // 麻痺判定
                 if (players[defender].paralysisLevel == 3) {
-                   //std::cerr << "paralysisLevel == 2" << std::endl;
+                    //std::cerr << "paralysisLevel == 2" << std::endl;
                 }
                 players[defender].paralysis = true;
                 players[defender].paralysisTurns = 4;
@@ -620,12 +604,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++;//回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
-            percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
             if (kaisinn) {//0x020759ec
                 tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
                 baseDamage = static_cast<int>(floor(tmp));
-                (*position) += 2;
             }
+            percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
             if (percent1 < 0.5) {
                 if (percent > 0.5) {
                     (*position)++;
@@ -640,16 +623,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[1].rageTurns = lcg::intRangeRand(position, 2, 4);
                 }
             }
-//            if (isRage){
-//                (*position) += 2;
-//            }
-//            ProcessFUN_021db2a0(position, attacker, players);
-            if (!kaihi) {
-                (*position)++;//目を覚ました
-                (*position)++;//不明
-            } else {
-                baseDamage = 0;
-            }
+            (*position)++;//目を覚ました
+            (*position)++;//不明
 
             if (kaisinn) {
                 (*position)++;//会心時特殊処理　0x021e54fc
