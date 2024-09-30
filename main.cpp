@@ -147,7 +147,8 @@ int main(int argc, char *argv[]) {
     auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.12515)));
     time1 = (time1 & 0xffff) << 16;
 
-    auto time2 = time1 + 100000;
+    auto time2 = time1 +   10000000;
+                                //853300000
 
     int tryCount = 0;
     int lost = 0;
@@ -161,7 +162,7 @@ int main(int argc, char *argv[]) {
     std::map<int, int> win_counts;
 
     for (uint64_t seed = time1; seed < time2; ++seed) {
-        if (seed % 10000 == 0) {
+        if (seed % 100000 == 0) {
             std::cout << seed << std::endl;
         }
         lcg::init(seed, 5000);
