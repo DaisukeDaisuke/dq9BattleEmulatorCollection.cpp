@@ -99,7 +99,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             j = Gene[genePosition++];
         }
 
-        if (players[0].hp >= 10 || players[1].hp <= 8) {
+        if (players[0].hp >= 10 || players[1].hp <= 9) {
             actionTable[0] = ATTACK_ALLY;
         } else {
             if (players[0].mp >= 2) {
