@@ -9,6 +9,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <map>
 #include "lcg.h"
 #include "BattleEmulator.h"
 
@@ -139,18 +140,29 @@ int main(int argc, char *argv[]) {
 
 //    time1 = 0x98087FD0;
 //    time2 = 0x98087FD0+1;
-    int minutes = 28;
+    int minutes = 27;
     int seconds = 0;
     int totalSeconds = minutes * 60 + seconds;
 
     auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.12515)));
     time1 = (time1 & 0xffff) << 16;
 
-    auto time2 = time1 + 10000000;
+    auto time2 = time1+100000;
+
+    int tryCount = 0;
+    int lost = 0;
+    int win = 0;
+    int turn = 0;
+    int winturn = 0;
+    int lostturn = 0;
+    int LosingSecond = 0;
+    int HP1Lost = 0;
+    int MP0Lost = 0;
+    std::map<int, int> win_counts;
 
     for (uint64_t seed = time1; seed < time2; ++seed) {
         if (seed % 10000 == 0) {
-            //std::cout << seed << std::endl;
+            std::cout << seed << std::endl;
         }
         lcg::init(seed, 5000);
         int *position = new int(1);
@@ -170,15 +182,42 @@ int main(int argc, char *argv[]) {
                 ss << damage << " ";
             }
         }
-        if (players[0].hp <= 0) {
-            ss << "L ";
+        tryCount++;
+        turn += result.totalTurn;
+        if (players[0].hp <= 0){
+            lostturn += result.totalTurn;
+            //ss << "L H: " << players[1].hp << ", mp: " << players[0].mp << ", f: " << result.preemptive[result.position-1];
+            lost++;
+            if (!result.preemptive[result.position-1]){
+                LosingSecond++;
+            }else if(players[1].hp == 1){
+                HP1Lost++;
+            }else if(players[0].mp == 0){
+                MP0Lost++;
+            }
+
+            //cout << ss.str() << std::endl;
         }
-        if (players[1].hp <= 0) {
+        if (players[1].hp <= 0){
+            winturn += result.totalTurn;
             ss << "W ";
+            win++;
+            if (result.totalTurn == 3){
+                cout << ss.str() << std::endl;
+            }
+            win_counts[result.totalTurn]++;
         }
         lcg::release();
         delete position;
         //cout << ss.str() << std::endl;
+    }
+    cout << "turn: " << turn << ", try: " << tryCount << ", win: " << win << ", lost: " << lost << ", winturn: " << winturn << ", lostturn: " << lostturn << ", LosingSecond: " << LosingSecond << ", HP1Lost: " << HP1Lost << ", MP0Lost: " << MP0Lost << std::endl;
+
+    // 勝利回数が0でない要素のみ出力
+    for (const auto& pair : win_counts) {
+        if (pair.second != 0) {
+            std::cout << "t: "<< pair.first << ", c: " << pair.second << std::endl;
+        }
     }
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =

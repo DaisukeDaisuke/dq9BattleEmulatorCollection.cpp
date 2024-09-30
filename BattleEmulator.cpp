@@ -36,7 +36,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int doAction = -1;
     int genePosition = 0;
     bool debugFlag = false;
-    for (int counterJ = 0; counterJ < 10; ++counterJ) {
+    for (int counterJ = 0; counterJ < 200; ++counterJ) {
         players[0].defence = 1.0;
 
         //std::cout << counterJ << std::endl;
@@ -81,6 +81,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         int enemyAction = table[ProcessEnemyRandomAction(position, 0)];
 
 
+        bool player0_has_initiative = (indexed_speed[0].second == 0);
 
 
         if (enemyAction == ATTACK_ENEMY){
@@ -162,7 +163,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 }
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(enemyAction, position, players, 1, 0);
-                BattleResult::add(result, enemyAction, basedamage, true);
+                BattleResult::add(result, enemyAction, basedamage, true, counterJ, players[0], players[1], player0_has_initiative);
                 //std::cout << "a: " << basedamage << "\n";
                 direction.emplace_back(1, 0);
                 Player::reduceHp(players[0], basedamage);
@@ -180,7 +181,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 (*position) += 1;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(action, position, players, 0, 1);
-                BattleResult::add(result, action, basedamage, false);
+                BattleResult::add(result, action, basedamage, false, counterJ, players[0], players[1], player0_has_initiative);
                 //std::cout << "youzilyo: " << basedamage << std::endl;
                 direction.emplace_back(0, 1);
                 if (action == HEAL || action == MEDICINAL_HERBS) {
