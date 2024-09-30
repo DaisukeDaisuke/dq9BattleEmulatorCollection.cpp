@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     Player players[2];
     int hps[2] = {79, 456};
     int defs[2] = {73, 58};
-    int atks[2] = {67, 56};
+    int atks[2] = {67+2, 56};
     int speeds[2] = {51, 54};
     int mps[2] = {27, 255};
     for (int i = 0; i < 2; ++i) {
