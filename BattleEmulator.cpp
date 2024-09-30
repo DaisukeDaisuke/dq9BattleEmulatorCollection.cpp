@@ -35,7 +35,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
-    for (int counterJ = 0; counterJ < 20; ++counterJ) {
+    for (int counterJ = 0; counterJ < 100; ++counterJ) {
         players[0].defence = 1.0;
 
         //std::cout << counterJ << std::endl;
@@ -77,6 +77,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         int table[6] = {ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, ATTACK_ENEMY};
         int enemyAction = table[ProcessEnemyRandomAction(position, 0)];
 
+
+        bool player0_has_initiative = (indexed_speed[0].second == 0);
 
         if (enemyAction == ATTACK_ENEMY){
             (*position) += 3;
