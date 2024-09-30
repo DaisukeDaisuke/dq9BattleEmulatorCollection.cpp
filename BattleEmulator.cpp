@@ -604,12 +604,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++;//回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
-            percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
             if (kaisinn) {//0x020759ec
                 tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
                 baseDamage = static_cast<int>(floor(tmp));
-                (*position) += 2;
+                //(*position) += 2;
             }
+            percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
             if (percent1 < 0.5) {
                 if (percent > 0.5) {
                     (*position)++;
@@ -628,12 +628,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 //                (*position) += 2;
 //            }
 //            ProcessFUN_021db2a0(position, attacker, players);
-            if (!kaihi) {
-                (*position)++;//目を覚ました
-                (*position)++;//不明
-            } else {
-                baseDamage = 0;
-            }
+            (*position)++;//目を覚ました
+            (*position)++;//不明
 
             if (kaisinn) {
                 (*position)++;//会心時特殊処理　0x021e54fc

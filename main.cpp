@@ -92,11 +92,11 @@ int main(int argc, char *argv[]) {
     //uint64_t seed = 0x45F7ADf0;//幼女3回目、2ターン目必殺チャージ
     //uint64_t seed = 0x30f24ab7;//幼女4回目
     //uint64_t seed = 0x31D66981;
-    //uint64_t seed = 0x0499510C;
+    uint64_t seed = 0x0499510C;
     //uint64_t seed = 0x2ee97e2;
     //uint64_t seed = 0x3add9cd;
     //uint64_t seed = 0x225ff835;
-    uint64_t seed = 0x3467000A;
+    //uint64_t seed = 0x3467000A;
 
 
 //    int hours = 1;
