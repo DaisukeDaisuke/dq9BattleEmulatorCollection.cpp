@@ -27,19 +27,7 @@ int main(int argc, char *argv[]) {
 
     auto t0 = std::chrono::high_resolution_clock::now();
 
-    int32_t gene[100] = {
-            BattleEmulator::ATTACK_ALLY,
-            BattleEmulator::ATTACK_ALLY,
-            BattleEmulator::ATTACK_ALLY,
-            BattleEmulator::HEAL,
-            BattleEmulator::ATTACK_ALLY,
-            BattleEmulator::ATTACK_ALLY,
-            BattleEmulator::HEAL,
-            BattleEmulator::ATTACK_ALLY,
-            BattleEmulator::ATTACK_ALLY,
-            BattleEmulator::ATTACK_ALLY,
-
-    };
+    int32_t gene[100] = {};
 
     Player players[2];
     int hps[2] = {79, 456};
