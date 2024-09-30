@@ -51,6 +51,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
 //        std::cout << players[0].hp << std::endl;
 //        std::cout << players[1].hp << std::endl;
 
+            std::cout << "!! " << (*position) << std::endl;
+
         players[0].defence = 1.0;
 
         //std::cout << counterJ << std::endl;
@@ -139,6 +141,8 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             if (!Player::isPlayerAlive(players[0])) {
                 break;
             }
+
+            std::cout << (*position) << std::endl;
 
             int basedamage = 0;
             DEBUG_COUT("start: " + std::to_string(*position));
