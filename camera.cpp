@@ -60,4 +60,10 @@ void camera::onFreeCameraMove(int * position, const int action, const int param5
 //        }
         (*position)++;
     }
+
+
+}
+
+void camera::reset() {
+    counter = 0;
 }

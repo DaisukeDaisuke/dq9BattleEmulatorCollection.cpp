@@ -27,6 +27,7 @@ uint64_t seed1 = 0;
 bool player0_has_initiative;
 
 bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, BattleResult &result, uint64_t seed) {
+    camera::reset();
     seed1 = seed;
     previousState = 0;
     previousAttack = -1;
