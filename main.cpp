@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
     auto t0 = std::chrono::high_resolution_clock::now();
 
-    std::vector<int32_t> gene = std::vector<int32_t>(30, 0);
+    std::vector<int32_t> gene = std::vector<int32_t>(80, 0);
 
     Player players[2];
     int hps[2] = {79, 456};
@@ -111,6 +111,7 @@ int main(int argc, char *argv[]) {
 
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
+    std::cout << (time2 - time1) << std::endl;
     time1 = 2501309583;
     time2 = 2501309586;
 

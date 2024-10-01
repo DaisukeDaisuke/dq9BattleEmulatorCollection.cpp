@@ -53,7 +53,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
         int ahp = players[0].hp;
 
         std::cout << (*position) << ", " << players[1].hp  << ", mhp: " << players[0].hp <<  std::endl;
-        if (seed == 2501309585&&(*position) == 711){
+        if (seed == 2501309585&&(*position) == 1012){
             std::cout << "!!" << std::endl;
         }
         //std::cout << players[0].specialCharge << std::endl;
@@ -716,18 +716,18 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                         }
                     }else if(percent == 0.5){
                         (*position)++;
-                    }
-                }else{
-                    if (percent1 < 0.5 || percent1 < 0.25) {
-                        if (percent > 0.25) {
-                            if (!players[1].rage) {
-                                (*position)++;
-                                (*position)++;
-                            } else {
+                    }else{
+                        if (percent1 < 0.25) {
+                            if (percent > 0.25) {
+                                if (!players[1].rage) {
+                                    (*position)++;
+                                    (*position)++;
+                                } else {
+                                    (*position)++;
+                                }
+                            }else if(percent == 0.25){
                                 (*position)++;
                             }
-                        }else if(percent == 0.25){
-                            (*position)++;
                         }
                     }
                 }
