@@ -44,23 +44,13 @@ void camera::onFreeCameraMove(int * position, const int action, const int param5
         (*position)++;
         if (counter == 0) {
             (*position)++;//引数5が1なら強制的に実行
+            counter = 0;
             return;
         }
         (*position)++;
-//        auto ret = lcg::getPercent(position, 5 - counter);
-//        if (ret != 0){
-//            ret = 1;
-//        }else{
-//            ret = 1;
-//        }
         counter = 0;
-//        if (ret == 0 || counter == 5) {
-//            counter = 0;
-//            //(*position)++;
-//        }
-        if (!Consumption2){
-            (*position)++;
-        }
+        (*position)++;
+
     }
 }
 

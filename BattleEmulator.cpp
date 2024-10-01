@@ -53,7 +53,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
         int ahp = players[0].hp;
 
         std::cout << (*position) << ", " << players[1].hp  << ", mhp: " << players[0].hp <<  std::endl;
-        if (seed == 2501309585&&(*position) == 681){
+        if (seed == 2501309585&&(*position) == 711){
             std::cout << "!!" << std::endl;
         }
         //std::cout << players[0].specialCharge << std::endl;
@@ -689,7 +689,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             //みかわし(相手)
             if (!players[0].paralysis && !players[0].inactive) {
                 if (lcg::getPercent(position, 100) < 2) {
-                    Consumption2 = true;
                     kaihi = true;
                 }
                 if (!kaihi) {
@@ -705,24 +704,29 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
 
             if (!kaihi) {
-                if(players[1].rage){
-                    std::cout << "!!" << std::endl;
-                }
-
                 percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
                 if (percent1 < 0.5) {
                     if (percent > 0.5) {
-                        (*position)++;
-                        players[1].rage = true;
-                        players[1].rageTurns = lcg::intRangeRand(position, 2, 4);
-                    }
-                }
-                if (percent1 < 0.5||percent1 < 0.25) {
-                    if (percent > 0.25) {
-                        if (!players[1].rage){
+                        if (!players[1].rage) {
                             (*position)++;
-                            (*position)++;
+                            players[1].rage = true;
+                            players[1].rageTurns = lcg::intRangeRand(position, 2, 4);
                         }else{
+                            (*position)++;
+                        }
+                    }else if(percent == 0.5){
+                        (*position)++;
+                    }
+                }else{
+                    if (percent1 < 0.5 || percent1 < 0.25) {
+                        if (percent > 0.25) {
+                            if (!players[1].rage) {
+                                (*position)++;
+                                (*position)++;
+                            } else {
+                                (*position)++;
+                            }
+                        }else if(percent == 0.25){
                             (*position)++;
                         }
                     }
