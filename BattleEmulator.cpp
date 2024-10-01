@@ -26,7 +26,7 @@ int preHP[5] = {0, 0, 0, 0, 0};
 uint64_t seed1 = 0;
 bool player0_has_initiative = false;
 
-bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, BattleResult &result, uint64_t seed) {
+bool BattleEmulator::Main(int *position,  const int32_t Gene, Player *players, BattleResult &result, uint64_t seed) {
     camera::reset();
     player0_has_initiative = false;
     seed1 = seed;
@@ -37,7 +37,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
-    for (int counterJ = 0; counterJ < 1000; ++counterJ) {
+    for (int counterJ = 0; counterJ < 100; ++counterJ) {
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
             players[0].dirtySpecialCharge = false;
@@ -188,8 +188,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 (*position)++;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(enemyAction, position, players, 1, 0);
-                BattleResult::add(result, enemyAction, basedamage, true, counterJ+1);
-                //std::cout << "a: " << basedamage << "\n";
+                BattleResult::add(result, enemyAction, basedamage, true, counterJ+1);//std::cout << "a: " << basedamage << "\n";
                 direction.emplace_back(1, 0);
                 Player::reduceHp(players[0], basedamage);
                 doAction = enemyAction;
@@ -285,18 +284,18 @@ void BattleEmulator::ProcessFUN_021db2a0(int *position, const int attacker, Play
     DEBUG_COUT("hp: " + std::to_string(preHP[4]) + ", " + std::to_string(players[4].hp));
 //    //std::cout << percent << ", " << percent1 << std::endl;
 //    //std::cout << attacker << std::endl;
-    if (percent1 > 0.25) {
-        if (percent < 0.25) {
-            ////std::cout << "test1" << std::endl;
-            (*position) += 2;
-            return;
-        }
-    }
     if (percent1 > 0.5) {
         if (percent < 0.5) {
             DEBUG_COUT(" ProcessFUN_021db2a0");
             (*position) += 2;
             //FUN_021eb858
+            return;
+        }
+    }
+    if (percent1 > 0.5||percent1 > 0.25) {
+        if (percent < 0.25) {
+            ////std::cout << "test1" << std::endl;
+            (*position) += 2;
             return;
         }
     }
@@ -418,13 +417,14 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//関係ない
             (*position)++;//会心
             (*position)++;//回避
-            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+            FUN_0207564c(position, players[attacker].atk, players[defender].def);
             (*position)++;//不明
             (*position)++;//必殺チャージ(敵)
             if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
                 players[defender].specialCharge = true;
                 players[defender].specialChargeTurn = 6;
             }
+            baseDamage = 0;
             break;
         case VICTIMISER:
             (*position) += 2;
@@ -683,25 +683,39 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
 //            ProcessFUN_021db2a0(position, attacker, players);
-            percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
-            if (percent1 < 0.5) {
-                if (percent > 0.5) {
-                    (*position)++;
-                    players[1].rage = true;
-                    players[1].rageTurns = lcg::intRangeRand(position, 2, 4);
-                }
-            }
-            if (percent1 < 0.25) {
-                if (percent > 0.25) {
-                    (*position)++;
-                    (*position)++;
-                }
-            }
             if (kaisinn) {//0x020759ec
                 tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
                 baseDamage = static_cast<int>(floor(tmp));
             }
+
             if (!kaihi) {
+                percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
+                if (percent1 < 0.5) {
+                    if (percent > 0.5) {
+                        if (!players[1].rage) {
+                            (*position)++;
+                            players[1].rage = true;
+                            players[1].rageTurns = lcg::intRangeRand(position, 2, 4);
+                        }else{
+                            (*position)++;
+                        }
+                    }else if(percent == 0.5){
+                        (*position)++;
+                    }else{
+                        if (percent1 < 0.25) {
+                            if (percent > 0.25) {
+                                if (!players[1].rage) {
+                                    (*position)++;
+                                    (*position)++;
+                                } else {
+                                    (*position)++;
+                                }
+                            }else if(percent == 0.25){
+                                (*position)++;
+                            }
+                        }
+                    }
+                }
                 (*position)++;//目を覚ました
                 (*position)++;//不明
             } else {
