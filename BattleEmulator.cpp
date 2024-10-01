@@ -25,11 +25,9 @@ int actionsPosition = 0;
 int preHP[5] = {0, 0, 0, 0, 0};
 uint64_t seed1 = 0;
 bool player0_has_initiative = false;
-bool Consumption2 = false;
 
 bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gene, Player *players, BattleResult &result, uint64_t seed) {
     camera::reset();
-    Consumption2 = false;
     player0_has_initiative = false;
     seed1 = seed;
     previousState = 0;
@@ -40,7 +38,6 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
     int doAction = -1;
     int genePosition = 0;
     for (int counterJ = 0; counterJ < RunCount; ++counterJ) {
-        Consumption2 = false;
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
             players[0].dirtySpecialCharge = false;
@@ -52,10 +49,10 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
         int ehp = players[1].hp;
         int ahp = players[0].hp;
 
-        std::cout << (*position) << ", " << players[1].hp  << ", mhp: " << players[0].hp <<  std::endl;
-        if (seed == 2501309585&&(*position) == 1012){
-            std::cout << "!!" << std::endl;
-        }
+//        std::cout << (*position) << ", " << players[1].hp  << ", mhp: " << players[0].hp <<  std::endl;
+//        if (seed == 2501309585&&(*position) == 1012){
+//            std::cout << "!!" << std::endl;
+//        }
         //std::cout << players[0].specialCharge << std::endl;
 //        if (counterJ == 48) {
 //            //std::cout << 5 << std::endl;
@@ -277,7 +274,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
             //std::cout << 5 << std::endl;
         }
         //std::cout << "Before camera: " << (*position) << std::endl;
-        camera::Main(position, actions, direction, Consumption2);
+        camera::Main(position, actions, direction);
         //std::cout << counterJ << std::endl;
         //std::cout << "after camera: " << (*position) << std::endl;
         //std::cout << (players[0].specialCharge ? "hissatu: true" : "hissatu: fa") << std::endl;
