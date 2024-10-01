@@ -9,10 +9,12 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <map>
 #include "lcg.h"
 #include "BattleEmulator.h"
 
 int toint(char *string);
+void processResult(BattleResult &result,const Player *copiedPlayers,const uint64_t seed);
 
 using namespace std;
 
@@ -27,7 +29,7 @@ int main(int argc, char *argv[]) {
 
     auto t0 = std::chrono::high_resolution_clock::now();
 
-    int32_t gene[100] = {};
+    std::vector<int32_t> gene = std::vector<int32_t>(30, 0);
 
     Player players[2];
     int hps[2] = {79, 456};
@@ -109,6 +111,9 @@ int main(int argc, char *argv[]) {
 
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
+    time1 = 2501309583;
+    time2 = 2501309586;
+
     //std::cout << time2  << std::endl;
     // Now you can use the precalculated values as needed
     //int test = 0;
@@ -130,7 +135,7 @@ int main(int argc, char *argv[]) {
             players[j] = copiedPlayers[j];
         }
         BattleResult result;
-        BattleEmulator::Main(position, gene, players, result, seed);
+        BattleEmulator::Main(position, 25, gene, players, result, seed);
         std::stringstream ss;
         ss << seed << " ";
         for (int i = 0; i < result.position; ++i) {
@@ -150,10 +155,13 @@ int main(int argc, char *argv[]) {
         }
         std::string resultStr = ss.str();
 
+
+
         //if (resultStr.find(str2) != std::string::npos) {
         if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
             //std::cout << seed << std::endl;
             std::cout << resultStr << std::endl;
+            processResult(result, copiedPlayers, seed);
         }
         lcg::release();
         delete position;
@@ -161,7 +169,7 @@ int main(int argc, char *argv[]) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-    //std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
+    std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
     //std::cout << (*position) << std::endl;
 
     //cout << "hp" << endl;
@@ -177,6 +185,109 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
+
+void processResult(BattleResult &result, const Player *copiedPlayers, const uint64_t seed) {
+    std::stringstream ss;
+    int PreviousTurn = 0;
+    int lastParalysis = -1;
+    int lastCounter = -1;
+    int paralysisTurns = 0;
+    bool first = false;
+    std::map<int32_t, int> paralysis_map;
+
+    for (int j = result.position - 1; j >= 0; --j) {
+        if (!result.isEnemy[j]) {
+            // ss1 << lastParalysis << ": " << paralysisTurns << ", ";
+            int action = result.actions[j];
+            auto paralysis = result.isParalysis[j];
+            auto inactive = result.isInactive[j];
+            auto player0_has_initiative = result.initiative[j];
+            auto turn = result.turns[j];
+            auto ehp = result.ehp[j];
+            auto ahp = result.ahp[j];
+            //ss1 << action << ": " << enemy.ehp << ": " << result.turn[j] << ", ";
+            if (action == BattleEmulator::PARALYSIS || (paralysisTurns > 0 && action == BattleEmulator::INACTIVE_ALLY) || action == BattleEmulator::CURE_PARALYSIS || inactive || paralysis) {
+                paralysisTurns++;
+                lastParalysis = turn;
+                lastCounter = j;
+                continue;
+            }
+            if (paralysisTurns > 0) {
+                paralysis_map[turn] = (ehp << 10) | ahp;
+            }
+            lastParalysis = -1;
+            lastCounter = -1;
+            paralysisTurns = 0;
+        }
+
+    }
+    for (const auto& pair : paralysis_map) {
+        ss << "hp: " << ((pair.second >> 10) & 0x7ff) << ", hp1: " << (pair.second & 0x3ff) << ", defense: ";
+        Player players[2];
+        int *position = new int(1);
+        for (int j = 0; j < 2; ++j) {
+            players[j] = copiedPlayers[j];
+        }
+        BattleResult result1;
+        std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
+        gene[pair.first] = BattleEmulator::DEFENCE;
+        BattleEmulator::Main(position, 200, gene, players, result1, seed);
+        for (int i = 0; i < result1.position; ++i) {
+            auto action = result1.actions[i];
+            auto damage = result1.damages[i];
+            if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
+                ss << "h ";
+            } else if (damage != 0) {
+                ss << damage << " ";
+            }
+        }
+        if (players[0].hp <= 0){
+            ss << "L ";
+        }
+        if (players[1].hp <= 0){
+            ss << "W ";
+        }
+        ss << std::endl;
+    }
+
+/*
+    for (const auto& pair : paralysis_map) {
+        ss << "hp: " << ((pair.second >> 10) & 0x7ff) << ", hp1: " << (pair.second & 0x3ff) << ", heal: ";
+        Player players[2];
+        int *position = new int(1);
+        for (int j = 0; j < 2; ++j) {
+            players[j] = copiedPlayers[j];
+        }
+        BattleResult result1;
+        std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
+        gene[pair.first] = BattleEmulator::HEAL;
+        BattleEmulator::Main(position, 200, gene, players, result1, seed);
+        for (int i = 0; i < result1.position; ++i) {
+            auto action = result1.actions[i];
+            auto damage = result1.damages[i];
+            if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
+                ss << "h ";
+            } else if (damage != 0) {
+                ss << damage << " ";
+            }
+        }
+        if (players[0].hp <= 0){
+            ss << "L ";
+        }
+        if (players[1].hp <= 0){
+            ss << "W ";
+        }
+        ss << std::endl;
+    }
+*/
+
+
+    std::cout << ss.str() << endl;
+
+
+}
+
 int toint(char * str){
     try {
         int number = std::stoi(str);
