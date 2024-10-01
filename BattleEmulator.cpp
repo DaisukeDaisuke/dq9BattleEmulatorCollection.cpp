@@ -26,7 +26,7 @@ int preHP[5] = {0, 0, 0, 0, 0};
 uint64_t seed1 = 0;
 bool player0_has_initiative = false;
 
-bool BattleEmulator::Main(int *position,  const int32_t Gene, Player *players, BattleResult &result, uint64_t seed) {
+bool BattleEmulator::Main(int *position, const int32_t *Gene, Player *players, BattleResult &result, uint64_t seed) {
     camera::reset();
     player0_has_initiative = false;
     seed1 = seed;

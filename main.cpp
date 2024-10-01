@@ -42,12 +42,12 @@ int main(int argc, char *argv[]) {
     };
 
     Player players[2];
-    int hps[2] = {79, 456};
-    int defs[2] = {73, 58};
+    int hps[2] = {70, 456};
+    int defs[2] = {69, 58};
     //int atks[2] = {67, 56};
-    int atks[2] = {67+2, 56};
-    int speeds[2] = {51, 54};
-    int mps[2] = {27, 255};
+    int atks[2] = {62+2, 56};
+    int speeds[2] = {44, 54};
+    int mps[2] = {24, 255};
     for (int i = 0; i < 2; ++i) {
         players[i].playerId = i;
         players[i].hp = hps[i];
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
     std::cout << time1 << std::endl;
 
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
-    time2 = ((time2 & 0xffff) << 16) + 100000;
+    time2 = ((time2 & 0xffff) << 16) + 10000;
     std::cout << time2  << std::endl;
     // Now you can use the precalculated values as needed
     //int test = 0;
