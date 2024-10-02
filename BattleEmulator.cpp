@@ -51,7 +51,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
         }
         DEBUG_COUT2((*position));
 #ifdef DEBUG2
-        if ((*position) == 635){
+        if ((*position) == 686){
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -184,10 +184,13 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
                 int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, UNSPEAKABLE_EVIL, PUFF_PUFF};
                 //休み時消費:   タナトス バンパイアエッジ ヒャド 攻撃 まなざし まなざし
                 //バンパイアエッジ(制限行動: タナトスハント) バンパイアエッジ ヒャド 通常攻撃 まなざし ぱふぱふ
-                if (lcg::getPercent(position, 100) < 0.0260) {
-                    enemyAction = INACTIVE_ENEMY;
-                    (*position)++;
-                } else {
+                if (lcg::getPercent(position, 100) < 0.0160) {//0x021588ec
+                    int mitore = lcg::getPercent(position, 100);//0x02158964
+                    if(mitore < 90){
+                        enemyAction = INACTIVE_ENEMY;
+                    }
+                }
+                if (enemyAction != INACTIVE_ENEMY){
                     //int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, UNSPEAKABLE_EVIL, PUFF_PUFF};
                     enemyAction = table[ProcessEnemyRandomAction(position, 0)];
                     //制限行動ぱふぱふ

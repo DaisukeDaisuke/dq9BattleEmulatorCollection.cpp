@@ -13,12 +13,14 @@
 #include "lcg.h"
 #include "BattleEmulator.h"
 #include "AnalyzeData.h"
+#include "debug.h"
 
 int toint(char *string);
 void processResult(BattleResult &result,const Player *copiedPlayers,const uint64_t seed,  std::vector<int32_t> gene,int depth);
 
 using namespace std;
 
+int CandidateID = 0;
 
 int main(int argc, char *argv[]) {
     if (argc < 6){
@@ -119,7 +121,7 @@ int main(int argc, char *argv[]) {
         players[j] = copiedPlayers[j];
     }
     vector<int32_t> gene1(gene);
-    gene1[8] = BattleEmulator::HEAL;
+    gene1[20-1] = BattleEmulator::DEFENCE;
     BattleResult result1;
     BattleEmulator::Main(position, 100, gene1, players, result1, time1);
     delete position;
@@ -423,15 +425,19 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
     // 候補を効率の高い順にソート
     std::sort(candidate.begin(), candidate.end(),
               [](const AnalyzeData& a, const AnalyzeData& b) {
-                  return a.calculateEfficiency() > b.calculateEfficiency(); // 降順でソート
+                  return a.calculateEfficiency() <= b.calculateEfficiency(); // 降順でソート
               });
 
+    int lastTurn = -1;
     // ソートされた候補を処理
+    int found = 0;
     for (AnalyzeData& data : candidate) {
         //std::cout << "efficiency: " << data.calculateEfficiency() << std::endl;
-        if (data.calculateEfficiency() > 8){
+        if (data.calculateEfficiency() > 7){
             if (data.getWinStatus()){
-                std::cout << std::endl << std::endl << data.getBattleTrace();
+                CandidateID++;
+                found++;
+                std::cout << std::endl << std::endl << "=======cid " << CandidateID << "========" << std::endl << data.getBattleTrace();
                 std::cout << "actions: " << std::endl;
 
                 auto vec = data.getGenome();
@@ -444,11 +450,10 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                         }else if(action == BattleEmulator::DEFENCE){
                             actionName = "DEFENCE";
                         }
-                        std::cout << "turn: " << (i+1) << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: " << ((vec[i] >> 20) & 0x3ff) << ", action: " << actionName <<  std::endl;
+                        lastTurn = i+1;
+                        std::cout << "turn: " << lastTurn << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: " << ((vec[i] >> 20) & 0x3ff) << ", action: " << actionName <<  std::endl;
                     }
                 }
-
-                return;
             }
         }
         // 他の処理をここに追加...
