@@ -38,6 +38,8 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
     int doAction = -1;
     int genePosition = 0;
 
+
+
     for (int counterJ = 0; counterJ < RunCount; ++counterJ) {
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
@@ -46,6 +48,10 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
         players[0].specialChargeTurn--;
         if (players[0].specialChargeTurn == -1) {
             players[0].specialCharge = false;
+        }
+        DEBUG_COUT2((*position));
+        if ((*position) == 635){
+            std::cout << "!!" << std::endl;
         }
         int ehp = players[1].hp;
         int ahp = players[0].hp;
@@ -126,7 +132,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
                 }
             }
         }else {
-            if (players[0].hp >= 55) {
+            if (players[0].hp >= 35) {
                 actionTable[0] = ATTACK_ALLY;
             } else {
                 if (players[0].mp >= 2) {
@@ -413,6 +419,34 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = static_cast<int>(floor(tmp));
             }
             if (!kaihi) {
+                percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
+                if (percent1 < 0.5) {
+                    if (percent > 0.5) {
+                        if (!players[1].rage) {
+                            (*position)++;
+                            players[1].rage = true;
+                            players[1].rageTurns = lcg::intRangeRand(position, 2, 4);
+                        } else {
+                            (*position)++;
+                        }
+                    } else if (percent == 0.5) {
+                        (*position)++;
+                    } else {
+                        if (percent1 < 0.25) {
+                            if (percent > 0.25) {
+                                if (!players[1].rage) {
+                                    (*position)++;
+                                    (*position)++;
+                                } else {
+                                    (*position)++;
+                                }
+                            } else if (percent == 0.25) {
+                                (*position)++;
+                            }
+                        }
+                    }
+                }
+
                 Player::reduceHp(players[defender], baseDamage);
             }
             return 0;

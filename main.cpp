@@ -33,11 +33,11 @@ int main(int argc, char *argv[]) {
     std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
 
     Player players[2];
-    int hps[2] = {79, 456};
-    int defs[2] = {73, 58};
-    int atks[2] = {67+2, 56};
-    int speeds[2] = {51, 54};
-    int mps[2] = {27, 255};
+    int hps[2] = {70, 456};
+    int defs[2] = {69, 58};
+    int atks[2] = {62+2, 56};
+    int speeds[2] = {44, 54};
+    int mps[2] = {24, 255};
     for (int i = 0; i < 2; ++i) {
         players[i].playerId = i;
         players[i].hp = hps[i];
@@ -91,12 +91,9 @@ int main(int argc, char *argv[]) {
 //    int hours = 1;
 //    int minutes = 27;
 //    int seconds = 58;
-    int hours = toint(argv[2]);
-    int minutes = toint(argv[3]);
-    int seconds = toint(argv[4]);
-
-    int startHP = toint(argv[1]);
-    players[0].hp = startHP;
+    int hours = toint(argv[1]);
+    int minutes = toint(argv[2]);
+    int seconds = toint(argv[3]);
 
     Player copiedPlayers[2];
     for (int i = 0; i < 2; ++i) {
@@ -112,8 +109,21 @@ int main(int argc, char *argv[]) {
 
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
-    time1 = 2501309583;
+    time1 = 2501309585;
     time2 = 2501309586;
+
+    lcg::init(time1, 5000);
+    int *position = new int(1);
+    for (int j = 0; j < 2; ++j) {
+        players[j] = copiedPlayers[j];
+    }
+    vector<int32_t> gene1(gene);
+    gene1[8] = BattleEmulator::HEAL;
+    BattleResult result1;
+    BattleEmulator::Main(position, 100, gene1, players, result1, time1);
+    delete position;
+    lcg::release();
+    return 0;
 
     //std::cout << time2  << std::endl;
     // Now you can use the precalculated values as needed
@@ -127,7 +137,7 @@ int main(int argc, char *argv[]) {
     std::stringstream ss;
 
     // argv[5]以降をstringstreamに入れる
-    for (int i = 5; i < argc; ++i) {
+    for (int i = 4; i < argc; ++i) {
         ss << argv[i] << " ";
     }
 
@@ -166,8 +176,6 @@ int main(int argc, char *argv[]) {
             ss << "W ";
         }
         std::string resultStr = ss.str();
-
-
 
         //if (resultStr.find(str2) != std::string::npos) {
         if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
@@ -230,11 +238,18 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                 ss1 << "h ";
                 counter++;
             } else if (damage != 0) {
-                ss1 << damage << " ";
+                if (isP){
+                    ss1 << damage << "-m" << " ";
+                }else if(isI){
+                    ss1 << damage << "-i" << " ";
+                }else {
+                    ss1 << damage << " ";
+                }
                 counter++;
             }
-            if(counter % 10 == 0){
+            if(counter == 10){
                 ss1 << std::endl;
+                counter = 0;
             }
         }
         auto turn = result2.turn;
@@ -245,6 +260,7 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
             ss1 << "W " << turn;
         }
         std::cout << ss1.str() << std::endl;
+        delete position;
     }
 
     for (int j = result.position - 1; j >= 0; --j) {
@@ -317,8 +333,9 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                     ss << damage << " ";
                 }
             }
-            if(counter % 10 == 0){
+            if(counter == 10){
                 ss << std::endl;
+                counter = 0;
             }
         }
         auto turn = result1.turn;
@@ -333,6 +350,7 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         ss << std::endl;
         analyzeData.setBattleTrace(ss.str());
         candidate.push_back(analyzeData);
+        delete position;
         //std::cout << ss.str() << endl;
     }
 
@@ -374,8 +392,9 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                     ss << damage << " ";
                 }
             }
-            if(counter % 10 == 0){
+            if(counter == 10){
                 ss << std::endl;
+                counter = 0;
             }
         }
         auto turn = result3.turn;
@@ -390,6 +409,7 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         ss << std::endl;
         analyzeData.setBattleTrace(ss.str());
         candidate.push_back(analyzeData);
+        delete position;
         //std::cout << ss.str() << endl;
     }
 

@@ -8,6 +8,8 @@
 // DEBUGが未定義の場合、デフォルトで無効になるように設定
 //#define DEBUG 1
 
+#define DEBUG2 1
+
 // DEBUGモードが有効な場合にのみデバッグ出力を有効にする
 #ifdef DEBUG
 #define DEBUG_COUT(x) std::cout << x << std::endl
@@ -24,6 +26,11 @@
 #define DEBUG_COUT1(x)
 #endif
 
+#ifdef DEBUG2
+#define DEBUG_COUT2(x) std::cout << x << std::endl
+#else
+#define DEBUG_COUT2(x)
+#endif
 
 class debug {
 
