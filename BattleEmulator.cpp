@@ -50,9 +50,11 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
             players[0].specialCharge = false;
         }
         DEBUG_COUT2((*position));
+#ifdef DEBUG2
         if ((*position) == 635){
             std::cout << "!!" << std::endl;
         }
+#endif
         int ehp = players[1].hp;
         int ahp = players[0].hp;
         bool isInactive = players[0].inactive;

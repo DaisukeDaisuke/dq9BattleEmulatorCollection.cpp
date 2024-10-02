@@ -112,6 +112,7 @@ int main(int argc, char *argv[]) {
     time1 = 2501309585;
     time2 = 2501309586;
 
+#ifdef DEBUG2
     lcg::init(time1, 5000);
     int *position = new int(1);
     for (int j = 0; j < 2; ++j) {
@@ -124,6 +125,7 @@ int main(int argc, char *argv[]) {
     delete position;
     lcg::release();
     return 0;
+#endif
 
     //std::cout << time2  << std::endl;
     // Now you can use the precalculated values as needed
