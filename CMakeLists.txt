@@ -16,8 +16,10 @@ add_executable(newDirectory main.cpp
         debug.h
         BattleResult.cpp
         BattleResult.h
+        AnalyzeData.cpp
+        AnalyzeData.h
 )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 set(CMAKE_EXE_LINKER_FLAGS "-static")

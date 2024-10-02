@@ -12,9 +12,10 @@
 #include <map>
 #include "lcg.h"
 #include "BattleEmulator.h"
+#include "AnalyzeData.h"
 
 int toint(char *string);
-void processResult(BattleResult &result,const Player *copiedPlayers,const uint64_t seed);
+void processResult(BattleResult &result,const Player *copiedPlayers,const uint64_t seed,  std::vector<int32_t> gene,int depth);
 
 using namespace std;
 
@@ -29,7 +30,7 @@ int main(int argc, char *argv[]) {
 
     auto t0 = std::chrono::high_resolution_clock::now();
 
-    std::vector<int32_t> gene = std::vector<int32_t>(80, 0);
+    std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
 
     Player players[2];
     int hps[2] = {79, 456};
@@ -111,8 +112,8 @@ int main(int argc, char *argv[]) {
 
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
-//    time1 = 2501309583;
-//    time2 = 2501309586;
+    time1 = 2501309583;
+    time2 = 2501309586;
 
     //std::cout << time2  << std::endl;
     // Now you can use the precalculated values as needed
@@ -172,7 +173,7 @@ int main(int argc, char *argv[]) {
         if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
             //std::cout << seed << std::endl;
             //std::cout << resultStr << std::endl;
-            processResult(result, copiedPlayers, seed);
+            processResult(result, copiedPlayers, seed, gene, 0);
         }
         lcg::release();
         delete position;
@@ -180,7 +181,7 @@ int main(int argc, char *argv[]) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-    std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
+    //std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
     //std::cout << (*position) << std::endl;
 
     //cout << "hp" << endl;
@@ -198,8 +199,8 @@ int main(int argc, char *argv[]) {
 }
 
 
-void processResult(BattleResult &result, const Player *copiedPlayers, const uint64_t seed) {
-    std::stringstream ss;
+void processResult(BattleResult &result, const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene1, int depth) {
+    vector<AnalyzeData> candidate = vector<AnalyzeData>();
     int PreviousTurn = 0;
     int lastParalysis = -1;
     int lastCounter = -1;
@@ -216,7 +217,8 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
             players[j] = copiedPlayers[j];
         }
         BattleResult result2;
-        std::vector<int32_t> gene = std::vector<int32_t>(200, 0);
+
+        std::vector<int32_t> gene(gene1);
         BattleEmulator::Main(position, 200, gene, players, result2, seed);
         for (int i = 0; i < result2.position; ++i) {
             auto action = result2.actions[i];
@@ -256,8 +258,13 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                 lastCounter = j;
                 continue;
             }
+            if(first){
+                paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
+                first = false;
+            }
             if (paralysisTurns > 0) {
-                paralysis_map[turn] = (ehp << 10) | ahp;
+                first = true;
+                paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
             }
             lastParalysis = -1;
             lastCounter = -1;
@@ -265,16 +272,26 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         }
     }
     for (const auto& pair : paralysis_map) {
-        ss << "hp: " << ((pair.second >> 10) & 0x7ff) << ", hp1: " << (pair.second & 0x3ff) << ", defense: ";
+        std::stringstream ss;
+        int ehp = ((pair.second >> 10) & 0x3ff);
+        int ahp = (pair.second & 0x3ff);
+        int turns = ((pair.second >> 20) & 0x3ff);
+        ss << "hp: " << ((pair.second >> 10) & 0x3ff) << ", hp1: " << (pair.second & 0x3ff) << ", turn: " << ((pair.second >> 20) & 0x3ff) << ", defense: ";
         Player players[2];
         int *position = new int(1);
         for (int j = 0; j < 2; ++j) {
             players[j] = copiedPlayers[j];
         }
         BattleResult result1;
-        std::vector<int32_t> gene = std::vector<int32_t>(200, 0);
-        gene[pair.first] = BattleEmulator::DEFENCE;
+        //gene[pair.first] = (ahp << 20) | (ehp << 10) | BattleEmulator::DEFENCE;
+        std::vector<int32_t> gene(gene1);
+        gene[pair.first] = (ahp << 20) | (ehp << 10) | BattleEmulator::DEFENCE;
         BattleEmulator::Main(position, 200, gene, players, result1, seed);
+        AnalyzeData analyzeData;
+        analyzeData.FromBattleResult(result1);
+        analyzeData.setGenome(gene);
+        //std::cout << analyzeData.calculateEfficiency() << std::endl;
+
         for (int i = 0; i < result1.position; ++i) {
             auto action = result1.actions[i];
             auto damage = result1.damages[i];
@@ -295,29 +312,42 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         auto turn = result1.turn;
         if (players[0].hp <= 0){
             ss << "L " << turn;
+            analyzeData.setWinStatus(false);
         }
         if (players[1].hp <= 0){
             ss << "W " << turn;
+            analyzeData.setWinStatus(true);
         }
         ss << std::endl;
+        analyzeData.setBattleTrace(ss.str());
+        candidate.push_back(analyzeData);
+        //std::cout << ss.str() << endl;
     }
 
     for (const auto& pair : paralysis_map) {
-        ss << "hp: " << ((pair.second >> 10) & 0x7ff) << ", hp1: " << (pair.second & 0x3ff) << ", heal: ";
+        std::stringstream ss;
+        int ehp = ((pair.second >> 10) & 0x3ff);
+        int ahp = (pair.second & 0x3ff);
+        int turns = ((pair.second >> 20) & 0x3ff);
+        ss << "hp: " << ((pair.second >> 10) & 0x3ff) << ", hp1: " << (pair.second & 0x3ff) << ", turn: " << ((pair.second >> 20) & 0x3ff) << ", heal: ";
         Player players[2];
         int *position = new int(1);
         for (int j = 0; j < 2; ++j) {
             players[j] = copiedPlayers[j];
         }
-        BattleResult result1;
-        std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
-        gene[pair.first] = BattleEmulator::HEAL;
-        BattleEmulator::Main(position, 200, gene, players, result1, seed);
-        for (int i = 0; i < result1.position; ++i) {
-            auto action = result1.actions[i];
-            auto damage = result1.damages[i];
-            auto isP = result1.isParalysis[i];
-            auto isI = result1.isInactive[i];
+        BattleResult result3;
+        std::vector<int32_t> gene(gene1);
+        gene[pair.first] = (ahp << 20) | (ehp << 10) | BattleEmulator::HEAL;
+        BattleEmulator::Main(position, 200, gene, players, result3, seed);
+        AnalyzeData analyzeData;
+        analyzeData.FromBattleResult(result3);
+        analyzeData.setGenome(gene);
+
+        for (int i = 0; i < result3.position; ++i) {
+            auto action = result3.actions[i];
+            auto damage = result3.damages[i];
+            auto isP = result3.isParalysis[i];
+            auto isI = result3.isInactive[i];
             if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
                 ss << "h ";
             } else if (damage != 0) {
@@ -330,20 +360,52 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                 }
             }
         }
-        auto turn = result1.turn;
+        auto turn = result3.turn;
         if (players[0].hp <= 0){
             ss << "L " << turn;
+            analyzeData.setWinStatus(false);
         }
         if (players[1].hp <= 0){
             ss << "W " << turn;
+            analyzeData.setWinStatus(true);
         }
         ss << std::endl;
+        analyzeData.setBattleTrace(ss.str());
+        candidate.push_back(analyzeData);
+        //std::cout << ss.str() << endl;
     }
 
 
-    std::cout << ss.str() << endl;
 
 
+
+    // 最高の効率を持つ要素を見つける
+    // 候補を効率の高い順にソート
+    std::sort(candidate.begin(), candidate.end(),
+              [](const AnalyzeData& a, const AnalyzeData& b) {
+                  return a.calculateEfficiency() > b.calculateEfficiency(); // 降順でソート
+              });
+
+    // ソートされた候補を処理
+    for (AnalyzeData& data : candidate) {
+        //std::cout << "efficiency: " << data.calculateEfficiency() << std::endl;
+        if (data.calculateEfficiency() > 8){
+            if (data.getWinStatus()){
+                std::cout << std::endl << std::endl << data.getBattleTrace();
+                std::cout << "actions: " << std::endl;
+
+                auto vec = data.getGenome();
+                for (size_t i = 0; i < vec.size(); ++i) {
+                    if (vec[i] != 0) {
+                        std::cout << "turn: " << (i+1) << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: " << ((vec[i] >> 20) & 0x3ff) << std::endl;
+                    }
+                }
+
+                return;
+            }
+        }
+        // 他の処理をここに追加...
+    }
 }
 
 int toint(char * str){

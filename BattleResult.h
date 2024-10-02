@@ -24,15 +24,15 @@ public:
 
     int position = 0;
     int turn = 0;
-    int actions[100] = {};
-    int damages[100] = {};
-    int isEnemy[100] = {};
-    bool isParalysis[100] = {};
-    bool isInactive[100] = {};
-    int turns[100] = {};
-    bool initiative[100] = {};
-    int ehp[100] = {};
-    int ahp[100] = {};
+    int actions[1000] = {};
+    int damages[1000] = {};
+    int isEnemy[1000] = {};
+    bool isParalysis[1000] = {};
+    bool isInactive[1000] = {};
+    int turns[1000] = {};
+    bool initiative[1000] = {};
+    int ehp[1000] = {};
+    int ahp[1000] = {};
 };
 
 #endif //NEWDIRECTORY_BATTLERESULT_H
