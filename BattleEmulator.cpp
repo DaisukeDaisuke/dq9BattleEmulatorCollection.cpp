@@ -615,7 +615,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++;//?
             if (kaisinn) {
-                (*position) += 2;//会心時特殊処理
+                if (!players[1].rage){
+                    (*position)++;//会心時特殊処理　0x021e54fc
+                    (*position)++;//会心時特殊処理　0x021eb8c8
+                }else{
+                    (*position)++;//会心時特殊処理　既に怒り狂ってる場合は1消費になる
+                }
             }
             if (!players[0].paralysis&&!players[0].inactive) {
                 if (!players[attacker].specialCharge  && lcg::getPercent(position, 100) < 1) {
@@ -775,8 +780,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = 0;
             }
             if (kaisinn) {
-                (*position)++;//会心時特殊処理　0x021e54fc
-                (*position)++;//会心時特殊処理　0x021eb8c8
+                if (!players[1].rage){
+                    (*position)++;//会心時特殊処理　0x021e54fc
+                    (*position)++;//会心時特殊処理　0x021eb8c8
+                }else{
+                    (*position)++;//会心時特殊処理　既に怒り狂ってる場合は1消費になる
+                }
+
             }
             if (players[defender].hp - baseDamage >= 0) {
                 if (!players[attacker].specialCharge && lcg::getPercent(position, 100) < 1) {
