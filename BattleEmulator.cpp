@@ -426,27 +426,23 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (!kaihi) {
                 percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
                 if (percent1 < 0.5) {
-                    if (percent > 0.5) {
+                    if (percent >= 0.5) {
                         if (!players[1].rage) {
                             (*position)++;
                             players[1].rage = true;
                             players[1].rageTurns = lcg::intRangeRand(position, 2, 4);
-                        } else {
+                        }else{
                             (*position)++;
                         }
-                    } else if (percent == 0.5) {
-                        (*position)++;
-                    } else {
+                    }else{
                         if (percent1 < 0.25) {
-                            if (percent > 0.25) {
+                            if (percent >= 0.25) {
                                 if (!players[1].rage) {
                                     (*position)++;
                                     (*position)++;
                                 } else {
                                     (*position)++;
                                 }
-                            } else if (percent == 0.25) {
-                                (*position)++;
                             }
                         }
                     }
