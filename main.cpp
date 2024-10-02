@@ -16,7 +16,7 @@
 #include "debug.h"
 
 int toint(char *string);
-void processResult(BattleResult &result,const Player *copiedPlayers,const uint64_t seed,  std::vector<int32_t> gene,int depth);
+void processResult(const Player *copiedPlayers,const uint64_t seed,  std::vector<int32_t> gene,int depth);
 
 using namespace std;
 
@@ -111,20 +111,67 @@ int main(int argc, char *argv[]) {
 
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
-    time1 = 2501309585;
-    time2 = 2501309586;
+
 
 #ifdef DEBUG2
+    time1 = 2501309586;
+    time2 = 2501309586;
+
     lcg::init(time1, 5000);
     int *position = new int(1);
     for (int j = 0; j < 2; ++j) {
         players[j] = copiedPlayers[j];
     }
     vector<int32_t> gene1(gene);
-    gene1[20-1] = BattleEmulator::DEFENCE;
-    BattleResult result1;
-    BattleEmulator::Main(position, 100, gene1, players, result1, time1);
+    //gene1[21-1] = BattleEmulator::DEFENCE;
+    BattleResult result;
+    BattleEmulator::Main(position, 100, gene1, players, result, time1);
     delete position;
+    lcg::release();
+
+    std::stringstream ss1;
+    ss1 << time1 << " ";
+    int counter = 0;
+    for (int i = 0; i < result.position; ++i) {
+        auto action = result.actions[i];
+        auto damage = result.damages[i];
+        auto isP = result.isParalysis[i];
+        auto isI = result.isInactive[i];
+        if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
+            ss1 << "h ";
+            counter++;
+        } else if (damage != 0) {
+            if (isP){
+                ss1 << damage << "-m" << " ";
+            }else if(isI){
+                ss1 << damage << "-i" << " ";
+            }else {
+                ss1 << damage << " ";
+            }
+            counter++;
+        }
+        if(counter == 10){
+            ss1 << std::endl;
+            counter = 0;
+        }
+    }
+    auto turn = result.turn;
+    if (players[0].hp <= 0){
+        ss1 << "L " << turn;
+    }
+    if (players[1].hp <= 0){
+        ss1 << "W " << turn;
+    }
+    std::string resultStr = ss1.str();
+    std::cout << resultStr << std::endl;
+    return 0;
+#endif
+
+#ifdef DEBUG3
+    time1 = 0x1000;
+
+    lcg::init(time1, 5000);
+    processResult(copiedPlayers, time1, gene, 0);
     lcg::release();
     return 0;
 #endif
@@ -185,7 +232,7 @@ int main(int argc, char *argv[]) {
         if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
             //std::cout << seed << std::endl;
             //std::cout << resultStr << std::endl;
-            processResult(result, copiedPlayers, seed, gene, 0);
+            processResult(copiedPlayers, seed, gene, 0);
         }
         lcg::release();
         delete position;
@@ -211,7 +258,8 @@ int main(int argc, char *argv[]) {
 }
 
 
-void processResult(BattleResult &result, const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene1, int depth) {
+void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene1, int depth) {
+    BattleResult result2;
     vector<AnalyzeData> candidate = vector<AnalyzeData>();
     int PreviousTurn = 0;
     int lastParalysis = -1;
@@ -228,7 +276,6 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         for (int j = 0; j < 2; ++j) {
             players[j] = copiedPlayers[j];
         }
-        BattleResult result2;
 
         std::vector<int32_t> gene(gene1);
         BattleEmulator::Main(position, 200, gene, players, result2, seed);
@@ -267,16 +314,16 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         delete position;
     }
 
-    for (int j = result.position - 1; j >= 0; --j) {
-        if (!result.isEnemy[j]) {
+    for (int j = result2.position - 1; j >= 0; --j) {
+        if (!result2.isEnemy[j]) {
             // ss1 << lastParalysis << ": " << paralysisTurns << ", ";
-            int action = result.actions[j];
-            auto paralysis = result.isParalysis[j];
-            auto inactive = result.isInactive[j];
-            auto player0_has_initiative = result.initiative[j];
-            auto turn = result.turns[j];
-            auto ehp = result.ehp[j];
-            auto ahp = result.ahp[j];
+            int action = result2.actions[j];
+            auto paralysis = result2.isParalysis[j];
+            auto inactive = result2.isInactive[j];
+            auto player0_has_initiative = result2.initiative[j];
+            auto turn = result2.turns[j];
+            auto ehp = result2.ehp[j];
+            auto ahp = result2.ahp[j];
             //ss1 << action << ": " << enemy.ehp << ": " << result.turn[j] << ", ";
             if (action == BattleEmulator::PARALYSIS || (paralysisTurns > 0 && action == BattleEmulator::INACTIVE_ALLY) || action == BattleEmulator::CURE_PARALYSIS || inactive || paralysis) {
                 paralysisTurns++;
@@ -457,6 +504,24 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
             }
         }
         // 他の処理をここに追加...
+    }
+
+    if (found != 0){
+        return;
+    }
+
+    // 最高の効率を持つ要素を見つける
+    auto maxElementIter = std::max_element(candidate.begin(), candidate.end(),
+                                           [](const AnalyzeData& a, const AnalyzeData& b) {
+                                               return a.calculateEfficiency() < b.calculateEfficiency();
+                                           });
+
+    if (maxElementIter != candidate.end()) {
+        // 最も高い効率値を持つ要素にアクセス
+        AnalyzeData& bestCandidate = *maxElementIter;
+
+    } else {
+        std::cout << "error1" << std::endl;
     }
 }
 
