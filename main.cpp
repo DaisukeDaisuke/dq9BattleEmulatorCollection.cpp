@@ -210,7 +210,7 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
 
     {
         std::stringstream ss1;
-        ss1 << seed << " ";
+        ss1 << seed << " " << std::endl;
         Player players[2];
         int *position = new int(1);
         for (int j = 0; j < 2; ++j) {
@@ -220,6 +220,7 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
 
         std::vector<int32_t> gene(gene1);
         BattleEmulator::Main(position, 200, gene, players, result2, seed);
+        int counter = 0;
         for (int i = 0; i < result2.position; ++i) {
             auto action = result2.actions[i];
             auto damage = result2.damages[i];
@@ -227,8 +228,13 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
             auto isI = result2.isInactive[i];
             if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
                 ss1 << "h ";
+                counter++;
             } else if (damage != 0) {
                 ss1 << damage << " ";
+                counter++;
+            }
+            if(counter % 10 == 0){
+                ss1 << std::endl;
             }
         }
         auto turn = result2.turn;
@@ -258,11 +264,11 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                 lastCounter = j;
                 continue;
             }
-            if(first){
+            if(first&&action != BattleEmulator::INACTIVE_ALLY){
                 paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
                 first = false;
             }
-            if (paralysisTurns > 0) {
+            if (paralysisTurns > 0&&action != BattleEmulator::INACTIVE_ALLY) {
                 first = true;
                 paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
             }
@@ -276,7 +282,7 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         int ehp = ((pair.second >> 10) & 0x3ff);
         int ahp = (pair.second & 0x3ff);
         int turns = ((pair.second >> 20) & 0x3ff);
-        ss << "hp: " << ((pair.second >> 10) & 0x3ff) << ", hp1: " << (pair.second & 0x3ff) << ", turn: " << ((pair.second >> 20) & 0x3ff) << ", defense: ";
+        //ss << "hp: " << ((pair.second >> 10) & 0x3ff) << ", hp1: " << (pair.second & 0x3ff) << ", turn: " << ((pair.second >> 20) & 0x3ff) << ", defense: ";
         Player players[2];
         int *position = new int(1);
         for (int j = 0; j < 2; ++j) {
@@ -292,6 +298,7 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         analyzeData.setGenome(gene);
         //std::cout << analyzeData.calculateEfficiency() << std::endl;
 
+        int counter = 0;
         for (int i = 0; i < result1.position; ++i) {
             auto action = result1.actions[i];
             auto damage = result1.damages[i];
@@ -299,7 +306,9 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
             auto isI = result1.isInactive[i];
             if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
                 ss << "h ";
+                counter++;
             } else if (damage != 0) {
+                counter++;
                 if (isP){
                     ss << damage << "-m" << " ";
                 }else if(isI){
@@ -307,6 +316,9 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                 }else {
                     ss << damage << " ";
                 }
+            }
+            if(counter % 10 == 0){
+                ss << std::endl;
             }
         }
         auto turn = result1.turn;
@@ -329,7 +341,7 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         int ehp = ((pair.second >> 10) & 0x3ff);
         int ahp = (pair.second & 0x3ff);
         int turns = ((pair.second >> 20) & 0x3ff);
-        ss << "hp: " << ((pair.second >> 10) & 0x3ff) << ", hp1: " << (pair.second & 0x3ff) << ", turn: " << ((pair.second >> 20) & 0x3ff) << ", heal: ";
+        //ss << "hp: " << ((pair.second >> 10) & 0x3ff) << ", hp1: " << (pair.second & 0x3ff) << ", turn: " << ((pair.second >> 20) & 0x3ff) << ", heal: ";
         Player players[2];
         int *position = new int(1);
         for (int j = 0; j < 2; ++j) {
@@ -343,6 +355,7 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
         analyzeData.FromBattleResult(result3);
         analyzeData.setGenome(gene);
 
+        int counter = 0;
         for (int i = 0; i < result3.position; ++i) {
             auto action = result3.actions[i];
             auto damage = result3.damages[i];
@@ -350,7 +363,9 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
             auto isI = result3.isInactive[i];
             if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
                 ss << "h ";
+                counter++;
             } else if (damage != 0) {
+                counter++;
                 if (isP){
                     ss << damage << "-m" << " ";
                 }else if(isI){
@@ -358,6 +373,9 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                 }else {
                     ss << damage << " ";
                 }
+            }
+            if(counter % 10 == 0){
+                ss << std::endl;
             }
         }
         auto turn = result3.turn;
@@ -397,7 +415,14 @@ void processResult(BattleResult &result, const Player *copiedPlayers, const uint
                 auto vec = data.getGenome();
                 for (size_t i = 0; i < vec.size(); ++i) {
                     if (vec[i] != 0) {
-                        std::cout << "turn: " << (i+1) << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: " << ((vec[i] >> 20) & 0x3ff) << std::endl;
+                        int action = (vec[i] & 0x3ff);
+                        std::string actionName;
+                        if (action == BattleEmulator::HEAL){
+                            actionName = "HEAL";
+                        }else if(action == BattleEmulator::DEFENCE){
+                            actionName = "DEFENCE";
+                        }
+                        std::cout << "turn: " << (i+1) << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: " << ((vec[i] >> 20) & 0x3ff) << ", action: " << actionName <<  std::endl;
                     }
                 }
 

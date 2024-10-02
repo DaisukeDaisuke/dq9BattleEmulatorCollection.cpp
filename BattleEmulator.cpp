@@ -37,6 +37,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
     int damageCount = 0;
     int doAction = -1;
     int genePosition = 0;
+
     for (int counterJ = 0; counterJ < RunCount; ++counterJ) {
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
@@ -48,6 +49,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
         }
         int ehp = players[1].hp;
         int ahp = players[0].hp;
+        bool isInactive = players[0].inactive;
 
 //        std::cout << (*position) << ", " << players[1].hp  << ", mhp: " << players[0].hp <<  std::endl;
 //        if (seed == 2501309585&&(*position) == 1012){
@@ -207,7 +209,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
                 (*position)++;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(enemyAction, position, players, 1, 0);
-                BattleResult::add(result, enemyAction, basedamage, true, players[0].paralysis, players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
+                BattleResult::add(result, enemyAction, basedamage, true, players[0].paralysis, isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
                 //std::cout << "a: " << basedamage << "\n";
                 direction.emplace_back(1, 0);
                 Player::reduceHp(players[0], basedamage);
@@ -248,7 +250,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
                 }
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(action, position, players, 0, 1);
-                BattleResult::add(result, action, basedamage, false,players[0].paralysis, players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
+                BattleResult::add(result, action, basedamage, false,players[0].paralysis, isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
                 //std::cout << "youzilyo: " << basedamage << std::endl;
                 direction.emplace_back(0, 1);
                 if (action == HEAL || action == MEDICINAL_HERBS) {
