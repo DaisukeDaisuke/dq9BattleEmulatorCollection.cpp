@@ -764,7 +764,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                         tmp = baseDamage * players[defender].defence;
                         baseDamage = static_cast<int>(floor(tmp));
                         if (baseDamage < 14) {
-                            if (percent_tmp < 1) {
+                            if (percent_tmp < 1) { // なぜか14未満の場合1%
                                 players[defender].specialCharge = true;
                                 players[defender].specialChargeTurn = 6;
                             }
@@ -832,7 +832,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                                 players[defender].specialCharge = true;
                                 players[defender].specialChargeTurn = 6;
                             }
-                        }else {
+                        } else {
                             for (int i = 0; i < 8; ++i) {
                                 if (baseDamage >= proportionTable3[i]) {
                                     if (percent_tmp < proportionTable2[i]) {
@@ -844,6 +844,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                             }
                         }
                     }
+                }
                 tmp = baseDamage * players[defender].defence;
                 baseDamage = static_cast<int>(floor(tmp));
                 Player::heal(players[attacker], (baseDamage >> 2)); // /4

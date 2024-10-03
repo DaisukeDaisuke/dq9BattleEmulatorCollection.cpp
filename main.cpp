@@ -226,8 +226,8 @@ int main(int argc, char *argv[]) {
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
 
-    time1 = 166779029;
-    time2 = 166779031;
+//    time1 = 166779029;
+//    time2 = 166779031;
 
 #ifdef DEBUG2
     time1 = 166779030;
@@ -338,7 +338,7 @@ int main(int argc, char *argv[]) {
                 std::cout << selectedData1.getEvaluationString() << std::endl;
             }
 
-            std::cout << std::endl << "Candidate ID q is exit please input: >" << std::endl;
+            std::cout << std::endl << "Candidate ID q is exit please input:" << std::endl;
             std::cin >> input; // 入力を受け取る
 
             // 'q'の場合、ループを抜ける
