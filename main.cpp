@@ -332,59 +332,7 @@ int main(int argc, char *argv[]) {
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
     //std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
-
-    if (CandidateID != 0) {
-        std::string input;
-        while (true) {
-            std::cout << std::endl  << "found: " << foundSeeds << std::endl << "Candidate ID q is exit please input:" << std::endl;
-            std::cin >> input; // 入力を受け取る
-
-            // 'q'の場合、ループを抜ける
-            if (input == "q") {
-                break;
-            }
-
-            // IDを整数に変換
-            int candidateID;
-            try {
-                candidateID = std::stoi(input);
-            } catch (const std::invalid_argument &) {
-                std::cout << "is invalid." << std::endl;
-                continue;
-            }
-
-            bool foundkey = false;
-            int counter = 0;
-            // IDが存在するか確認
-            for (AnalyzeData &selectedData: analyzeDataMap) {
-                if (counter != candidateID) {
-                    counter++;
-                    continue;
-                }
-                foundkey = true;
-                std::cout << "id: " << candidateID;
-                std::shared_ptr<BattleResult> battleResult = selectedData.getBattleResult();
-                std::vector<int32_t> gene1 = selectedData.getGenome();
-
-                std::string table = dumpTable(*battleResult, gene1, selectedData.getLastInputTurn());
-                if (selectedData.getWinStatus()) {
-                    std::cout << table << std::endl << "win!" << std::endl;
-                } else {
-                    std::cout << table << std::endl << "lost" << std::endl;
-                }
-
-                std::cout << normalDump(selectedData) << std::endl;
-
-                counter++;
-            }
-            if (!foundkey) {
-                std::cout << "not found: " << candidateID << std::endl;
-            }
-        }
-
-
-        return 0;
-    }
+    return 0;
 }
 
 
@@ -483,24 +431,11 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
             }
             //ss1 << action << ": " << enemy.ehp << ": " << result.turn[j] << ", ";
             if (action == BattleEmulator::PARALYSIS ||
-                (paralysisTurns > 0 && action == BattleEmulator::INACTIVE_ALLY) ||
+                (action == BattleEmulator::INACTIVE_ALLY) ||
                 action == BattleEmulator::CURE_PARALYSIS || inactive || paralysis) {
-                paralysisTurns++;
-                lastParalysis = turn;
-                lastCounter = j;
                 continue;
             }
-            if (first && action != BattleEmulator::INACTIVE_ALLY) {
-                paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
-                first = false;
-            }
-            if (paralysisTurns > 0 && action != BattleEmulator::INACTIVE_ALLY) {
-                first = true;
-                paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
-            }
-            lastParalysis = -1;
-            lastCounter = -1;
-            paralysisTurns = 0;
+            paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
         }
     }
     for (const auto &pair: paralysis_map) {
@@ -584,7 +519,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     // 候補を効率の高い順にソート
     std::sort(candidate.begin(), candidate.end(),
               [](const AnalyzeData &a, const AnalyzeData &b) {
-                  return a.calculateEfficiency() <= b.calculateEfficiency(); // 降順でソート
+                  return a.calculateEfficiency() > b.calculateEfficiency(); // 降順でソート
               });
 
     int lastTurn = -1;
@@ -593,9 +528,6 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     AnalyzeData lastData;
 
     for (AnalyzeData &data: candidate) {
-        if (CandidateID < 0 && found != 0) {
-            return;
-        }
         //std::cout << "efficiency: " << data.calculateEfficiency() << std::endl;
         if (data.calculateEfficiency() > 7) {
             if (data.getWinStatus()) {
@@ -625,6 +557,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
                 analyzeDataMap.push_back(data);
                 CandidateID++;
                 lastData = data;
+                break;
             }
         }
         // 他の処理をここに追加...
