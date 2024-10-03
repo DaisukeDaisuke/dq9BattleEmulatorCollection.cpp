@@ -347,6 +347,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     bool first = false;
     std::map<int32_t, int> paralysis_map;
     int lastInputTurn = -1;
+    auto respite = -1;
 
     std::cout << "============" << seed  << "============" << std::endl;
 
@@ -404,6 +405,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
 
 
         auto turn = result2.turn + 1;
+        respite = turn - lastInputTurn;
         if (players[0].hp <= 0) {
             ss1 << "L " << turn;
             std::cout << table << std::endl << "lost" << std::endl;
@@ -426,8 +428,14 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
             auto turn = result2.turns[j];
             auto ehp = result2.ehp[j];
             auto ahp = result2.ahp[j];
-            if (turn <= lastInputTurn) {
-                continue;
+            if (respite >= 8) {
+                if (turn <= (lastInputTurn+3)) {
+                    continue;
+                }
+            }else{
+                if (turn <= lastInputTurn) {
+                    continue;
+                }
             }
             //ss1 << action << ": " << enemy.ehp << ": " << result.turn[j] << ", ";
             if (action == BattleEmulator::PARALYSIS ||
