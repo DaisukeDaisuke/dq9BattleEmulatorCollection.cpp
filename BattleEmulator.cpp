@@ -395,8 +395,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     double percent1 = 0.0;
     int attackCount;
     int percent_tmp;
-    float proportionTable1[8] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2};
+    //double proportionTable1[8] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2};
+   // double proportionTable1[8] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
     int proportionTable2[8] = {90, 90, 64, 32, 16, 8, 4, 2};
+    int proportionTable3[8] = {63 , 56, 49, 42, 35, 28, 21, 14};
     switch (Id & 0xffff) {
         case BattleEmulator::MEDICINAL_HERBS:
             (*position) += 2;
@@ -543,9 +545,27 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 (*position)++;//目を覚ました
                 (*position)++;//不明
                 if (!players[defender].paralysis && !players[defender].inactive) {
-                    if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
-                        players[defender].specialCharge = true;
-                        players[defender].specialChargeTurn = 6;
+                    //必殺チャージ(敵)
+                    if (!players[defender].specialCharge) {
+                        percent_tmp = lcg::getPercent(position, 100);
+                        tmp = baseDamage * players[defender].defence;
+                        baseDamage = static_cast<int>(floor(tmp));
+                        if (baseDamage < 14) {
+                            if (percent_tmp < 1) {
+                                players[defender].specialCharge = true;
+                                players[defender].specialChargeTurn = 6;
+                            }
+                        }else {
+                            for (int i = 0; i < 8; ++i) {
+                                if (baseDamage >= proportionTable3[i]) {
+                                    if (percent_tmp < proportionTable2[i]) {
+                                        players[defender].specialCharge = true;
+                                        players[defender].specialChargeTurn = 6;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -588,9 +608,27 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 (*position)++;//目を覚ました
                 (*position)++;//不明
                 if (!players[defender].paralysis && !players[defender].inactive) {
-                    if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
-                        players[defender].specialCharge = true;
-                        players[defender].specialChargeTurn = 6;
+                    //必殺チャージ(敵)
+                    if (!players[defender].specialCharge) {
+                        percent_tmp = lcg::getPercent(position, 100);
+                        tmp = baseDamage * players[defender].defence;
+                        baseDamage = static_cast<int>(floor(tmp));
+                        if (baseDamage < 14) {
+                            if (percent_tmp < 1) {
+                                players[defender].specialCharge = true;
+                                players[defender].specialChargeTurn = 6;
+                            }
+                        }else {
+                            for (int i = 0; i < 8; ++i) {
+                                if (baseDamage >= proportionTable3[i]) {
+                                    if (percent_tmp < proportionTable2[i]) {
+                                        players[defender].specialCharge = true;
+                                        players[defender].specialChargeTurn = 6;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -679,9 +717,27 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++;//不明
             if (!players[defender].paralysis && !players[defender].inactive) {
-                if (!players[defender].specialCharge  && lcg::getPercent(position, 100) < 1) {
-                    players[defender].specialCharge = true;
-                    players[defender].specialChargeTurn = 6;
+                //必殺チャージ(敵)
+                if (!players[defender].specialCharge) {
+                    percent_tmp = lcg::getPercent(position, 100);
+                    tmp = baseDamage * players[defender].defence;
+                    baseDamage = static_cast<int>(floor(tmp));
+                    if (baseDamage < 14) {
+                        if (percent_tmp < 1) {
+                            players[defender].specialCharge = true;
+                            players[defender].specialChargeTurn = 6;
+                        }
+                    }else {
+                        for (int i = 0; i < 8; ++i) {
+                            if (baseDamage >= proportionTable3[i]) {
+                                if (percent_tmp < proportionTable2[i]) {
+                                    players[defender].specialCharge = true;
+                                    players[defender].specialChargeTurn = 6;
+                                }
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             tmp = baseDamage * players[defender].defence;
@@ -702,35 +758,28 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             } else {
                 (*position)++;
                 if (!players[defender].paralysis && !players[0].inactive) {
-                    /*
-                    0.9000: 90
-                    0.8000: 64
-                    0.7000: 32
-                    0.6000: 16
-                    0.5000: 8
-                    0.4000: 4
-                    0.3000: 2
-                    0.2000: 1
-                     */
-
+                    //必殺チャージ(敵)
                     if (!players[defender].specialCharge) {
+                        percent_tmp = lcg::getPercent(position, 100);
                         tmp = baseDamage * players[defender].defence;
                         baseDamage = static_cast<int>(floor(tmp));
-                        tmp =  baseDamage / players[0].maxHp;
-                        percent_tmp = lcg::getPercent(position, 100);
-                        for (int i = 0; i < 8; ++i) {
-                            if (tmp > proportionTable1[i]){
-                                if(percent_tmp < proportionTable2[i]){
-                                    players[defender].specialCharge = true;
-                                    players[defender].specialChargeTurn = 6;
+                        if (baseDamage < 14) {
+                            if (percent_tmp < 1) {
+                                players[defender].specialCharge = true;
+                                players[defender].specialChargeTurn = 6;
+                            }
+                        }else {
+                            for (int i = 0; i < 8; ++i) {
+                                if (baseDamage >= proportionTable3[i]) {
+                                    if (percent_tmp < proportionTable2[i]) {
+                                        players[defender].specialCharge = true;
+                                        players[defender].specialChargeTurn = 6;
+                                    }
+                                    break;
                                 }
                             }
                         }
                     }
-
-//                    if ( &&  < 1) {//0x021ed7a8
-//
-//                    }
                 }
             }
 
@@ -773,11 +822,28 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 (*position)++;//目を覚ました
                 (*position)++;//不明
                 if (!players[defender].paralysis && !players[defender].inactive) {
-                    if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
-                        players[defender].specialCharge = true;
-                        players[defender].specialChargeTurn = 6;
+                    //必殺チャージ(敵)
+                    if (!players[defender].specialCharge) {
+                        percent_tmp = lcg::getPercent(position, 100);
+                        tmp = baseDamage * players[defender].defence;
+                        baseDamage = static_cast<int>(floor(tmp));
+                        if (baseDamage < 14) {
+                            if (percent_tmp < 1) {
+                                players[defender].specialCharge = true;
+                                players[defender].specialChargeTurn = 6;
+                            }
+                        }else {
+                            for (int i = 0; i < 8; ++i) {
+                                if (baseDamage >= proportionTable3[i]) {
+                                    if (percent_tmp < proportionTable2[i]) {
+                                        players[defender].specialCharge = true;
+                                        players[defender].specialChargeTurn = 6;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
                     }
-                }
                 tmp = baseDamage * players[defender].defence;
                 baseDamage = static_cast<int>(floor(tmp));
                 Player::heal(players[attacker], (baseDamage >> 2)); // /4
