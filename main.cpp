@@ -30,13 +30,16 @@ std::string trim(const std::string &s);
 using namespace std;
 
 int CandidateID = 0;
+int foundSeeds = 0;
+std::vector<AnalyzeData> analyzeDataMap;
+
 
 void printHeader(std::stringstream &ss);
 
 // ヘッダーを出力する関数
 void printHeader(std::stringstream &ss) {
     ss << std::left << std::setw(8) << "turn"
-        << std::setw(8) << "ehp"
+       << std::setw(8) << "ehp"
        << std::setw(8) << "ahp"
        << std::setw(18) << "eAction"
        << std::setw(18) << "aAction"
@@ -49,9 +52,9 @@ void printHeader(std::stringstream &ss) {
     ss << std::string(130, '-') << "\n";  // 区切り線を出力
 }
 
-std::string dumpTable(BattleResult& result);
+std::string dumpTable(BattleResult &result, std::vector<int32_t> gene);
 
-std::string dumpTable(BattleResult& result) {
+std::string dumpTable(BattleResult &result, std::vector<int32_t> gene) {
     stringstream ss6;
     printHeader(ss6);
     int currentTurn = -1;
@@ -71,6 +74,12 @@ std::string dumpTable(BattleResult& result) {
         auto ahp1 = result.ahp[i];
         auto isEnemy = result.isEnemy[i];
 
+        auto special = gene[turn];
+        std::string specialAction;
+        if (special != 0) {
+            specialAction = BattleEmulator::getActionName(special & 0x3ff);
+        }
+
         // ターンが変わったら、前のターンのデータを出力
         if (turn != currentTurn) {
             if (currentTurn != -1) {
@@ -83,10 +92,10 @@ std::string dumpTable(BattleResult& result) {
                         << std::setw(18) << aAction
                         << std::setw(8) << eDamage
                         << std::setw(8) << aDamage
-                        << std::setw(13) << initiative
-                        << std::setw(18) << ""
-                        << std::setw(11) << (aAction == "Paralysis")
-                        << std::setw(11) << (aAction == "Inactive Ally"||aAction == "Cure Paralysis")
+                        << std::setw(13) << (initiative ? "yes" : "no")
+                        << std::setw(18) << specialAction
+                        << std::setw(11) << ((aAction == "Paralysis") ? "yes" : "no")
+                        << std::setw(11) << ((aAction == "Inactive Ally" || aAction == "Cure Paralysis") ? "yes" : "no")
                         << std::setw(11) << "" << "\n";
             }
             // ターンの初期化
@@ -120,14 +129,52 @@ std::string dumpTable(BattleResult& result) {
                 << std::setw(18) << aAction
                 << std::setw(8) << eDamage
                 << std::setw(8) << aDamage
-                << std::setw(13) << result.initiative[result.position - 1]
+                << std::setw(13) << (result.initiative[result.position - 1] ? "yes" : "no")
                 << std::setw(18) << ""
-                << std::setw(11) << (aAction == "Paralysis")
-                << std::setw(11) << (aAction == "Inactive Ally"||aAction == "Cure Paralysis")
+                << std::setw(11) << ((aAction == "Paralysis") ? "yes" : "no")
+                << std::setw(11) << ((aAction == "Inactive Ally" || aAction == "Cure Paralysis") ? "yes" : "no")
                 << std::setw(11) << "" << "\n";
     }
 
     return ss6.str();
+}
+
+std::string normalDump(AnalyzeData data);
+
+std::string normalDump(AnalyzeData data) {
+    int counter = 0;
+    BattleResult result = *data.getBattleResult();
+    std::stringstream ss;
+    for (int i = 0; i < result.position; ++i) {
+        auto action = result.actions[i];
+        auto damage = result.damages[i];
+        auto isP = result.isParalysis[i];
+        auto isI = result.isInactive[i];
+        if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
+            ss << "h ";
+            counter++;
+        } else if (damage != 0) {
+            counter++;
+            if (isP) {
+                ss << damage << "-m" << " ";
+            } else if (isI) {
+                ss << damage << "-i" << " ";
+            } else {
+                ss << damage << " ";
+            }
+        }
+        if (counter == 10) {
+            ss << std::endl;
+            counter = 0;
+        }
+    }
+    auto turn = result.turn;
+    if (data.getWinStatus()) {
+        ss << "W " << turn;
+    }else{
+        ss << "L " << turn;
+    }
+    return ss.str();
 }
 
 int main(int argc, char *argv[]) {
@@ -157,50 +204,6 @@ int main(int argc, char *argv[]) {
         players[i].speed = speeds[i];
         players[i].mp = mps[i];
     }
-
-
-
-//        auto time = (static_cast<int>(floor(((48 * 60 + 0) * 0.19)))) << 16;
-//        auto time1 = (static_cast<int>(floor(((50 * 60 + 0) * 0.19)))) << 16;
-//        auto time = (static_cast<int>(floor(((50 * 60 + 50) * 0.19)))) << 16;
-//        auto time1 = (static_cast<int>(floor(((60 * 60 + 50) * 0.19)))) << 16;
-    //b 20 17 21 18 21 31 26 22 17
-//        auto time = 0x025C5A0D-2;
-//        auto time1 = 0x025C5A0D+2;
-
-    //int i = 0x025C5A0D;
-    //b z 22 A 27 17 19 28
-    //b a 25 16 z 22 16 22 22
-
-//        //b z 22 A 27 22 16 22 9 17 21 21 18
-//        for (int i = time; i <time1; ++i) {
-//            int *position = new int(1);
-//            lcg::init(i, 500);
-//            for (int j = 0; j < 2; ++j) {
-//                players[j] = copiedPlayers[j];
-//            }
-//            if(BattleEmulator::Main(position, gene, players)){
-//                std::cout << "found: " << i << std::endl;
-//            }
-//            lcg::release();
-//            delete position;
-//        }
-    // Declare and initialize an array to store precalculated values
-    //b a 25 16 z 22 16 22
-    //uint64_t seed = 36434887;
-    //uint64_t seed = 0x31DEF5AB;
-    //uint64_t seed = 0x30ffea3a;//幼女2回目
-    //uint64_t seed = 0x45F7ADf0;//幼女3回目、2ターン目必殺チャージ
-    //uint64_t seed = 0x30f24ab7;//幼女4回目
-    //uint64_t seed = 0x31D66981;
-    //uint64_t seed = 0x127578ED;
-
-//    int hours = 1;
-//    int minutes = 21;
-//    int seconds = 28;
-//    int hours = 1;
-//    int minutes = 27;
-//    int seconds = 58;
     int hours = toint(argv[1]);
     int minutes = toint(argv[2]);
     int seconds = toint(argv[3]);
@@ -220,6 +223,8 @@ int main(int argc, char *argv[]) {
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
 
+    time1 = 166779029;
+    time2 = 166779031;
 
 #ifdef DEBUG2
     time1 = 2327755714;
@@ -276,10 +281,10 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    time1 = 109840968;
+    time1 = 166779030;
 
     lcg::init(time1, 5000);
-    processResult(copiedPlayers, time1, gene, 0, "11 16 9 19");
+    processResult(copiedPlayers, time1, gene, 0, "15 9 10 18 9 17 13 15 h");
     lcg::release();
     return 0;
 #endif
@@ -341,6 +346,7 @@ int main(int argc, char *argv[]) {
             //std::cout << seed << std::endl;
             //std::cout << resultStr << std::endl;
             processResult(copiedPlayers, seed, gene, 0, str2);
+            foundSeeds++;
         }
         lcg::release();
         delete position;
@@ -349,20 +355,65 @@ int main(int argc, char *argv[]) {
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
     //std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
-    //std::cout << (*position) << std::endl;
 
-    //cout << "hp" << endl;
-//    for (auto &player: players) {
-//        std::cout << player.hp << std::endl;
-//    }
-    //std::cout << (players[0].specialCharge ? "hissatu: true" : "hissatu: fa") << std::endl;
+    std::cout << std::endl << "found: " << foundSeeds << std::endl;
 
-    //std::cout << "Size of int: " << sizeof(int) * 8 << " bits" << std::endl;
+    if (CandidateID != 0) {
+        std::string input;
+        while (true) {
+            for (AnalyzeData &selectedData1: analyzeDataMap) {
+                std::cout << selectedData1.getEvaluationString() << std::endl;
+            }
 
-    //delete position;
+            std::cout << std::endl << "Candidate ID q is exit please input: >" << std::endl;
+            std::cin >> input; // 入力を受け取る
+
+            // 'q'の場合、ループを抜ける
+            if (input == "q") {
+                break;
+            }
+
+            // IDを整数に変換
+            int candidateID;
+            try {
+                candidateID = std::stoi(input);
+            } catch (const std::invalid_argument &) {
+                std::cout << "is invalid." << std::endl;
+                continue;
+            }
+
+            bool foundkey = false;
+            int counter = 0;
+            // IDが存在するか確認
+            for (AnalyzeData &selectedData: analyzeDataMap) {
+                if (counter != candidateID) {
+                    CandidateID++;
+                    continue;
+                }
+                foundkey = true;
+                std::cout << "id: " << candidateID;
+                std::shared_ptr<BattleResult> battleResult = selectedData.getBattleResult();
+                std::vector<int32_t> gene1 = selectedData.getGenome();
+
+                std::string table = dumpTable(*battleResult, gene1);
+                if (selectedData.getWinStatus()) {
+                    std::cout << table << std::endl << "win!" << std::endl;
+                } else {
+                    std::cout << table << std::endl << "lost" << std::endl;
+                }
+
+                std::cout << normalDump(selectedData) << std::endl;
+
+                CandidateID++;
+            }
+            if (!foundkey) {
+                std::cout << "not found: " << candidateID << std::endl;
+            }
+        }
 
 
-    return 0;
+        return 0;
+    }
 }
 
 
@@ -428,15 +479,17 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
                 counter = 0;
             }
         }
-        auto table = dumpTable(result2);
-        std::cout << table << std::endl;
+        auto table = dumpTable(result2, gene);
+
 
         auto turn = result2.turn;
         if (players[0].hp <= 0) {
             ss1 << "L " << turn;
+            std::cout << table << std::endl << "lost" << std::endl;
         }
         if (players[1].hp <= 0) {
             ss1 << "W " << turn;
+            std::cout << table << std::endl << "win!" << std::endl;
         }
         std::cout << ss1.str() << std::endl;
         delete position;
@@ -498,32 +551,6 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         analyzeData.setGenome(gene);
         //std::cout << analyzeData.calculateEfficiency() << std::endl;
 
-
-
-//        int counter = 0;
-//        for (int i = 0; i < result1.position; ++i) {
-//            auto action = result1.actions[i];
-//            auto damage = result1.damages[i];
-//            auto isP = result1.isParalysis[i];
-//            auto isI = result1.isInactive[i];
-//            if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
-//                ss << "h ";
-//                counter++;
-//            } else if (damage != 0) {
-//                counter++;
-//                if (isP){
-//                    ss << damage << "-m" << " ";
-//                }else if(isI){
-//                    ss << damage << "-i" << " ";
-//                }else {
-//                    ss << damage << " ";
-//                }
-//            }
-//            if(counter == 10){
-//                ss << std::endl;
-//                counter = 0;
-//            }
-//        }
         auto turn = result1.turn;
         if (players[0].hp <= 0) {
             ss << "L " << turn;
@@ -559,30 +586,6 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         analyzeData.FromBattleResult(result3);
         analyzeData.setGenome(gene);
 
-        int counter = 0;
-        for (int i = 0; i < result3.position; ++i) {
-            auto action = result3.actions[i];
-            auto damage = result3.damages[i];
-            auto isP = result3.isParalysis[i];
-            auto isI = result3.isInactive[i];
-            if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
-                ss << "h ";
-                counter++;
-            } else if (damage != 0) {
-                counter++;
-                if (isP) {
-                    ss << damage << "-m" << " ";
-                } else if (isI) {
-                    ss << damage << "-i" << " ";
-                } else {
-                    ss << damage << " ";
-                }
-            }
-            if (counter == 10) {
-                ss << std::endl;
-                counter = 0;
-            }
-        }
         auto turn = result3.turn;
         if (players[0].hp <= 0) {
             ss << "L " << turn;
@@ -613,15 +616,20 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     int lastTurn = -1;
     // ソートされた候補を処理
     int found = 0;
+    AnalyzeData lastData;
+
     for (AnalyzeData &data: candidate) {
+        if (CandidateID < 0 && found != 0) {
+            return;
+        }
         //std::cout << "efficiency: " << data.calculateEfficiency() << std::endl;
         if (data.calculateEfficiency() > 7) {
             if (data.getWinStatus()) {
-                CandidateID++;
+                std::stringstream ss7;
                 found++;
-                std::cout << std::endl << std::endl << "=======cid " << CandidateID << "========" << std::endl
-                          << data.getBattleTrace();
-                std::cout << "actions: " << std::endl;
+                ss7 << std::endl << std::endl << "=======cid " << CandidateID << "========" << std::endl
+                    << data.getBattleTrace();
+                ss7 << "actions: " << std::endl;
 
                 auto vec = data.getGenome();
                 for (size_t i = 0; i < vec.size(); ++i) {
@@ -634,32 +642,24 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
                             actionName = "DEFENCE";
                         }
                         lastTurn = i + 1;
-                        std::cout << "turn: " << lastTurn << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: "
-                                  << ((vec[i] >> 20) & 0x3ff) << ", action: " << actionName << std::endl;
+                        ss7 << "turn: " << lastTurn << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: "
+                            << ((vec[i] >> 20) & 0x3ff) << ", action: " << actionName << std::endl;
                     }
                 }
+                std::cout << ss7.str();
+                data.setEvaluationString(ss7.str());
+                analyzeDataMap.push_back(data);
+                CandidateID++;
+                lastData = data;
             }
         }
         // 他の処理をここに追加...
     }
-
     if (found != 0) {
-        return;
+        std::cout << dumpTable(*lastData.getBattleResult(), lastData.getGenome()) << std::endl << normalDump(lastData)
+                  << std::endl;
     }
-
-    // 最高の効率を持つ要素を見つける
-    auto maxElementIter = std::max_element(candidate.begin(), candidate.end(),
-                                           [](const AnalyzeData &a, const AnalyzeData &b) {
-                                               return a.calculateEfficiency() < b.calculateEfficiency();
-                                           });
-
-    if (maxElementIter != candidate.end()) {
-        // 最も高い効率値を持つ要素にアクセス
-        AnalyzeData &bestCandidate = *maxElementIter;
-
-    } else {
-        std::cout << "error1" << std::endl;
-    }
+    return;
 }
 
 int toint(char *str) {

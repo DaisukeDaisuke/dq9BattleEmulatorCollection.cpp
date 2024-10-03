@@ -71,6 +71,14 @@ public:
         final_hp = result.ehp[result.position - 1]; // 最終HPを取得
     }
 
+    void setEvaluationString(std::string str){
+        EvaluationString = std::move(str);
+    }
+
+    [[nodiscard]] std::string getEvaluationString(){
+        return EvaluationString;
+    }
+
     // バトル効率を計算
     double calculateEfficiency() const {
         if (turns == 0) return 0.0; // ターン数が0の場合は効率を0として返す
@@ -90,6 +98,7 @@ private:
     int ehp = 0;
     int ahp = 0;
     std::string BattleTrace;
+    std::string EvaluationString;
 };
 
 
