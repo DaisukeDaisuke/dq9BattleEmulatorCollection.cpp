@@ -31,14 +31,14 @@ std::string BattleEmulator::getActionName(int actionId) {
 
     switch (actionId) {
         case BattleEmulator::PUFF_PUFF: return "Puff Puff";
-        case BattleEmulator::UNSPEAKABLE_EVIL: return "Unspeakable";
+        case BattleEmulator::MANAZASHI: return "Witch's Gaze";
         case BattleEmulator::VICTIMISER: return "Victimiser";
-        case BattleEmulator::CRACK_ENEMY: return "Crack Enemy";
-        case BattleEmulator::INACTIVE_ENEMY: return "Inactive Enemy";
-        case BattleEmulator::INACTIVE_ALLY: return "Inactive Ally";
+        case BattleEmulator::CRACK_ENEMY: return "Crack";
+        case BattleEmulator::INACTIVE_ENEMY: return "Inactive";
+        case BattleEmulator::INACTIVE_ALLY: return "Inactive";
         case BattleEmulator::HP_HOOVER: return "HP Hoover";
 
-        case BattleEmulator::ATTACK_ENEMY: return "Attack Enemy";
+        case BattleEmulator::ATTACK_ENEMY: return "Attack";
         case BattleEmulator::MULTITHRUST: return "Multithrust";
         case BattleEmulator::MEDICINAL_HERBS: return "Medicinal Herbs";
         case BattleEmulator::PARALYSIS: return "Paralysis";
@@ -46,7 +46,7 @@ std::string BattleEmulator::getActionName(int actionId) {
         case BattleEmulator::ACROBATSTAR_KAIHI: return "Acrobat Kaihi";
         case BattleEmulator::CURE_PARALYSIS: return "Cure Paralysis";
 
-        case BattleEmulator::ATTACK_ALLY: return "Attack Ally";
+        case BattleEmulator::ATTACK_ALLY: return "Attack";
         case BattleEmulator::HEAL: return "Heal";
         case BattleEmulator::ACROBATIC_STAR: return "Acrobatic Star";
         case BattleEmulator::DEFENCE: return "Defence";
@@ -80,7 +80,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
         }
         DEBUG_COUT2((*position));
 #ifdef DEBUG2
-        if ((*position) == 1171){
+        if ((*position) == 1004){
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -154,7 +154,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
 
         if (Gene.size() > genePosition&&Gene[genePosition] != 0) {
             actionTable[0] = Gene[genePosition] & 0x3ff;
-            if (actionTable[0] == HEAL&&players[0].mp == 0){
+            if (actionTable[0] == HEAL&&players[0].mp <= 0){
                 if (players[0].medicinal_herbs_count != 0){
                     actionTable[0] = MEDICINAL_HERBS;
                     players[0].medicinal_herbs_count--;
@@ -210,7 +210,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
             ////std::cout << "元の位置: " << element.second << ", 値: " << element.first << std::endl;
             if (element.second == 1) {
                 //--------start_FUN_02158dfc-------
-                int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, UNSPEAKABLE_EVIL, PUFF_PUFF};
+                int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, MANAZASHI, PUFF_PUFF};
                 //休み時消費:   タナトス バンパイアエッジ ヒャド 攻撃 まなざし まなざし
                 //バンパイアエッジ(制限行動: タナトスハント) バンパイアエッジ ヒャド 通常攻撃 まなざし ぱふぱふ
                 if (lcg::getPercent(position, 100) < 0.0160) {//0x021588ec
@@ -220,13 +220,13 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
                     }
                 }
                 if (enemyAction != INACTIVE_ENEMY){
-                    //int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, UNSPEAKABLE_EVIL, PUFF_PUFF};
+                    //int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, MANAZASHI, PUFF_PUFF};
                     enemyAction = table[ProcessEnemyRandomAction(position, 0)];
                     //制限行動ぱふぱふ
                     if (enemyAction == PUFF_PUFF && players[0].inactive) {
-                        enemyAction = UNSPEAKABLE_EVIL;
+                        enemyAction = MANAZASHI;
                     }
-                    if (enemyAction == UNSPEAKABLE_EVIL) {
+                    if (enemyAction == MANAZASHI) {
                         //randIntRange: 0x0216139c 3 4 90
                         //randIntRange: 0x021613b0 6 8 91
                         (*position)++;
@@ -395,6 +395,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     double percent1 = 0.0;
     int attackCount;
     int percent_tmp;
+    float proportionTable1[8] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2};
+    int proportionTable2[8] = {90, 90, 64, 32, 16, 8, 4, 2};
     switch (Id & 0xffff) {
         case BattleEmulator::MEDICINAL_HERBS:
             (*position) += 2;
@@ -661,7 +663,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             players[attacker].mp -= 2;
             break;
-        case BattleEmulator::UNSPEAKABLE_EVIL:
+        case BattleEmulator::MANAZASHI:
             (*position) += 2;
             (*position)++;//会心
             (*position)++;//関係ない
@@ -700,10 +702,35 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             } else {
                 (*position)++;
                 if (!players[defender].paralysis && !players[0].inactive) {
-                    if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
-                        players[defender].specialCharge = true;
-                        players[defender].specialChargeTurn = 6;
+                    /*
+                    0.9000: 90
+                    0.8000: 64
+                    0.7000: 32
+                    0.6000: 16
+                    0.5000: 8
+                    0.4000: 4
+                    0.3000: 2
+                    0.2000: 1
+                     */
+
+                    if (!players[defender].specialCharge) {
+                        tmp = baseDamage * players[defender].defence;
+                        baseDamage = static_cast<int>(floor(tmp));
+                        tmp =  baseDamage / players[0].maxHp;
+                        percent_tmp = lcg::getPercent(position, 100);
+                        for (int i = 0; i < 8; ++i) {
+                            if (tmp > proportionTable1[i]){
+                                if(percent_tmp < proportionTable2[i]){
+                                    players[defender].specialCharge = true;
+                                    players[defender].specialChargeTurn = 6;
+                                }
+                            }
+                        }
                     }
+
+//                    if ( &&  < 1) {//0x021ed7a8
+//
+//                    }
                 }
             }
 

@@ -79,6 +79,14 @@ public:
         return EvaluationString;
     }
 
+    void setLastInputTurn(int turn){
+        lastInputTurn = turn;
+    }
+
+    [[nodiscard]] int getLastInputTurn(){
+        return lastInputTurn;
+    }
+
     // バトル効率を計算
     double calculateEfficiency() const {
         if (turns == 0) return 0.0; // ターン数が0の場合は効率を0として返す
@@ -94,6 +102,7 @@ private:
     int turns = 0;
     int final_hp = 0; // 最終HP
     bool winStatus = false;
+    int lastInputTurn;
     std::shared_ptr<BattleResult> battleResult;
     int ehp = 0;
     int ahp = 0;

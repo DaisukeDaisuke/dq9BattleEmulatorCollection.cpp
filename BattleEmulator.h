@@ -13,7 +13,7 @@
 class BattleEmulator {
 public:
     static const int PUFF_PUFF = 1011;
-    static const int UNSPEAKABLE_EVIL = 1010;
+    static const int MANAZASHI = 1010;
     static const int VICTIMISER = 1009;
     static const int CRACK_ENEMY = 1008;
     static const int INACTIVE_ENEMY = 1013;
