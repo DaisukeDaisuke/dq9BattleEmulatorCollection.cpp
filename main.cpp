@@ -338,7 +338,7 @@ int main(int argc, char *argv[]) {
                 std::cout << selectedData1.getEvaluationString() << std::endl;
             }
 
-            std::cout << std::endl << "Candidate ID q is exit please input:" << std::endl;
+            std::cout << std::endl  << "found: " << foundSeeds << std::endl << "Candidate ID q is exit please input:" << std::endl;
             std::cin >> input; // 入力を受け取る
 
             // 'q'の場合、ループを抜ける
@@ -401,6 +401,8 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     bool first = false;
     std::map<int32_t, int> paralysis_map;
     int lastInputTurn = -1;
+
+    std::cout << "============" << seed  << "============" << std::endl;
 
     {
         std::stringstream ss1;
@@ -526,11 +528,11 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
 
         auto turn = result1.turn + 1;
         if (players[0].hp <= 0) {
-            ss << "L " << turn;
+            ss << "L " << turn << ", seed: " << seed;
             analyzeData.setWinStatus(false);
         }
         if (players[1].hp <= 0) {
-            ss << "W " << turn;
+            ss << "W " << turn << ", seed: " << seed;
             analyzeData.setWinStatus(true);
         }
         ss << std::endl;
@@ -562,11 +564,11 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
 
         auto turn = result3.turn + 1;
         if (players[0].hp <= 0) {
-            ss << "L " << turn;
+            ss << "L " << turn << ", seed: " << seed;
             analyzeData.setWinStatus(false);
         }
         if (players[1].hp <= 0) {
-            ss << "W " << turn;
+            ss << "W " << turn << ", seed: " << seed;
             analyzeData.setWinStatus(true);
         }
         ss << std::endl;
@@ -633,6 +635,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         std::cout << dumpTable(*lastData.getBattleResult(), lastData.getGenome(), lastInputTurn) << std::endl << normalDump(lastData)
                   << std::endl;
     }
+    std::cout << "============" << seed  << "============" << std::endl;
     return;
 }
 
