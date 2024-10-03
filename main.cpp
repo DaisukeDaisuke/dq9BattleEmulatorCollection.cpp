@@ -10,20 +10,128 @@
 #include <fstream>
 #include <vector>
 #include <map>
+#include <iomanip>
 #include "lcg.h"
 #include "BattleEmulator.h"
 #include "AnalyzeData.h"
 #include "debug.h"
 
 int toint(char *string);
-void processResult(const Player *copiedPlayers,const uint64_t seed,  std::vector<int32_t> gene,int depth);
+
+void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene, int depth,
+                   std::string input);
+
+std::string ltrim(const std::string &s);
+
+std::string rtrim(const std::string &s);
+
+std::string trim(const std::string &s);
 
 using namespace std;
 
 int CandidateID = 0;
 
+void printHeader(std::stringstream &ss);
+
+// ヘッダーを出力する関数
+void printHeader(std::stringstream &ss) {
+    ss << std::left << std::setw(8) << "turn"
+        << std::setw(8) << "ehp"
+       << std::setw(8) << "ahp"
+       << std::setw(18) << "eAction"
+       << std::setw(18) << "aAction"
+       << std::setw(8) << "eDamage"
+       << std::setw(8) << "aDamage"
+       << std::setw(13) << "initiative"
+       << std::setw(18) << "special"
+       << std::setw(11) << "Paralysis"
+       << std::setw(11) << "Inactive" << "\n";
+    ss << std::string(130, '-') << "\n";  // 区切り線を出力
+}
+
+std::string dumpTable(BattleResult& result);
+
+std::string dumpTable(BattleResult& result) {
+    stringstream ss6;
+    printHeader(ss6);
+    int currentTurn = -1;
+    int eDamage = -1, aDamage = -1;
+    bool isP1, isI1 = false;
+    std::string eAction, aAction;
+
+    // データのループ
+    for (int i = 0; i < result.position; ++i) {
+        auto action = result.actions[i];
+        auto damage = result.damages[i];
+        auto isP = result.isParalysis[i];
+        auto isI = result.isInactive[i];
+        auto turn = result.turns[i];
+        auto initiative = result.initiative[i];
+        auto ehp1 = result.ehp[i];
+        auto ahp1 = result.ahp[i];
+        auto isEnemy = result.isEnemy[i];
+
+        // ターンが変わったら、前のターンのデータを出力
+        if (turn != currentTurn) {
+            if (currentTurn != -1) {
+                // 前のターンの出力
+                ss6
+                        << std::left << std::setw(8) << (currentTurn + 1)
+                        << std::left << std::setw(8) << ehp1
+                        << std::setw(8) << ahp1
+                        << std::setw(18) << eAction
+                        << std::setw(18) << aAction
+                        << std::setw(8) << eDamage
+                        << std::setw(8) << aDamage
+                        << std::setw(13) << initiative
+                        << std::setw(18) << ""
+                        << std::setw(11) << (aAction == "Paralysis")
+                        << std::setw(11) << (aAction == "Inactive Ally"||aAction == "Cure Paralysis")
+                        << std::setw(11) << "" << "\n";
+            }
+            // ターンの初期化
+            currentTurn = turn;
+            eAction = "";
+            aAction = "";
+            eDamage = 0;
+            aDamage = 0;
+        }
+
+        // 敵か味方の行動を適切な変数に格納
+        if (isEnemy) {
+            eAction = BattleEmulator::getActionName(action);
+            eDamage = damage;
+            isI1 = isI1 || isI;
+        } else {
+            aAction = BattleEmulator::getActionName(action);
+            aDamage = damage;
+            isP1 = isP;
+            isI1 = isI;
+        }
+    }
+
+    // 最後のターンのデータを出力
+    if (currentTurn != -1) {
+        ss6
+                << std::left << std::setw(8) << (currentTurn + 1)
+                << std::left << std::setw(8) << result.ehp[result.position - 1]
+                << std::setw(8) << result.ahp[result.position - 1]
+                << std::setw(18) << eAction
+                << std::setw(18) << aAction
+                << std::setw(8) << eDamage
+                << std::setw(8) << aDamage
+                << std::setw(13) << result.initiative[result.position - 1]
+                << std::setw(18) << ""
+                << std::setw(11) << (aAction == "Paralysis")
+                << std::setw(11) << (aAction == "Inactive Ally"||aAction == "Cure Paralysis")
+                << std::setw(11) << "" << "\n";
+    }
+
+    return ss6.str();
+}
+
 int main(int argc, char *argv[]) {
-    if (argc < 6){
+    if (argc < 6) {
         std::cerr << "argc!!" << std::endl;
         return 1;
     }
@@ -37,7 +145,7 @@ int main(int argc, char *argv[]) {
     Player players[2];
     int hps[2] = {70, 456};
     int defs[2] = {69, 58};
-    int atks[2] = {62+2, 56};
+    int atks[2] = {62 + 2, 56};
     int speeds[2] = {44, 54};
     int mps[2] = {24, 255};
     for (int i = 0; i < 2; ++i) {
@@ -168,10 +276,10 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    time1 = 0x1000;
+    time1 = 109840968;
 
     lcg::init(time1, 5000);
-    processResult(copiedPlayers, time1, gene, 0);
+    processResult(copiedPlayers, time1, gene, 0, "11 16 9 19");
     lcg::release();
     return 0;
 #endif
@@ -220,10 +328,10 @@ int main(int argc, char *argv[]) {
                 ss << damage << " ";
             }
         }
-        if (players[0].hp <= 0){
+        if (players[0].hp <= 0) {
             ss << "L ";
         }
-        if (players[1].hp <= 0){
+        if (players[1].hp <= 0) {
             ss << "W ";
         }
         std::string resultStr = ss.str();
@@ -232,7 +340,7 @@ int main(int argc, char *argv[]) {
         if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
             //std::cout << seed << std::endl;
             //std::cout << resultStr << std::endl;
-            processResult(copiedPlayers, seed, gene, 0);
+            processResult(copiedPlayers, seed, gene, 0, str2);
         }
         lcg::release();
         delete position;
@@ -258,7 +366,8 @@ int main(int argc, char *argv[]) {
 }
 
 
-void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene1, int depth) {
+void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene1, int depth,
+                   std::string input) {
     BattleResult result2;
     vector<AnalyzeData> candidate = vector<AnalyzeData>();
     int PreviousTurn = 0;
@@ -267,9 +376,12 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     int paralysisTurns = 0;
     bool first = false;
     std::map<int32_t, int> paralysis_map;
+    int lastInputTurn = -1;
 
     {
         std::stringstream ss1;
+        std::stringstream ss5;
+        std::stringstream ss6;
         ss1 << seed << " " << std::endl;
         Player players[2];
         int *position = new int(1);
@@ -280,34 +392,50 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         std::vector<int32_t> gene(gene1);
         BattleEmulator::Main(position, 200, gene, players, result2, seed);
         int counter = 0;
+
+
         for (int i = 0; i < result2.position; ++i) {
             auto action = result2.actions[i];
             auto damage = result2.damages[i];
             auto isP = result2.isParalysis[i];
             auto isI = result2.isInactive[i];
+            auto turn = result2.turns[i];
             if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
                 ss1 << "h ";
+                ss5 << "h ";
                 counter++;
             } else if (damage != 0) {
-                if (isP){
+                if (isP) {
                     ss1 << damage << "-m" << " ";
-                }else if(isI){
+                    ss5 << damage << " ";
+                } else if (isI) {
                     ss1 << damage << "-i" << " ";
-                }else {
+                    ss5 << damage << " ";
+                } else {
                     ss1 << damage << " ";
+                    ss5 << damage << " ";
                 }
                 counter++;
             }
-            if(counter == 10){
+            std::string trimmedInput = trim(input);
+            std::string trimmedSS5 = trim(ss5.str());
+
+            if (!trimmedInput.empty() && trimmedInput == trimmedSS5) {
+                lastInputTurn = turn;
+            }
+            if (counter == 10) {
                 ss1 << std::endl;
                 counter = 0;
             }
         }
+        auto table = dumpTable(result2);
+        std::cout << table << std::endl;
+
         auto turn = result2.turn;
-        if (players[0].hp <= 0){
+        if (players[0].hp <= 0) {
             ss1 << "L " << turn;
         }
-        if (players[1].hp <= 0){
+        if (players[1].hp <= 0) {
             ss1 << "W " << turn;
         }
         std::cout << ss1.str() << std::endl;
@@ -324,18 +452,23 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
             auto turn = result2.turns[j];
             auto ehp = result2.ehp[j];
             auto ahp = result2.ahp[j];
+            if (turn <= lastInputTurn) {
+                continue;
+            }
             //ss1 << action << ": " << enemy.ehp << ": " << result.turn[j] << ", ";
-            if (action == BattleEmulator::PARALYSIS || (paralysisTurns > 0 && action == BattleEmulator::INACTIVE_ALLY) || action == BattleEmulator::CURE_PARALYSIS || inactive || paralysis) {
+            if (action == BattleEmulator::PARALYSIS ||
+                (paralysisTurns > 0 && action == BattleEmulator::INACTIVE_ALLY) ||
+                action == BattleEmulator::CURE_PARALYSIS || inactive || paralysis) {
                 paralysisTurns++;
                 lastParalysis = turn;
                 lastCounter = j;
                 continue;
             }
-            if(first&&action != BattleEmulator::INACTIVE_ALLY){
+            if (first && action != BattleEmulator::INACTIVE_ALLY) {
                 paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
                 first = false;
             }
-            if (paralysisTurns > 0&&action != BattleEmulator::INACTIVE_ALLY) {
+            if (paralysisTurns > 0 && action != BattleEmulator::INACTIVE_ALLY) {
                 first = true;
                 paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
             }
@@ -344,7 +477,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
             paralysisTurns = 0;
         }
     }
-    for (const auto& pair : paralysis_map) {
+    for (const auto &pair: paralysis_map) {
         std::stringstream ss;
         int ehp = ((pair.second >> 10) & 0x3ff);
         int ahp = (pair.second & 0x3ff);
@@ -365,36 +498,38 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         analyzeData.setGenome(gene);
         //std::cout << analyzeData.calculateEfficiency() << std::endl;
 
-        int counter = 0;
-        for (int i = 0; i < result1.position; ++i) {
-            auto action = result1.actions[i];
-            auto damage = result1.damages[i];
-            auto isP = result1.isParalysis[i];
-            auto isI = result1.isInactive[i];
-            if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
-                ss << "h ";
-                counter++;
-            } else if (damage != 0) {
-                counter++;
-                if (isP){
-                    ss << damage << "-m" << " ";
-                }else if(isI){
-                    ss << damage << "-i" << " ";
-                }else {
-                    ss << damage << " ";
-                }
-            }
-            if(counter == 10){
-                ss << std::endl;
-                counter = 0;
-            }
-        }
+
+
+//        int counter = 0;
+//        for (int i = 0; i < result1.position; ++i) {
+//            auto action = result1.actions[i];
+//            auto damage = result1.damages[i];
+//            auto isP = result1.isParalysis[i];
+//            auto isI = result1.isInactive[i];
+//            if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
+//                ss << "h ";
+//                counter++;
+//            } else if (damage != 0) {
+//                counter++;
+//                if (isP){
+//                    ss << damage << "-m" << " ";
+//                }else if(isI){
+//                    ss << damage << "-i" << " ";
+//                }else {
+//                    ss << damage << " ";
+//                }
+//            }
+//            if(counter == 10){
+//                ss << std::endl;
+//                counter = 0;
+//            }
+//        }
         auto turn = result1.turn;
-        if (players[0].hp <= 0){
+        if (players[0].hp <= 0) {
             ss << "L " << turn;
             analyzeData.setWinStatus(false);
         }
-        if (players[1].hp <= 0){
+        if (players[1].hp <= 0) {
             ss << "W " << turn;
             analyzeData.setWinStatus(true);
         }
@@ -405,7 +540,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         //std::cout << ss.str() << endl;
     }
 
-    for (const auto& pair : paralysis_map) {
+    for (const auto &pair: paralysis_map) {
         std::stringstream ss;
         int ehp = ((pair.second >> 10) & 0x3ff);
         int ahp = (pair.second & 0x3ff);
@@ -435,25 +570,25 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
                 counter++;
             } else if (damage != 0) {
                 counter++;
-                if (isP){
+                if (isP) {
                     ss << damage << "-m" << " ";
-                }else if(isI){
+                } else if (isI) {
                     ss << damage << "-i" << " ";
-                }else {
+                } else {
                     ss << damage << " ";
                 }
             }
-            if(counter == 10){
+            if (counter == 10) {
                 ss << std::endl;
                 counter = 0;
             }
         }
         auto turn = result3.turn;
-        if (players[0].hp <= 0){
+        if (players[0].hp <= 0) {
             ss << "L " << turn;
             analyzeData.setWinStatus(false);
         }
-        if (players[1].hp <= 0){
+        if (players[1].hp <= 0) {
             ss << "W " << turn;
             analyzeData.setWinStatus(true);
         }
@@ -471,20 +606,21 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     // 最高の効率を持つ要素を見つける
     // 候補を効率の高い順にソート
     std::sort(candidate.begin(), candidate.end(),
-              [](const AnalyzeData& a, const AnalyzeData& b) {
+              [](const AnalyzeData &a, const AnalyzeData &b) {
                   return a.calculateEfficiency() <= b.calculateEfficiency(); // 降順でソート
               });
 
     int lastTurn = -1;
     // ソートされた候補を処理
     int found = 0;
-    for (AnalyzeData& data : candidate) {
+    for (AnalyzeData &data: candidate) {
         //std::cout << "efficiency: " << data.calculateEfficiency() << std::endl;
-        if (data.calculateEfficiency() > 7){
-            if (data.getWinStatus()){
+        if (data.calculateEfficiency() > 7) {
+            if (data.getWinStatus()) {
                 CandidateID++;
                 found++;
-                std::cout << std::endl << std::endl << "=======cid " << CandidateID << "========" << std::endl << data.getBattleTrace();
+                std::cout << std::endl << std::endl << "=======cid " << CandidateID << "========" << std::endl
+                          << data.getBattleTrace();
                 std::cout << "actions: " << std::endl;
 
                 auto vec = data.getGenome();
@@ -492,13 +628,14 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
                     if (vec[i] != 0) {
                         int action = (vec[i] & 0x3ff);
                         std::string actionName;
-                        if (action == BattleEmulator::HEAL){
+                        if (action == BattleEmulator::HEAL) {
                             actionName = "HEAL";
-                        }else if(action == BattleEmulator::DEFENCE){
+                        } else if (action == BattleEmulator::DEFENCE) {
                             actionName = "DEFENCE";
                         }
-                        lastTurn = i+1;
-                        std::cout << "turn: " << lastTurn << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: " << ((vec[i] >> 20) & 0x3ff) << ", action: " << actionName <<  std::endl;
+                        lastTurn = i + 1;
+                        std::cout << "turn: " << lastTurn << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: "
+                                  << ((vec[i] >> 20) & 0x3ff) << ", action: " << actionName << std::endl;
                     }
                 }
             }
@@ -506,34 +643,52 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         // 他の処理をここに追加...
     }
 
-    if (found != 0){
+    if (found != 0) {
         return;
     }
 
     // 最高の効率を持つ要素を見つける
     auto maxElementIter = std::max_element(candidate.begin(), candidate.end(),
-                                           [](const AnalyzeData& a, const AnalyzeData& b) {
+                                           [](const AnalyzeData &a, const AnalyzeData &b) {
                                                return a.calculateEfficiency() < b.calculateEfficiency();
                                            });
 
     if (maxElementIter != candidate.end()) {
         // 最も高い効率値を持つ要素にアクセス
-        AnalyzeData& bestCandidate = *maxElementIter;
+        AnalyzeData &bestCandidate = *maxElementIter;
 
     } else {
         std::cout << "error1" << std::endl;
     }
 }
 
-int toint(char * str){
+int toint(char *str) {
     try {
         int number = std::stoi(str);
         return number;
-    } catch (const std::invalid_argument& e) {
+    } catch (const std::invalid_argument &e) {
         std::cerr << "Invalid argument: " << e.what() << std::endl;
         return -1;
-    } catch (const std::out_of_range& e) {
+    } catch (const std::out_of_range &e) {
         std::cerr << "Out of range: " << e.what() << std::endl;
         return -1;
     }
+}
+
+
+// 左側の空白をトリム
+std::string ltrim(const std::string &s) {
+    size_t start = s.find_first_not_of(" \t\n\r\f\v");
+    return (start == std::string::npos) ? "" : s.substr(start);
+}
+
+// 右側の空白をトリム
+std::string rtrim(const std::string &s) {
+    size_t end = s.find_last_not_of(" \t\n\r\f\v");
+    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+}
+
+// 両側の空白をトリム
+std::string trim(const std::string &s) {
+    return rtrim(ltrim(s));
 }

@@ -26,6 +26,35 @@ int preHP[5] = {0, 0, 0, 0, 0};
 uint64_t seed1 = 0;
 bool player0_has_initiative = false;
 
+
+std::string BattleEmulator::getActionName(int actionId) {
+
+    switch (actionId) {
+        case BattleEmulator::PUFF_PUFF: return "Puff Puff";
+        case BattleEmulator::UNSPEAKABLE_EVIL: return "Unspeakable";
+        case BattleEmulator::VICTIMISER: return "Victimiser";
+        case BattleEmulator::CRACK_ENEMY: return "Crack Enemy";
+        case BattleEmulator::INACTIVE_ENEMY: return "Inactive Enemy";
+        case BattleEmulator::INACTIVE_ALLY: return "Inactive Ally";
+        case BattleEmulator::HP_HOOVER: return "HP Hoover";
+
+        case BattleEmulator::ATTACK_ENEMY: return "Attack Enemy";
+        case BattleEmulator::MULTITHRUST: return "Multithrust";
+        case BattleEmulator::MEDICINAL_HERBS: return "Medicinal Herbs";
+        case BattleEmulator::PARALYSIS: return "Paralysis";
+        case BattleEmulator::COUNTER: return "Counter";
+        case BattleEmulator::ACROBATSTAR_KAIHI: return "Acrobat Kaihi";
+        case BattleEmulator::CURE_PARALYSIS: return "Cure Paralysis";
+
+        case BattleEmulator::ATTACK_ALLY: return "Attack Ally";
+        case BattleEmulator::HEAL: return "Heal";
+        case BattleEmulator::ACROBATIC_STAR: return "Acrobatic Star";
+        case BattleEmulator::DEFENCE: return "Defence";
+
+        default: return "Unknown Action";
+    }
+}
+
 bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gene, Player *players, BattleResult &result, uint64_t seed) {
     camera::reset();
     player0_has_initiative = false;
@@ -310,6 +339,8 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
     return false;
 }
 
+
+
 void BattleEmulator::ProcessFUN_021db2a0(int *position, const int attacker, Player *players) {
     double percent = FUN_021dbc04(players[1].hp, players[1].maxHp);
     double percent1 = FUN_021dbc04(preHP[1], players[1].maxHp);
@@ -365,7 +396,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     int attackCount;
     int percent_tmp;
     switch (Id & 0xffff) {
-        case MEDICINAL_HERBS:
+        case BattleEmulator::MEDICINAL_HERBS:
             (*position) += 2;
             (*position)++; // 関係ない
             (*position)++; // 会心判定
@@ -380,7 +411,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
             }
             break;
-        case CURE_PARALYSIS:
+        case BattleEmulator::CURE_PARALYSIS:
             (*position) += 2;
             (*position)++;//関係ない　0x021ec6f8
             (*position)++;//会心
@@ -393,7 +424,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 players[defender].specialChargeTurn = 6;
             }
             break;
-        case ACROBATSTAR_KAIHI:
+        case BattleEmulator::ACROBATSTAR_KAIHI:
             //(*position) += 2;
             //(*position)++;//アクロバットスター判定
             if (lcg::getPercent(position, 0x2710) < 200) {
@@ -404,7 +435,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//0x021ed7a8
             return 0;
             break;
-        case COUNTER:
+        case BattleEmulator::COUNTER:
             //(*position) += 2;
             //(*position)++;//アクロバットスター判定
             (*position)++;//0x02158584 会心(無効)
@@ -452,7 +483,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             return 0;
             break;
-        case ACROBATIC_STAR:
+        case BattleEmulator::ACROBATIC_STAR:
             players[0].acrobaticStar = true;
             players[0].acrobaticStarTurn = 6;
             if(player0_has_initiative) {
@@ -469,7 +500,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             FUN_0207564c(position, players[attacker].atk, players[defender].def);
             (*position)++;//不明
             break;
-        case DEFENCE:
+        case BattleEmulator::DEFENCE:
             (*position) += 2;
             (*position)++;//関係ない
             (*position)++;//会心
@@ -483,7 +514,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             baseDamage = 0;
             break;
-        case VICTIMISER:
+        case BattleEmulator::VICTIMISER:
             (*position) += 2;
             (*position)++;//アクロバットスターは絶対に発動しない
             (*position)++;//会心
@@ -519,7 +550,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             tmp = baseDamage * players[defender].defence;
             baseDamage = static_cast<int>(floor(tmp));
             break;
-        case ATTACK_ENEMY:
+        case BattleEmulator::ATTACK_ENEMY:
             (*position) += 2;
             if (players[0].acrobaticStar && !players[0].paralysis && !players[0].inactive) {
                 percent_tmp = lcg::getPercent(position, 100);
@@ -564,9 +595,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             tmp = baseDamage * players[defender].defence;
             baseDamage = static_cast<int>(floor(tmp));
             break;
-        case INACTIVE_ALLY:
-        case PARALYSIS:
-        case INACTIVE_ENEMY:
+        case BattleEmulator::INACTIVE_ALLY:
+        case BattleEmulator::PARALYSIS:
+        case BattleEmulator::INACTIVE_ENEMY:
             (*position) += 2;
             (*position)++;//関係ない
             (*position)++;//会心
@@ -574,7 +605,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             FUN_0207564c(position, players[attacker].atk, players[defender].def);
             (*position)++;//不明
             break;
-        case PUFF_PUFF:
+        case BattleEmulator::PUFF_PUFF:
             (*position) += 2;
             (*position)++;//関係ない
             (*position)++;//会心
@@ -593,7 +624,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
             }
             break;
-        case HEAL:
+        case BattleEmulator::HEAL:
             (*position) += 2;
             (*position)++;//関係ない
             if (lcg::getPercent(position, 0x2710) < 100) {
@@ -630,7 +661,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             players[attacker].mp -= 2;
             break;
-        case UNSPEAKABLE_EVIL:
+        case BattleEmulator::UNSPEAKABLE_EVIL:
             (*position) += 2;
             (*position)++;//会心
             (*position)++;//関係ない
@@ -654,7 +685,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             tmp = baseDamage * players[defender].defence;
             baseDamage = static_cast<int>(floor(tmp));
             break;
-        case CRACK_ENEMY:
+        case BattleEmulator::CRACK_ENEMY:
             (*position) += 2;
             (*position)++;
             (*position)++;//会心
@@ -679,7 +710,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             tmp = baseDamage * players[defender].defence;
             baseDamage = static_cast<int>(floor(tmp));
             break;
-        case HP_HOOVER://バンパイアエッジ
+        case BattleEmulator::HP_HOOVER://バンパイアエッジ
             (*position) += 2;
             if (players[0].acrobaticStar && !players[0].paralysis && !players[0].inactive) {
                 percent_tmp = lcg::getPercent(position, 100);
@@ -725,7 +756,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 Player::heal(players[attacker], (baseDamage >> 2)); // /4
             }
             break;
-        case ATTACK_ALLY:
+        case BattleEmulator::ATTACK_ALLY:
             (*position) += 2;
             (*position)++;
             //会心
@@ -941,3 +972,5 @@ int BattleEmulator::FUN_0208aecc(int *position) {
     DEBUG_COUT1(previousState);
     return attack[r3_var12];
 }
+
+

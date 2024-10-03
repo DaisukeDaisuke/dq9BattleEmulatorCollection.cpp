@@ -34,6 +34,7 @@ public:
     static const int DEFENCE = 1020;
 
     static bool Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players, BattleResult &result, uint64_t seed);
+    static std::string getActionName(int actionId);
 private:
     static int FUN_0208aecc(int *position);
 
