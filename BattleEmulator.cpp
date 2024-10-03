@@ -386,6 +386,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     bool kaisinn = false;
     bool kaihi = false;
     bool tate = false;
+    int baseDamage_tmp = -1;
     int OffensivePower = players[attacker].atk;
     //int list[4] = {0,3,2,1};
     int list[4] = {0, 1, 2, 3};
@@ -549,15 +550,15 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     if (!players[defender].specialCharge) {
                         percent_tmp = lcg::getPercent(position, 100);
                         tmp = baseDamage * players[defender].defence;
-                        baseDamage = static_cast<int>(floor(tmp));
-                        if (baseDamage < 14) {
+                        baseDamage_tmp = static_cast<int>(floor(tmp));
+                        if (baseDamage_tmp < 14) {
                             if (percent_tmp < 1) {
                                 players[defender].specialCharge = true;
                                 players[defender].specialChargeTurn = 6;
                             }
                         }else {
                             for (int i = 0; i < 8; ++i) {
-                                if (baseDamage >= proportionTable3[i]) {
+                                if (baseDamage_tmp >= proportionTable3[i]) {
                                     if (percent_tmp < proportionTable2[i]) {
                                         players[defender].specialCharge = true;
                                         players[defender].specialChargeTurn = 6;
@@ -612,15 +613,15 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     if (!players[defender].specialCharge) {
                         percent_tmp = lcg::getPercent(position, 100);
                         tmp = baseDamage * players[defender].defence;
-                        baseDamage = static_cast<int>(floor(tmp));
-                        if (baseDamage < 14) {
+                        baseDamage_tmp = static_cast<int>(floor(tmp));
+                        if (baseDamage_tmp < 14) {
                             if (percent_tmp < 1) {
                                 players[defender].specialCharge = true;
                                 players[defender].specialChargeTurn = 6;
                             }
                         }else {
                             for (int i = 0; i < 8; ++i) {
-                                if (baseDamage >= proportionTable3[i]) {
+                                if (baseDamage_tmp >= proportionTable3[i]) {
                                     if (percent_tmp < proportionTable2[i]) {
                                         players[defender].specialCharge = true;
                                         players[defender].specialChargeTurn = 6;
@@ -721,15 +722,15 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 if (!players[defender].specialCharge) {
                     percent_tmp = lcg::getPercent(position, 100);
                     tmp = baseDamage * players[defender].defence;
-                    baseDamage = static_cast<int>(floor(tmp));
-                    if (baseDamage < 14) {
+                    baseDamage_tmp = static_cast<int>(floor(tmp));
+                    if (baseDamage_tmp < 14) {
                         if (percent_tmp < 1) {
                             players[defender].specialCharge = true;
                             players[defender].specialChargeTurn = 6;
                         }
                     }else {
                         for (int i = 0; i < 8; ++i) {
-                            if (baseDamage >= proportionTable3[i]) {
+                            if (baseDamage_tmp >= proportionTable3[i]) {
                                 if (percent_tmp < proportionTable2[i]) {
                                     players[defender].specialCharge = true;
                                     players[defender].specialChargeTurn = 6;
@@ -762,15 +763,15 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     if (!players[defender].specialCharge) {
                         percent_tmp = lcg::getPercent(position, 100);
                         tmp = baseDamage * players[defender].defence;
-                        baseDamage = static_cast<int>(floor(tmp));
-                        if (baseDamage < 14) {
+                        baseDamage_tmp = static_cast<int>(floor(tmp));
+                        if (baseDamage_tmp < 14) {
                             if (percent_tmp < 1) { // なぜか14未満の場合1%
                                 players[defender].specialCharge = true;
                                 players[defender].specialChargeTurn = 6;
                             }
                         }else {
                             for (int i = 0; i < 8; ++i) {
-                                if (baseDamage >= proportionTable3[i]) {
+                                if (baseDamage_tmp >= proportionTable3[i]) {
                                     if (percent_tmp < proportionTable2[i]) {
                                         players[defender].specialCharge = true;
                                         players[defender].specialChargeTurn = 6;
@@ -826,15 +827,15 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     if (!players[defender].specialCharge) {
                         percent_tmp = lcg::getPercent(position, 100);
                         tmp = baseDamage * players[defender].defence;
-                        baseDamage = static_cast<int>(floor(tmp));
-                        if (baseDamage < 14) {
+                        baseDamage_tmp = static_cast<int>(floor(tmp));
+                        if (baseDamage_tmp < 14) {
                             if (percent_tmp < 1) {
                                 players[defender].specialCharge = true;
                                 players[defender].specialChargeTurn = 6;
                             }
                         } else {
                             for (int i = 0; i < 8; ++i) {
-                                if (baseDamage >= proportionTable3[i]) {
+                                if (baseDamage_tmp >= proportionTable3[i]) {
                                     if (percent_tmp < proportionTable2[i]) {
                                         players[defender].specialCharge = true;
                                         players[defender].specialChargeTurn = 6;

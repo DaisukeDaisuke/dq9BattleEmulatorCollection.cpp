@@ -60,8 +60,8 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
     printHeader(ss6);
     int currentTurn = -1;
     int eDamage = -1, aDamage = -1;
-    bool isP1, isI1 = false;
-    std::string eAction, aAction;
+    bool isP1, isI1, initiative_tmp = false;
+    std::string eAction, aAction, sp;
 
     // データのループ
     for (int i = 0; i < result.position; ++i) {
@@ -88,14 +88,14 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                 if (turn > PastTurns) {
                     ss6
                             << std::left << std::setw(6) << (currentTurn + 1)
-                            << std::setw(16) << specialAction
+                            << std::setw(16) << sp
                             << std::setw(16) << aAction
                             << std::setw(16) << eAction
                             << std::setw(6) << aDamage
                             << std::setw(6) << eDamage
                             << std::setw(6) << ahp1
                             << std::left << std::setw(6) << ehp1
-                            << std::setw(6) << (initiative ? "yes" : "")
+                            << std::setw(6) << (initiative_tmp ? "yes" : "")
                             << std::setw(6) << ((aAction == "Paralysis") ? "yes" : "")
                             << std::setw(6) << ((aAction == "Inactive" || aAction == "Cure Paralysis") ? "yes" : "")
                             << std::setw(11) << "" << "\n";
@@ -107,6 +107,8 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
             aAction = "";
             eDamage = 0;
             aDamage = 0;
+            sp = "";
+            initiative_tmp = false;
         }
 
         // 敵か味方の行動を適切な変数に格納
@@ -119,6 +121,8 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
             aDamage = damage;
             isP1 = isP;
             isI1 = isI;
+            initiative_tmp = initiative;
+            sp = specialAction;
         }
     }
 
@@ -126,14 +130,14 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
     if (currentTurn != -1) {
         ss6
                 << std::left << std::setw(6) << (currentTurn + 1)
-                << std::setw(16) << ""
+                << std::setw(16) << sp
                 << std::setw(16) << aAction
                 << std::setw(16) << eAction
                 << std::setw(6) << aDamage
                 << std::setw(6) << eDamage
                 << std::setw(6) << result.ahp[result.position - 1]
                 << std::left << std::setw(6) << result.ehp[result.position - 1]
-                << std::setw(6) << (result.initiative[result.position - 1] ? "yes" : "")
+                << std::setw(6) << (initiative_tmp ? "yes" : "")
                 << std::setw(6) << ((aAction == "Paralysis") ? "yes" : "")
                 << std::setw(6) << ((aAction == "Inactive" || aAction == "Cure Paralysis") ? "yes" : "")
                 << std::setw(11) << "" << "\n";
@@ -230,7 +234,7 @@ int main(int argc, char *argv[]) {
 //    time2 = 166779031;
 
 #ifdef DEBUG2
-    time1 = 166779030;
+    time1 = 51099787;
     time2 = 2501309586;
 
     lcg::init(time1, 5000);
@@ -239,7 +243,7 @@ int main(int argc, char *argv[]) {
         players[j] = copiedPlayers[j];
     }
     vector<int32_t> gene1(gene);
-    //gene1[21-1] = BattleEmulator::DEFENCE;
+    gene1[18-1] = BattleEmulator::DEFENCE;
     BattleResult result;
     BattleEmulator::Main(position, 100, gene1, players, result, time1);
     delete position;
@@ -329,15 +333,9 @@ int main(int argc, char *argv[]) {
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
     //std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
 
-    std::cout << std::endl << "found: " << foundSeeds << std::endl;
-
     if (CandidateID != 0) {
         std::string input;
         while (true) {
-            for (AnalyzeData &selectedData1: analyzeDataMap) {
-                std::cout << selectedData1.getEvaluationString() << std::endl;
-            }
-
             std::cout << std::endl  << "found: " << foundSeeds << std::endl << "Candidate ID q is exit please input:" << std::endl;
             std::cin >> input; // 入力を受け取る
 
