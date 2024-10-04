@@ -1,0 +1,38 @@
+name: Windows C++ Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # 1. リポジトリのチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. CMakeのセットアップ
+      - name: Set up CMake
+        uses: chrislgarry/setup-cmake@v1
+        with:
+          cmake-version: 3.28.0
+
+      # 3. Ninjaのセットアップ
+      - name: Set up Ninja
+        uses: ashutoshvarma/setup-ninja@v1.1
+
+      # 4. CMakeビルドの構成
+      - name: Configure with CMake
+        run: cmake -S . -B build -G Ninja
+
+      # 5. プロジェクトのビルド
+      - name: Build project
+        run: cmake --build build --config Release
+
+      # 6. ビルドアーティファクトの保存
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: build/
