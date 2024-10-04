@@ -234,7 +234,7 @@ int main(int argc, char *argv[]) {
 //    time2 = 166779031;
 
 #ifdef DEBUG2
-    time1 = 51099787;
+    time1 = 52736593;
     time2 = 2501309586;
 
     lcg::init(time1, 5000);
