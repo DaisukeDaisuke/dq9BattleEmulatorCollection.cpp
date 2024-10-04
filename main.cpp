@@ -19,7 +19,7 @@
 int toint(char *string);
 
 void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene, int depth,
-                   std::string input);
+                   std::string input, int id);
 
 std::string ltrim(const std::string &s);
 
@@ -258,10 +258,10 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    time1 = 166779030;
+    time1 = 57086815;
 
     lcg::init(time1, 5000);
-    processResult(copiedPlayers, time1, gene, 0, "15 9 10 18 9 17 13 15 h");
+    processResult(copiedPlayers, time1, gene, 0, "11 18 15 9 18 9 10 16 h", -1);
     lcg::release();
     return 0;
 #endif
@@ -322,7 +322,7 @@ int main(int argc, char *argv[]) {
         if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
             //std::cout << seed << std::endl;
             //std::cout << resultStr << std::endl;
-            processResult(copiedPlayers, seed, gene, 0, str2);
+            processResult(copiedPlayers, seed, gene, 0, str2, -1);
             foundSeeds++;
         }
         lcg::release();
@@ -340,7 +340,7 @@ int main(int argc, char *argv[]) {
 
 
 void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene1, int depth,
-                   std::string input) {
+                   std::string input, int id) {
     BattleResult result2;
     vector<AnalyzeData> candidate = vector<AnalyzeData>();
     int PreviousTurn = 0;
@@ -439,7 +439,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
             auto turn = result2.turns[j];
             auto ehp = result2.ehp[j];
             auto ahp = result2.ahp[j];
-            if (respite >= 8) {
+            if (respite > 20) {
                 if (turn <= (lastInputTurn + 3)) {
                     continue;
                 }

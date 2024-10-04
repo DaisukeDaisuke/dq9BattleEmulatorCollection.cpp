@@ -174,7 +174,7 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
         if (Gene.size() > genePosition && Gene[genePosition] != 0) {
             actionTable[0] = Gene[genePosition] & 0x3ff;
             if (actionTable[0] == HEAL && players[0].mp <= 0) {
-                if (players[0].medicinal_herbs_count != 0) {
+                if (players[0].medicinal_herbs_count >= 1) {
                     actionTable[0] = MEDICINAL_HERBS;
                 } else {
                     actionTable[0] = ATTACK_ALLY;
