@@ -80,7 +80,7 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
         }
         DEBUG_COUT2((*position));
 #ifdef DEBUG2
-        if ((*position) == 1004){
+        if ((*position) == 230){
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -284,10 +284,15 @@ bool BattleEmulator::Main(int *position, int RunCount,  std::vector<int32_t> Gen
                         (*position) += 1;
                     }
                 }
+
                 if (players[0].inactive) {
                     players[0].inactive = false;
-                    action = INACTIVE_ALLY;
+                    if (action != CURE_PARALYSIS&&action != PARALYSIS) {
+                        action = INACTIVE_ALLY;
+                    }
                 }
+
+
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(action, position, players, 0, 1);
                 BattleResult::add(result, action, basedamage, false,players[0].paralysis, isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);

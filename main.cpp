@@ -96,8 +96,8 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                             << std::setw(6) << ahp1
                             << std::left << std::setw(6) << ehp1
                             << std::setw(6) << (initiative_tmp ? "yes" : "")
-                            << std::setw(6) << ((aAction == "Paralysis") ? "yes" : "")
-                            << std::setw(6) << ((aAction == "Inactive" || aAction == "Cure Paralysis") ? "yes" : "")
+                            << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
+                            << std::setw(6) << ((aAction == "Inactive") ? "yes" : "")
                             << std::setw(11) << "" << "\n";
                 }
             }
@@ -138,8 +138,8 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                 << std::setw(6) << result.ahp[result.position - 1]
                 << std::left << std::setw(6) << result.ehp[result.position - 1]
                 << std::setw(6) << (initiative_tmp ? "yes" : "")
-                << std::setw(6) << ((aAction == "Paralysis") ? "yes" : "")
-                << std::setw(6) << ((aAction == "Inactive" || aAction == "Cure Paralysis") ? "yes" : "")
+                << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
+                << std::setw(6) << ((aAction == "Inactive") ? "yes" : "")
                 << std::setw(11) << "" << "\n";
     }
 
