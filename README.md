@@ -1,4 +1,4 @@
-## dq9Tool.cpp
+## dq9BattleEmulatorCollection.cpp
 
 dq9のRTA用バトルエミュレーター  
 
