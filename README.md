@@ -4,7 +4,8 @@ dq9のRTA用バトルエミュレーター
 
 
 ## how to build
-Please build with jetBrains clion using cmake, ninja, or mingw.
+Please build with jetBrains clion using cmake, ninja, or mingw.  
+clionのデフォルト設定(mingw)向けで作られています。なのでclionとかいうペイウォールさえ突破できればビルドできます。  
 
 ## branches
 ブランチ紹介
