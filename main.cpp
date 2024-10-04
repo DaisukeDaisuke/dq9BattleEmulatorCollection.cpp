@@ -328,6 +328,9 @@ int main(int argc, char *argv[]) {
         lcg::release();
         delete position;
     }
+
+    std::cout << std::endl << "found: " << foundSeeds << std::endl;
+
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
