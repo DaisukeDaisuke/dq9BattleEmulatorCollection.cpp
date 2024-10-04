@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
     std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
 
     Player players[2];
-    int hps[2] = {70, 456};
+    int hps[2] = {70, 456}; //hp変更する際はproportionTable3を絶対変更すること。どこにあるか分からない場合はclionのctrl+shift+fを使うべし。
     int defs[2] = {69, 58};
     int atks[2] = {62 + 2, 56};
     int speeds[2] = {44, 54};
@@ -368,6 +368,9 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         std::vector<int32_t> gene(gene1);
         BattleEmulator::Main(position, 200, gene, players, result2, seed);
         int counter = 0;
+        AnalyzeData analyzeData;
+        analyzeData.FromBattleResult(result2);
+        analyzeData.setGenome(gene);
 
 
         for (int i = 0; i < result2.position; ++i) {
@@ -411,13 +414,18 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         respite = turn - lastInputTurn;
         if (players[0].hp <= 0) {
             ss1 << "L " << turn;
+            analyzeData.setBattleTrace("L " + std::to_string(turn) + "\n");
             std::cout << table << std::endl << "lost" << std::endl;
+            analyzeData.setWinStatus(false);
         }
         if (players[1].hp <= 0) {
             ss1 << "W " << turn;
+            analyzeData.setBattleTrace("W " + std::to_string(turn) + "\n");
             std::cout << table << std::endl << "win!" << std::endl;
+            analyzeData.setWinStatus(true);
         }
         std::cout << ss1.str() << std::endl;
+        candidate.push_back(analyzeData);
         delete position;
     }
 
