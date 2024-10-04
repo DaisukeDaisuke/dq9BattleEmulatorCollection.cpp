@@ -32,8 +32,8 @@ https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/yo2
 
 ### buru_BruteForce
 
-ブルドーガのバトルエミュレーターです。yo2では修正されたバグを何個か抱えてますが、動作に問題ないので放置してます。
-レベル1討伐とかで役に立つのに完全にリアルタイムタイマーとの誤差特定用になってます。
+ブルドーガのバトルエミュレーターです。yo2では修正されたバグを何個か抱えてますが、動作に問題ないので放置してます。  
+レベル1討伐とかで役に立つのに完全にリアルタイムタイマーとの誤差特定用になってます。  
 
 https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/buru_BruteForce
 
