@@ -68,7 +68,6 @@ public:
     void FromBattleResult(const BattleResult &result) {
         battleResult = std::make_shared<BattleResult>(result);
         turns = result.turn;
-        final_hp = result.ehp[result.position - 1]; // 最終HPを取得
     }
 
     void setEvaluationString(std::string str){
@@ -88,9 +87,8 @@ public:
     }
 
     // バトル効率を計算
-    double calculateEfficiency() const {
-        if (turns == 0) return 0.0; // ターン数が0の場合は効率を0として返す
-        return (456.0 - final_hp) / turns;
+    [[nodiscard]] int calculateEfficiency() const {
+        return turns;
     }
 
     // BattleResult を取得するゲッター
@@ -100,7 +98,6 @@ public:
 
 private:
     int turns = 0;
-    int final_hp = 0; // 最終HP
     bool winStatus = false;
     int lastInputTurn;
     std::shared_ptr<BattleResult> battleResult;

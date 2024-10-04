@@ -39,17 +39,17 @@ void printHeader(std::stringstream &ss);
 // ヘッダーを出力する関数
 void printHeader(std::stringstream &ss) {
     ss << std::left << std::setw(6) << "turn"
-        << std::setw(16) << "sp"
-        << std::setw(16) << "aAct"
-        << std::setw(16) << "eAct"
-        << std::setw(6) << "aD"
-        << std::setw(6) << "eD"
-        << std::setw(6) << "ahp"
-        << std::setw(6) << "ehp"
+       << std::setw(16) << "sp"
+       << std::setw(16) << "aAct"
+       << std::setw(16) << "eAct"
+       << std::setw(6) << "aD"
+       << std::setw(6) << "eD"
+       << std::setw(6) << "ahp"
+       << std::setw(6) << "ehp"
 
-        << std::setw(6) << "ini"
-        << std::setw(6) << "Para"
-        << std::setw(6) << "Ina" << "\n";
+       << std::setw(6) << "ini"
+       << std::setw(6) << "Para"
+       << std::setw(6) << "Ina" << "\n";
     ss << std::string(95, '-') << "\n";  // 区切り線を出力
 }
 
@@ -178,7 +178,7 @@ std::string normalDump(AnalyzeData data) {
     auto turn = result.turn + 1;
     if (data.getWinStatus()) {
         ss << "W " << turn;
-    }else{
+    } else {
         ss << "L " << turn;
     }
     return ss.str();
@@ -352,7 +352,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     int lastInputTurn = -1;
     auto respite = -1;
 
-    std::cout << "============" << seed  << "============" << std::endl;
+    std::cout << "============" << seed << "============" << std::endl;
 
     {
         std::stringstream ss1;
@@ -440,10 +440,10 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
             auto ehp = result2.ehp[j];
             auto ahp = result2.ahp[j];
             if (respite >= 8) {
-                if (turn <= (lastInputTurn+3)) {
+                if (turn <= (lastInputTurn + 3)) {
                     continue;
                 }
-            }else{
+            } else {
                 if (turn <= lastInputTurn) {
                     continue;
                 }
@@ -538,7 +538,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     // 候補を効率の高い順にソート
     std::sort(candidate.begin(), candidate.end(),
               [](const AnalyzeData &a, const AnalyzeData &b) {
-                  return a.calculateEfficiency() > b.calculateEfficiency(); // 降順でソート
+                  return a.calculateEfficiency() <= b.calculateEfficiency(); // 降順でソート
               });
 
     int lastTurn = -1;
@@ -547,45 +547,43 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     AnalyzeData lastData;
 
     for (AnalyzeData &data: candidate) {
-        //std::cout << "efficiency: " << data.calculateEfficiency() << std::endl;
-        if (data.calculateEfficiency() > 7) {
-            if (data.getWinStatus()) {
-                std::stringstream ss7;
-                found++;
-                ss7 << std::endl << std::endl << "=======cid " << CandidateID << "========" << std::endl
-                    << data.getBattleTrace();
-                ss7 << "actions: " << std::endl;
+        if (data.getWinStatus()) {
+            std::stringstream ss7;
+            found++;
+            ss7 << std::endl << std::endl << "=======cid " << CandidateID << "========" << std::endl
+                << data.getBattleTrace();
+            ss7 << "actions: " << std::endl;
 
-                auto vec = data.getGenome();
-                for (size_t i = 0; i < vec.size(); ++i) {
-                    if (vec[i] != 0) {
-                        int action = (vec[i] & 0x3ff);
-                        std::string actionName;
-                        if (action == BattleEmulator::HEAL) {
-                            actionName = "HEAL";
-                        } else if (action == BattleEmulator::DEFENCE) {
-                            actionName = "DEFENCE";
-                        }
-                        lastTurn = i + 1;
-                        ss7 << "turn: " << lastTurn << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: "
-                            << ((vec[i] >> 20) & 0x3ff) << ", action: " << actionName << std::endl;
+            auto vec = data.getGenome();
+            for (size_t i = 0; i < vec.size(); ++i) {
+                if (vec[i] != 0) {
+                    int action = (vec[i] & 0x3ff);
+                    std::string actionName;
+                    if (action == BattleEmulator::HEAL) {
+                        actionName = "HEAL";
+                    } else if (action == BattleEmulator::DEFENCE) {
+                        actionName = "DEFENCE";
                     }
+                    lastTurn = i + 1;
+                    ss7 << "turn: " << lastTurn << ", ehp: " << ((vec[i] >> 10) & 0x3ff) << ", ahp: "
+                        << ((vec[i] >> 20) & 0x3ff) << ", action: " << actionName << std::endl;
                 }
-                std::cout << ss7.str();
-                data.setEvaluationString(ss7.str());
-                analyzeDataMap.push_back(data);
-                CandidateID++;
-                lastData = data;
-                break;
             }
+            std::cout << ss7.str();
+            data.setEvaluationString(ss7.str());
+            analyzeDataMap.push_back(data);
+            CandidateID++;
+            lastData = data;
+            break;
         }
         // 他の処理をここに追加...
     }
     if (found != 0) {
-        std::cout << dumpTable(*lastData.getBattleResult(), lastData.getGenome(), lastInputTurn) << std::endl << normalDump(lastData)
+        std::cout << dumpTable(*lastData.getBattleResult(), lastData.getGenome(), lastInputTurn) << std::endl
+                  << normalDump(lastData)
                   << std::endl;
     }
-    std::cout << "============" << seed  << "============" << std::endl;
+    std::cout << "============" << seed << "============" << std::endl;
     return;
 }
 
