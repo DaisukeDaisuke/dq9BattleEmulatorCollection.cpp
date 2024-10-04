@@ -1,3 +1,5 @@
 /.idea
 /cmake-build-debug
 /newDirectory.zip
+/cmake-build-debug-mingw
+/cmake-build-release-mingw
