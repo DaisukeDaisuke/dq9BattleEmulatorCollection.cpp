@@ -13,7 +13,7 @@ Please build with [jetBrains clion](https://www.jetbrains.com/ja-jp/clion/) usin
 ブランチ紹介
 
 ### yo2
-イシュダルのレベル11 RTA装備用バトルエミュです。このブランチは最新のバグパッチが適応されています。  
+イシュダルの旅芸人レベル11 RTA装備用バトルエミュです。このブランチは最新のバグパッチが適応されています。  
 デフォルトで総当たりモードになってたりなかったりします。総当たりモードにするには、debug.hのフラグを全て折ってください  
 
 https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/yo2
