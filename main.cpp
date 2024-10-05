@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
     }
 
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    totalSeconds = totalSeconds - 14;
+    totalSeconds = totalSeconds - 15;
     //std::cout << totalSeconds << std::endl;
     auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.12515)));
     time1 = (time1 & 0xffff) << 16;
