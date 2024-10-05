@@ -230,7 +230,9 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                 int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, MANAZASHI, PUFF_PUFF};
                 //休み時消費:   タナトス バンパイアエッジ ヒャド 攻撃 まなざし まなざし
                 //バンパイアエッジ(制限行動: タナトスハント) バンパイアエッジ ヒャド 通常攻撃 まなざし ぱふぱふ
+                //見惚れ判定
                 if (lcg::getPercent(position, 100) < 0.0160) {//0x021588ec
+                    //次の乱数が90%以上(一致含む)なら見惚れないらしい。
                     int mitore = lcg::getPercent(position, 100);//0x02158964
                     if (mitore < 90) {
                         enemyAction = INACTIVE_ENEMY;
@@ -419,6 +421,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     double percent1 = 0.0;
     int attackCount;
     int percent_tmp;
+    //必殺チャージ(敵)の閾値
     // double proportionTable1[9] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2, 0.1};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
     int proportionTable2[9] = {90, 90, 64, 32, 16, 8, 4, 2, 1};//最後の項目を調べるのは手動　P:\lua\isilyudaru\hissatuteki.lua
     int proportionTable3[9] = {63, 56, 49, 42, 35, 28, 21, 14, 7};//6ダメージ以下で0%
@@ -485,13 +488,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (!kaihi) {
                 percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
                 if (percent1 < 0.5) {
-                    if (percent >= 0.5) {
+                    if (percent >= 0.5) {//これターンの初めのhpが228に一致している場合でも怒り狂うらしい。
                         if (!players[1].rage) {
                             (*position)++;
                             players[1].rage = true;
                             players[1].rageTurns = lcg::intRangeRand(position, 2, 4);
                         } else {
-                            (*position)++;
+                            (*position)++;//既に怒り狂ってる場合1消費になる。
                         }
                     } else {
                         if (percent1 < 0.25) {
