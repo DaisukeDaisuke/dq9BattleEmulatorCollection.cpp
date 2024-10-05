@@ -440,11 +440,11 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
             auto ehp = result2.ehp[j];
             auto ahp = result2.ahp[j];
             if (respite > 20) {
-                if (turn <= (lastInputTurn + 3)) {
+                if (turn <= (lastInputTurn + 5)) {
                     continue;
                 }
             } else {
-                if (turn <= lastInputTurn) {
+                if (turn <= (lastInputTurn + 2)) {
                     continue;
                 }
             }
