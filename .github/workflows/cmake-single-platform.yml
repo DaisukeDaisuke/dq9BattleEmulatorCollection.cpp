@@ -48,6 +48,6 @@ jobs:
       uses: actions/upload-artifact@v3.2.1-node20
       with:
         # Artifact name
-        name: test
-        path: ${{github.workspace}}/build
+        name: vs_be
+        path: ${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe
 
