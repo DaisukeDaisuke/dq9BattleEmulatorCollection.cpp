@@ -38,6 +38,13 @@ jobs:
         $destination = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
         Rename-Item -Path $source -NewName $destination
 
+    - name: Rename the pdb file
+      shell: pwsh
+      run: |
+        $source = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/newDirectory.pdb"
+        $destination = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.pdb"
+        Rename-Item -Path $source -NewName $destination
+
     - name: echo SHA256
       run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
 
@@ -49,5 +56,7 @@ jobs:
       with:
         # Artifact name
         name: vs_be
-        path: ${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe
+        path: |
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.pdb
 
