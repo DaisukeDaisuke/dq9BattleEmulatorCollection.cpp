@@ -75,7 +75,7 @@ int lcg::getPercent(int *position, int max) {
     if (position == nullptr) {
         throw std::invalid_argument("Null pointer passed to incrementPosition.");
     }
-    if ((*position) >= ARRAY_SIZE){
+    if ((*position) >= ARRAY_SIZE) {
         std::cerr << "out of range!!!" << std::endl;
         return 0;
     }
@@ -90,11 +90,11 @@ int lcg::getPercent(int *position, int max) {
     return roundedResult;
 }
 
-double lcg::floatRand(int * position, double min, double max){
+double lcg::floatRand(int *position, double min, double max) {
     if (position == nullptr) {
         throw std::invalid_argument("Null pointer passed to incrementPosition.");
     }
-    if ((*position) >= ARRAY_SIZE){
+    if ((*position) >= ARRAY_SIZE) {
         std::cerr << "out of range!!!" << std::endl;
         return 0;
     }
@@ -103,11 +103,11 @@ double lcg::floatRand(int * position, double min, double max){
     return min + result * (max - min);
 }
 
-int lcg::intRangeRand(int * position, int min, int max){
+int lcg::intRangeRand(int *position, int min, int max) {
     return min + getPercent(position, max - min + 1);
 }
 
-uint64_t lcg::getSeed(int *position){
+uint64_t lcg::getSeed(int *position) {
     if (position == nullptr) {
         throw std::invalid_argument("Null pointer passed to incrementPosition.");
     }

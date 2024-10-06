@@ -20,18 +20,18 @@ public:
     AnalyzeData() : genome(100, 0) {}
 
     // ゲノム全体のセッター
-    void setGenome(const std::vector<int32_t>& newGenome) {
+    void setGenome(const std::vector<int32_t> &newGenome) {
         if (newGenome.size() != genome.size()) {
             throw std::invalid_argument("Genome size mismatch");
         }
         genome = newGenome;
     }
 
-    void setWinStatus(const bool win){
+    void setWinStatus(const bool win) {
         winStatus = win;
     }
 
-    [[nodiscard]] bool getWinStatus() const{
+    [[nodiscard]] bool getWinStatus() const {
         return winStatus;
     }
 
@@ -56,11 +56,11 @@ public:
         return genome[index];
     }
 
-    void setBattleTrace(std::string trace){
+    void setBattleTrace(std::string trace) {
         BattleTrace = std::move(trace);
     }
 
-    [[nodiscard]] std::string getBattleTrace() const{
+    [[nodiscard]] std::string getBattleTrace() const {
         return BattleTrace;
     }
 
@@ -70,19 +70,19 @@ public:
         turns = result.turn;
     }
 
-    void setEvaluationString(std::string str){
+    void setEvaluationString(std::string str) {
         EvaluationString = std::move(str);
     }
 
-    [[nodiscard]] std::string getEvaluationString(){
+    [[nodiscard]] std::string getEvaluationString() {
         return EvaluationString;
     }
 
-    void setLastInputTurn(int turn){
+    void setLastInputTurn(int turn) {
         lastInputTurn = turn;
     }
 
-    [[nodiscard]] int getLastInputTurn(){
+    [[nodiscard]] int getLastInputTurn() {
         return lastInputTurn;
     }
 
@@ -106,7 +106,6 @@ private:
     std::string BattleTrace;
     std::string EvaluationString;
 };
-
 
 
 #endif //NEWDIRECTORY_ANALYZEDATA_H

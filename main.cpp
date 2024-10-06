@@ -1,9 +1,5 @@
 #include <iostream>
-#include <ctime>        // time
-#include <cstdlib>      // srand,lcg
-#include <cstdio>
 #include <cstring>
-#include <omp.h>
 #include <chrono>
 #include <cmath>
 #include <sstream>
@@ -334,7 +330,7 @@ int main(int argc, char *argv[]) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-    //std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
+    std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
     return 0;
 }
 
