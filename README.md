@@ -39,3 +39,10 @@ https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/yo2
 
 https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/buru_BruteForce
 
+
+### 追加要件
+
+- 許可なく自作発言禁止(自作発言は一部の人のみ許可しています)
+- これを使用したことによる実行したコンピーターやds、またはバグなどのミスによる不利益、損傷については一切保証せず、現状のままでの提供になります。
+  - また、mingw版は悪意のあるプログラムと誤検知されるため配布する予定はありません。フォークしてvs版(2倍遅い)をビルドするか、clionを使って各自でビルドしてください。
+  - exeをVenusTotalにかけるなど、万全を期していますが、vs版や、mingw版(非公開)を実行した場合、プログラムに悪意のあるプログラムが混じっている可能性があることに同意することとします。
