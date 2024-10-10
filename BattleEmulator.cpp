@@ -99,7 +99,7 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
         }
         DEBUG_COUT2((*position));
 #ifdef DEBUG2
-        if ((*position) == 230){
+        if ((*position) == 176){
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -463,7 +463,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++;//回避
             FUN_0207564c(position, players[attacker].atk, players[defender].def);
-            (*position)++;//0x021ed7a8
+            if (!players[defender].specialCharge){
+                (*position)++;//0x021ed7a8
+            }
             return 0;
             break;
         case BattleEmulator::COUNTER:
@@ -563,10 +565,14 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
             baseDamage *= 1.5;
             if (kaihi) {
-                (*position)++;//0x021ed7a8
+                if (!players[0].specialCharge) {
+                    (*position)++;//0x021ed7a8
+                }
                 baseDamage = 0;
             } else if (tate) {
-                (*position)++;//0x021ed7a8
+                if (!players[0].specialCharge) {
+                    (*position)++;//0x021ed7a8
+                }
                 baseDamage = 0;
             } else {
                 (*position)++;//目を覚ました
@@ -619,10 +625,14 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
 
             if (kaihi) {
-                (*position)++;//0x021ed7a8
+                if (!players[0].specialCharge) {
+                    (*position)++;//0x021ed7a8
+                }
                 baseDamage = 0;
             } else if (tate) {
-                (*position)++;//0x021ed7a8
+                if (!players[0].specialCharge) {
+                    (*position)++;//0x021ed7a8
+                }
                 baseDamage = 0;
             } else {
                 (*position)++;//目を覚ました
@@ -760,7 +770,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             baseDamage = FUN_021e8458_typeD(position, 5, 17);
             if (tate) {
                 baseDamage = 0;
-                (*position)++;
+                if (!players[0].specialCharge) {
+                    (*position)++;
+                }
             } else {
                 (*position)++;
                 if (!players[defender].paralysis && !players[0].inactive) {
@@ -812,10 +824,14 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
 
             if (kaihi) {
-                (*position)++;//0x021ed7a8
+                if (!players[0].specialCharge){
+                    (*position)++;//0x021ed7a8
+                }
                 baseDamage = 0;
             } else if (tate) {
-                (*position)++;//0x021ed7a8
+                if (!players[0].specialCharge){
+                    (*position)++;//0x021ed7a8
+                }
                 baseDamage = 0;
             } else {
                 (*position)++;//目を覚ました

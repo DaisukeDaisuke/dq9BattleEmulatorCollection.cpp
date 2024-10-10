@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
 //    time2 = 166779031;
 
 #ifdef DEBUG2
-    time1 = 57927105;
+    time1 = 2304586611;
     time2 = 2501309586;
 
     lcg::init(time1, 57927105);
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
         players[j] = copiedPlayers[j];
     }
     vector<int32_t> gene1(gene);
-    gene1[19-1] = BattleEmulator::DEFENCE;
+    //gene1[19-1] = BattleEmulator::DEFENCE;
     BattleResult result;
     BattleEmulator::Main(position, 100, gene1, players, result, time1);
     delete position;
