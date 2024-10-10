@@ -12,8 +12,9 @@
 // Define the size of the array
 const int ARRAY_SIZE = 2500;
 
-double *precalculatedValues;
-uint64_t *seeds;
+double precalculatedValues[ARRAY_SIZE]; // 固定メモリ
+uint64_t seeds[ARRAY_SIZE];             // 固定メモリ
+
 
 lcg::lcg() {
     // コンストラクタの実装
@@ -21,25 +22,15 @@ lcg::lcg() {
 }
 
 lcg::~lcg() {
-    delete[] precalculatedValues;
-    // デストラクタの実装
-    // メモリの解放やその他のクリーンアップ作業をここで行う
 }
 
-void lcg::init(uint64_t seed, int size) {
-    // Calculate and store values in the array
-    precalculatedValues = new double[ARRAY_SIZE];
-    seeds = new uint64_t[ARRAY_SIZE];
+void lcg::init(uint64_t seed) {
+    // 配列に値を再計算して格納する
     for (int i = 1; i < ARRAY_SIZE; ++i) {
         seed = lcg_rand(seed);
         precalculatedValues[i] = calculatePercent(seed) * 0.01;
         seeds[i] = seed >> 32;
     }
-}
-
-void lcg::release() {
-    delete[] precalculatedValues;
-    delete[] seeds;
 }
 
 // Linear congruential generator function

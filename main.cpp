@@ -284,12 +284,11 @@ int main(int argc, char *argv[]) {
 
 //    time1 = 0x98087FD0;
 //    time2 = 0x98087FD0+1;
+    int *position = new int(1);
     for (uint64_t seed = time1; seed < time2; ++seed) {
-        if (seed % 10000 == 0) {
-            //std::cout << seed << std::endl;
-        }
-        lcg::init(seed, 5000);
-        int *position = new int(1);
+        (*position) = 1;
+        lcg::init(seed);
+
         for (int j = 0; j < 2; ++j) {
             players[j] = copiedPlayers[j];
         }
@@ -321,9 +320,8 @@ int main(int argc, char *argv[]) {
             processResult(copiedPlayers, seed, gene, 0, str2, -1);
             foundSeeds++;
         }
-        lcg::release();
-        delete position;
     }
+    delete position;
 
     std::cout << std::endl << "found: " << foundSeeds << std::endl;
 
