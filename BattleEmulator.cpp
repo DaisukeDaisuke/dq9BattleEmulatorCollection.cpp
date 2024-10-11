@@ -331,19 +331,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
             }
             break;
-        case BattleEmulator::CURE_PARALYSIS:
-            (*position) += 2;
-            (*position)++;//関係ない　0x021ec6f8
-            (*position)++;//会心
-            (*position)++;//回避
-            FUN_0207564c(position, players[attacker].atk, players[defender].def);
-            (*position)++;//不明
-            (*position)++;//必殺チャージ(敵)　0%
-            if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {//0x021ed7a8
-                players[defender].specialCharge = true;
-                players[defender].specialChargeTurn = 6;
-            }
-            break;
         case BattleEmulator::ACROBATSTAR_KAIHI:
             //(*position) += 2;
             //(*position)++;//アクロバットスター判定
@@ -377,7 +364,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = static_cast<int>(floor(tmp));
             }
             if (!kaihi) {
-
                 percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
                 if (percent1 < 0.5) {
                     double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
@@ -425,6 +411,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//不明
             break;
         case BattleEmulator::DEFENCE:
+        case BattleEmulator::CURE_PARALYSIS:
             (*position) += 2;
             (*position)++;//関係ない
             (*position)++;//会心
