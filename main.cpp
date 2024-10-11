@@ -3,6 +3,8 @@
 #include <cmath>
 #include <vector>
 #include <iomanip>
+#include <sstream>
+#include <fstream>
 #include "lcg.h"
 #include "BattleEmulator.h"
 #include "AnalyzeData.h"
