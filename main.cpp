@@ -261,16 +261,6 @@ int main(int argc, char *argv[]) {
     lcg::release();
     return 0;
 #endif
-
-    //std::cout << time2  << std::endl;
-    // Now you can use the precalculated values as needed
-    //int test = 0;
-    //std::vector<std::stringstream> streams(100);
-    //for (uint64_t seed = 0; seed < 100000; ++seed) {
-    //std::string str2 = "10 18 19 10 h 9 17 8 18 11 9 h 18";
-    //std::string str2 = "19 9 9 17 h 13 15 10 10 11 11 h 15";
-    //std::string str2 = argv[5];//"18 9 15 18 15 h 19 9 14";
-
     std::stringstream ss;
 
     // argv[5]以降をstringstreamに入れる
@@ -280,10 +270,6 @@ int main(int argc, char *argv[]) {
 
     std::string str2 = ss.str();
 
-    //str2.erase(std::remove(str2.begin(), str2.end(), '"'), str2.end());
-
-//    time1 = 0x98087FD0;
-//    time2 = 0x98087FD0+1;
     int *position = new int(1);
     for (uint64_t seed = time1; seed < time2; ++seed) {
         (*position) = 1;
@@ -337,11 +323,6 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
                    std::string input, int id) {
     BattleResult result2;
     vector<AnalyzeData> candidate = vector<AnalyzeData>();
-    int PreviousTurn = 0;
-    int lastParalysis = -1;
-    int lastCounter = -1;
-    int paralysisTurns = 0;
-    bool first = false;
     std::map<int32_t, int> paralysis_map;
     int lastInputTurn = -1;
     auto respite = -1;
