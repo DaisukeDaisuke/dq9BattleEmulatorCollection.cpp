@@ -9,7 +9,7 @@
 
 int counter = 0;
 
-void camera::Main(int *position, const int32_t actions[5], const std::vector<std::pair<int, int>> &pairs) {
+void camera::Main(int *position, const int32_t actions[5]) {
     int32_t before = -1;
     bool preemptive = true;
     for (int i = 0; i < 2; ++i) {

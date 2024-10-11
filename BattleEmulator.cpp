@@ -96,35 +96,19 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
 
         players[0].defence = 1.0;
 
-        std::vector<std::pair<int, int>> direction;
         for (int32_t &action: actions) {
             action = -1;
         }
         actionsPosition = 0;
-        std::array<double, 2> speed{};
-        for (int k = 0; k < 2; ++k) {
-            speed[k] = players[k].speed;
+        double speed0 = players[0].speed * lcg::floatRand(position, 0.51, 1.0);
+        double speed1 = players[1].speed * lcg::floatRand(position, 0.51, 1.0);
+
+        // 素早さを比較
+        if (speed0 > speed1) {
+            player0_has_initiative = true;
+        } else {
+            player0_has_initiative = false;
         }
-        for (double &element: speed) {
-            element *= lcg::floatRand(position, 0.51, 1.0);
-        }
-
-        // インデックスと要素をペアにして保持
-        std::vector<std::pair<double, size_t>> indexed_speed;
-        for (size_t k = 0; k < speed.size(); ++k) {
-            indexed_speed.emplace_back(speed[k], k);
-        }
-
-        // ラムダ式を使用して要素を比較
-        auto compare_function = [](const auto &lhs, const auto &rhs) {
-            return lhs.first > rhs.first;
-        };
-
-        // ソート
-        std::sort(indexed_speed.begin(), indexed_speed.end(), compare_function);
-
-
-        player0_has_initiative = (indexed_speed[0].second == 0);
 
         (*position)++;//0x02160d64
 
@@ -165,7 +149,7 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
         int enemyAction = 0;
 
         // ソートされた結果を出力
-        for (const auto &element: indexed_speed) {
+        for (int t = 0; t < 2; ++t) {
             if (!Player::isPlayerAlive(players[1])) {
                 break;
             }
@@ -174,7 +158,7 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
             }
 
             int basedamage = 0;
-            if (element.second == 1) {
+            if ((t == 0&&!player0_has_initiative)||(t == 1&&player0_has_initiative)) {
                 //--------start_FUN_02158dfc-------
                 const int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, MANAZASHI, PUFF_PUFF};
                 //休み時消費:   タナトス バンパイアエッジ ヒャド 攻撃 まなざし まなざし
@@ -219,7 +203,6 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                 basedamage = callAttackFun(enemyAction, position, players, 1, 0);
                 BattleResult::add(result, enemyAction, basedamage, true, players[0].paralysis,
                                   isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
-                direction.emplace_back(1, 0);
                 Player::reduceHp(players[0], basedamage);
                 doAction = enemyAction;
                 //--------start_FUN_021594bc-------
@@ -264,7 +247,6 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                 basedamage = callAttackFun(action, position, players, 0, 1);
                 BattleResult::add(result, action, basedamage, false, players[0].paralysis,
                                   isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
-                direction.emplace_back(0, 1);
                 if (action == HEAL || action == MEDICINAL_HERBS) {
                     Player::heal(players[0], basedamage);
                 } else {
@@ -290,7 +272,7 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
         if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
             (*position) += 1;
         }
-        camera::Main(position, actions, direction);
+        camera::Main(position, actions);
 
         if (!Player::isPlayerAlive(players[1])) {
             return false;
