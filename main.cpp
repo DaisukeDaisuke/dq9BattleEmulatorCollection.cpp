@@ -190,11 +190,11 @@ int main(int argc, char *argv[]) {
     std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
 
     Player players[2];
-    int hps[2] = {70, 456}; //hp変更する際はproportionTable3を絶対変更すること。どこにあるか分からない場合はclionのctrl+shift+fを使うべし。
-    int defs[2] = {69, 58};
-    int atks[2] = {62 + 2, 56};
-    int speeds[2] = {44, 54};
-    int mps[2] = {24, 255};
+    const int hps[2] = {70, 456}; //hp変更する際はproportionTable3を絶対変更すること。どこにあるか分からない場合はclionのctrl+shift+fを使うべし。
+    const int defs[2] = {69, 58};
+    const int atks[2] = {62 + 2, 56};
+    const int speeds[2] = {44, 54};
+    const int mps[2] = {24, 255};
     for (int i = 0; i < 2; ++i) {
         players[i].playerId = i;
         players[i].hp = hps[i];
@@ -204,9 +204,9 @@ int main(int argc, char *argv[]) {
         players[i].speed = speeds[i];
         players[i].mp = mps[i];
     }
-    int hours = toint(argv[1]);
-    int minutes = toint(argv[2]);
-    int seconds = toint(argv[3]);
+    const int hours = toint(argv[1]);
+    const int minutes = toint(argv[2]);
+    const int seconds = toint(argv[3]);
 
     Player copiedPlayers[2];
     for (int i = 0; i < 2; ++i) {
