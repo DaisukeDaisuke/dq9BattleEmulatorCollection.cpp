@@ -8,15 +8,12 @@ add_executable(newDirectory main.cpp
         lcg.h
         BattleEmulator.cpp
         BattleEmulator.h
-        Player.cpp
         Player.h
         camera.cpp
         camera.h
         debug.cpp
         debug.h
-        BattleResult.cpp
         BattleResult.h
-        AnalyzeData.cpp
         AnalyzeData.h
 )
 

@@ -3,8 +3,6 @@
 //
 
 #include <cstdint>
-#include <array>
-#include <algorithm>
 #include <vector>
 #include <iostream>
 #include <cmath>
@@ -14,7 +12,6 @@
 #include "camera.h"
 #include "debug.h"
 #include "BattleResult.h"
-#include <utility>
 
 
 int32_t actions[2];
@@ -158,7 +155,7 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
             }
 
             int basedamage = 0;
-            if ((t == 0&&!player0_has_initiative)||(t == 1&&player0_has_initiative)) {
+            if ((t == 0 && !player0_has_initiative) || (t == 1 && player0_has_initiative)) {
                 //--------start_FUN_02158dfc-------
                 const int table[6] = {VICTIMISER, HP_HOOVER, CRACK_ENEMY, ATTACK_ENEMY, MANAZASHI, PUFF_PUFF};
                 //休み時消費:   タナトス バンパイアエッジ ヒャド 攻撃 まなざし まなざし
@@ -339,7 +336,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++;//回避
             FUN_0207564c(position, players[attacker].atk, players[defender].def);
-            if (!players[defender].specialCharge){
+            if (!players[defender].specialCharge) {
                 (*position)++;//0x021ed7a8
             }
             return 0;
@@ -702,12 +699,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
 
             if (kaihi) {
-                if (!players[0].specialCharge){
+                if (!players[0].specialCharge) {
                     (*position)++;//0x021ed7a8
                 }
                 baseDamage = 0;
             } else if (tate) {
-                if (!players[0].specialCharge){
+                if (!players[0].specialCharge) {
                     (*position)++;//0x021ed7a8
                 }
                 baseDamage = 0;

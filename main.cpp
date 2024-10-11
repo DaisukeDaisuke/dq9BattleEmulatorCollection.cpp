@@ -1,11 +1,7 @@
 #include <iostream>
 #include <cstring>
-#include <chrono>
 #include <cmath>
-#include <sstream>
-#include <fstream>
 #include <vector>
-#include <map>
 #include <iomanip>
 #include "lcg.h"
 #include "BattleEmulator.h"
@@ -185,10 +181,9 @@ int main(int argc, char *argv[]) {
         std::cerr << "argc!!" << std::endl;
         return 1;
     }
+
     //https://zenn.dev/reputeless/books/standard-cpp-for-competitive-programming/viewer/library-ios-iomanip#3.1-c-%E8%A8%80%E8%AA%9E%E3%81%AE%E5%85%A5%E5%87%BA%E5%8A%9B%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%E3%83%A0%E3%81%A8%E3%81%AE%E5%90%8C%E6%9C%9F%E3%82%92%E7%84%A1%E5%8A%B9%E3%81%AB%E3%81%99%E3%82%8B
     std::cin.tie(0)->sync_with_stdio(0);
-
-    auto t0 = std::chrono::high_resolution_clock::now();
 
     std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
 
@@ -226,9 +221,6 @@ int main(int argc, char *argv[]) {
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
 
-//    time1 = 166779029;
-//    time2 = 166779031;
-
 #ifdef DEBUG2
     time1 = 2304586611;
     time2 = 2501309586;
@@ -261,14 +253,14 @@ int main(int argc, char *argv[]) {
     lcg::release();
     return 0;
 #endif
-    std::stringstream ss;
+    std::stringstream ss10;
 
     // argv[5]以降をstringstreamに入れる
     for (int i = 4; i < argc; ++i) {
-        ss << argv[i] << " ";
+        ss10 << argv[i] << " ";
     }
 
-    std::string str2 = ss.str();
+    std::string str2 = ss10.str();
 
     int *position = new int(1);
     for (uint64_t seed = time1; seed < time2; ++seed) {
@@ -299,10 +291,7 @@ int main(int argc, char *argv[]) {
         }
         std::string resultStr = ss.str();
 
-        //if (resultStr.find(str2) != std::string::npos) {
         if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
-            //std::cout << seed << std::endl;
-            //std::cout << resultStr << std::endl;
             processResult(copiedPlayers, seed, gene, 0, str2, -1);
             foundSeeds++;
         }
@@ -310,11 +299,6 @@ int main(int argc, char *argv[]) {
     delete position;
 
     std::cout << std::endl << "found: " << foundSeeds << std::endl;
-
-    auto t1 = std::chrono::high_resolution_clock::now();
-    auto elapsed_time =
-            std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-    std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
     return 0;
 }
 
@@ -323,7 +307,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
                    std::string input, int id) {
     BattleResult result2;
     vector<AnalyzeData> candidate = vector<AnalyzeData>();
-    std::map<int32_t, int> paralysis_map;
+    vector<int> paralysis_map;
     int lastInputTurn = -1;
     auto respite = -1;
 
@@ -429,24 +413,24 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
                 action == BattleEmulator::CURE_PARALYSIS || inactive || paralysis) {
                 continue;
             }
-            paralysis_map[turn] = (turn << 20) | (ehp << 10) | ahp;
+            paralysis_map.push_back((turn << 20) | (ehp << 10) | ahp);
         }
     }
-    for (const auto &pair: paralysis_map) {
+    for (const auto &item: paralysis_map) {
         std::stringstream ss;
-        int ehp = ((pair.second >> 10) & 0x3ff);
-        int ahp = (pair.second & 0x3ff);
-        int turns = ((pair.second >> 20) & 0x3ff);
-        //ss << "hp: " << ((pair.second >> 10) & 0x3ff) << ", hp1: " << (pair.second & 0x3ff) << ", turn: " << ((pair.second >> 20) & 0x3ff) << ", defense: ";
+        int ehp = ((item >> 10) & 0x3ff);
+        int ahp = (item & 0x3ff);
+        int turns = ((item >> 20) & 0x3ff);
+        //ss << "hp: " << ((item.second >> 10) & 0x3ff) << ", hp1: " << (item.second & 0x3ff) << ", turn: " << ((item.second >> 20) & 0x3ff) << ", defense: ";
         Player players[2];
         int *position = new int(1);
         for (int j = 0; j < 2; ++j) {
             players[j] = copiedPlayers[j];
         }
         BattleResult result1;
-        //gene[pair.first] = (ahp << 20) | (ehp << 10) | BattleEmulator::DEFENCE;
+        //gene[item.first] = (ahp << 20) | (ehp << 10) | BattleEmulator::DEFENCE;
         std::vector<int32_t> gene(gene1);
-        gene[pair.first] = (ahp << 20) | (ehp << 10) | BattleEmulator::DEFENCE;
+        gene[turns] = (ahp << 20) | (ehp << 10) | BattleEmulator::DEFENCE;
         BattleEmulator::Main(position, 200, gene, players, result1, seed);
         AnalyzeData analyzeData;
         analyzeData.FromBattleResult(result1);
@@ -469,12 +453,12 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         //std::cout << ss.str() << endl;
     }
 
-    for (const auto &pair: paralysis_map) {
+    for (const auto &item: paralysis_map) {
         std::stringstream ss;
-        int ehp = ((pair.second >> 10) & 0x3ff);
-        int ahp = (pair.second & 0x3ff);
-        int turns = ((pair.second >> 20) & 0x3ff);
-        //ss << "hp: " << ((pair.second >> 10) & 0x3ff) << ", hp1: " << (pair.second & 0x3ff) << ", turn: " << ((pair.second >> 20) & 0x3ff) << ", heal: ";
+        int ehp = ((item >> 10) & 0x3ff);
+        int ahp = (item & 0x3ff);
+        int turns = ((item >> 20) & 0x3ff);
+        //ss << "hp: " << ((item.second >> 10) & 0x3ff) << ", hp1: " << (item.second & 0x3ff) << ", turn: " << ((item.second >> 20) & 0x3ff) << ", heal: ";
         Player players[2];
         int *position = new int(1);
         for (int j = 0; j < 2; ++j) {
@@ -482,7 +466,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         }
         BattleResult result3;
         std::vector<int32_t> gene(gene1);
-        gene[pair.first] = (ahp << 20) | (ehp << 10) | BattleEmulator::HEAL;
+        gene[turns] = (ahp << 20) | (ehp << 10) | BattleEmulator::HEAL;
         BattleEmulator::Main(position, 200, gene, players, result3, seed);
         AnalyzeData analyzeData;
         analyzeData.FromBattleResult(result3);

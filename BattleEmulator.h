@@ -7,7 +7,6 @@
 
 
 #include <cstdint>
-#include <set>
 #include "Player.h"
 #include "BattleResult.h"
 

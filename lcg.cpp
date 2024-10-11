@@ -3,11 +3,9 @@
 //
 
 #include "lcg.h"
-#include <stdint.h>
-#include <stdexcept>
+#include <cstdint>
 #include <cmath>  // cmathヘッダーをインクルードする
 #include <iostream>
-#include <chrono>
 
 // Define the size of the array
 const int ARRAY_SIZE = 2500;
