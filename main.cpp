@@ -281,10 +281,10 @@ int main(int argc, char *argv[]) {
 
         std::memcpy(players, copiedPlayers, sizeof(players));
 
-        bool resultbool = BattleEmulator::Main(position, 25, std::vector<int32_t>(), players,
+        bool resultBool = BattleEmulator::Main(position, 25, std::vector<int32_t>(), players,
                                                (optional<BattleResult> &) std::nullopt, seed, values, maxElement);
 
-        if (resultbool) {
+        if (resultBool) {
             processResult(copiedPlayers, seed, str2);
             foundSeeds++;
         }
