@@ -198,29 +198,14 @@ int main(int argc, char *argv[]) {
 
     std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
 
-    Player players[2];
-    const int hps[2] = {70, 456}; //hp変更する際はproportionTable3を絶対変更すること。どこにあるか分からない場合はclionのctrl+shift+fを使うべし。
-    const int defs[2] = {69, 58};
-    const int atks[2] = {62 + 2, 56};
-    const int speeds[2] = {44, 54};
-    const int mps[2] = {24, 255};
-    for (int i = 0; i < 2; ++i) {
-        players[i].playerId = i;
-        players[i].hp = hps[i];
-        players[i].maxHp = hps[i];
-        players[i].atk = atks[i];
-        players[i].def = defs[i];
-        players[i].speed = speeds[i];
-        players[i].mp = mps[i];
-    }
+    const Player copiedPlayers[2] = {
+            {70, 70.0, 62 + 2, 69, 44, false,  false, 0, false, false, 0, -1, false, 0, 24, 8, 1.0, false, 0},
+            {456, 456.0, 56, 58, 54, false,  false, 0, false, false, 0, -1, false, 0, 255, 8, 1.0, false, 0}
+    };
+
     const int hours = toint(argv[1]);
     const int minutes = toint(argv[2]);
     const int seconds = toint(argv[3]);
-
-    Player copiedPlayers[2];
-    for (int i = 0; i < 2; ++i) {
-        copiedPlayers[i] = players[i];
-    }
 
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 15;
@@ -293,13 +278,13 @@ int main(int argc, char *argv[]) {
 
     int *position = new int(1);
     BattleResult dummy;
+    Player players[2];
     for (uint64_t seed = time1; seed < time2; ++seed) {
         (*position) = 1;
         lcg::init(seed);
 
-        for (int j = 0; j < 2; ++j) {
-            players[j] = copiedPlayers[j];
-        }
+        std::memcpy(players, copiedPlayers, sizeof(players));
+
         bool resultbool = BattleEmulator::Main(position, 25, gene, players, dummy, seed, values, maxElement);
 
         if (resultbool){

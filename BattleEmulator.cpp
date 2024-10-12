@@ -887,35 +887,6 @@ int BattleEmulator::FUN_0207564c(int *position, int atk, int def) {
     //return 0;
 }
 
-int BattleEmulator::AttackTargetSelection(int *position, Player *players) {
-    int max = 0;
-    int tmp[5] = {0, 0, 0, 0};
-    for (int i = 0; i < 4; ++i) {
-        if (!Player::isPlayerAlive(players[i])) {
-            continue;
-        }
-        if (players[i].guard == FRONT) {
-            tmp[i] = 2;
-            max += 2;
-        } else {
-            tmp[i] = 1;
-            max += 1;
-        }
-    }
-    int result = lcg::getPercent(position, max);
-    for (int i = 0; i < 4; ++i) {
-        if (!Player::isPlayerAlive(players[i])) {
-            continue;
-        }
-        int element = tmp[i];
-        if (result <= element) {
-            return i;
-        }
-        result -= element;
-    }
-    throw std::logic_error("AttackTargetSelection error");
-}
-
 int BattleEmulator::ProcessEnemyRandomAction(int *position, int pattern) {//0x0208aca8
     const int patternTable[6] = {43, 42, 43, 43, 42, 43};
     //125

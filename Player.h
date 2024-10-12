@@ -8,14 +8,8 @@
 #include <algorithm>
 #include <iostream>
 
-enum Position {
-    FRONT = 0,
-    BACK = 1
-};
 
 struct Player {
-    int playerId;
-    int guard = FRONT;
     int hp = 0;
     double maxHp = 0.0;
     int atk;
@@ -23,7 +17,6 @@ struct Player {
     int speed;
     bool specialCharge = false;
     bool dirtySpecialCharge = false;
-    bool dirtySpecialCharge1 = false;
     int specialChargeTurn = 0;
     bool inactive = false;
     bool paralysis = false;
@@ -56,13 +49,6 @@ struct Player {
         obj.hp += amount;
         obj.hp = std::min(static_cast<int>(obj.maxHp), obj.hp);
     }
-
-    static bool isHPBelow40Percent(const Player &player) {
-        // HPが最大HPの40%未満であるかどうかを判別
-        return static_cast<double>(player.hp) < 0.4 * player.maxHp;
-    }
-
-
 };
 
 #endif //NEWDIRECTORY_PLAYER_H
