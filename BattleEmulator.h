@@ -7,6 +7,7 @@
 
 
 #include <cstdint>
+#include <optional>
 #include "Player.h"
 #include "BattleResult.h"
 
@@ -37,7 +38,7 @@ public:
     static const int CURE_PARALYSIS = 16;
 
     static bool
-    Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players, BattleResult &result, uint64_t seed, const int values[50], int maxElement);
+    Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players, std::optional<BattleResult> &result, uint64_t seed, const int values[50], int maxElement);
 
     static std::string getActionName(int actionId);
 

@@ -18,8 +18,7 @@
 
 int toint(char *string);
 
-void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene, int depth,
-                   std::string input, int id);
+void processResult(const Player *copiedPlayers, const uint64_t seed, std::string input);
 
 std::string ltrim(const std::string &s);
 
@@ -196,11 +195,9 @@ int main(int argc, char *argv[]) {
     //https://zenn.dev/reputeless/books/standard-cpp-for-competitive-programming/viewer/library-ios-iomanip#3.1-c-%E8%A8%80%E8%AA%9E%E3%81%AE%E5%85%A5%E5%87%BA%E5%8A%9B%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%E3%83%A0%E3%81%A8%E3%81%AE%E5%90%8C%E6%9C%9F%E3%82%92%E7%84%A1%E5%8A%B9%E3%81%AB%E3%81%99%E3%82%8B
     std::cin.tie(0)->sync_with_stdio(0);
 
-    std::vector<int32_t> gene = std::vector<int32_t>(100, 0);
-
     const Player copiedPlayers[2] = {
-            {70, 70.0, 62 + 2, 69, 44, false,  false, 0, false, false, 0, -1, false, 0, 24, 8, 1.0, false, 0},
-            {456, 456.0, 56, 58, 54, false,  false, 0, false, false, 0, -1, false, 0, 255, 8, 1.0, false, 0}
+            {70,  70.0,  62 + 2, 69, 44, false, false, 0, false, false, 0, -1, false, 0, 24,  8, 1.0, false, 0},
+            {456, 456.0, 56,     58, 54, false, false, 0, false, false, 0, -1, false, 0, 255, 8, 1.0, false, 0}
     };
 
     const int hours = toint(argv[1]);
@@ -254,7 +251,7 @@ int main(int argc, char *argv[]) {
 
     int maxElement = 0;
     int values[50];
-    if (50 <= argc){
+    if (50 <= argc) {
         std::cerr << "Too much input!" << std::endl;
         return 1;
     }
@@ -262,13 +259,13 @@ int main(int argc, char *argv[]) {
     for (int i = 4; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "h") {
-            values[i-4] = -1;  // "h" を -1 に置き換える
+            values[i - 4] = -1;  // "h" を -1 に置き換える
         } else {
             int tmp = toint(argv[i]);
-            if (tmp == -1){
+            if (tmp == -1) {
                 return 1;
             }
-            values[i-4] = tmp;  // 数値に変換
+            values[i - 4] = tmp;  // 数値に変換
         }
         maxElement++;
         ss10 << argv[i] << " ";
@@ -277,7 +274,6 @@ int main(int argc, char *argv[]) {
     std::string str2 = ss10.str();
 
     int *position = new int(1);
-    BattleResult dummy;
     Player players[2];
     for (uint64_t seed = time1; seed < time2; ++seed) {
         (*position) = 1;
@@ -285,10 +281,11 @@ int main(int argc, char *argv[]) {
 
         std::memcpy(players, copiedPlayers, sizeof(players));
 
-        bool resultbool = BattleEmulator::Main(position, 25, gene, players, dummy, seed, values, maxElement);
+        bool resultbool = BattleEmulator::Main(position, 25, std::vector<int32_t>(), players,
+                                               (optional<BattleResult> &) std::nullopt, seed, values, maxElement);
 
-        if (resultbool){
-            processResult(copiedPlayers, seed, gene, 0, str2, -1);
+        if (resultbool) {
+            processResult(copiedPlayers, seed, str2);
             foundSeeds++;
         }
     }
@@ -306,14 +303,16 @@ int main(int argc, char *argv[]) {
 }
 
 
-void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene1, int depth,
-                   std::string input, int id) {
-    BattleResult result2;
+void processResult(const Player *copiedPlayers, const uint64_t seed,
+                  const std::string input) {
+    std::optional<BattleResult> result20;
+    result20 = BattleResult();
     vector<AnalyzeData> candidate = vector<AnalyzeData>();
     vector<int> paralysis_map;
     int lastInputTurn = -1;
     auto respite = -1;
     int dummy[2];
+    std::vector<int32_t> gene1(100, 0);
 
     std::cout << "============" << seed << "============" << std::endl;
 
@@ -330,12 +329,13 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
 
         std::vector<int32_t> gene(gene1);
 
-        BattleEmulator::Main(position, 200, gene, players, result2, seed, dummy, -1);
+        BattleEmulator::Main(position, 200, gene, players, result20, seed, dummy, -1);
+        BattleResult& result2 = result20.value();
         int counter = 0;
         AnalyzeData analyzeData;
+
         analyzeData.FromBattleResult(result2);
         analyzeData.setGenome(gene);
-
 
         for (int i = 0; i < result2.position; ++i) {
             auto action = result2.actions[i];
@@ -393,6 +393,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         delete position;
     }
 
+    BattleResult& result2 = result20.value();
     for (int j = result2.position - 1; j >= 0; --j) {
         if (!result2.isEnemy[j]) {
             // ss1 << lastParalysis << ": " << paralysisTurns << ", ";
@@ -432,13 +433,15 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         for (int j = 0; j < 2; ++j) {
             players[j] = copiedPlayers[j];
         }
-        BattleResult result1;
+        std::optional<BattleResult> result10;
+        result10 = BattleResult();
         //gene[item.first] = (ahp << 20) | (ehp << 10) | BattleEmulator::DEFENCE;
         std::vector<int32_t> gene(gene1);
         gene[turns] = (ahp << 20) | (ehp << 10) | BattleEmulator::DEFENCE;
-        BattleEmulator::Main(position, 200, gene, players, result1, seed, dummy, -1);
+        BattleEmulator::Main(position, 200, gene, players, result10, seed, dummy, -1);
         AnalyzeData analyzeData;
-        analyzeData.FromBattleResult(result1);
+        analyzeData.FromBattleResult(result10.value());
+        BattleResult& result1 = result10.value();
         analyzeData.setGenome(gene);
         //std::cout << analyzeData.calculateEfficiency() << std::endl;
 
@@ -469,11 +472,13 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
         for (int j = 0; j < 2; ++j) {
             players[j] = copiedPlayers[j];
         }
-        BattleResult result3;
+        std::optional<BattleResult> result30;
+        result30 = BattleResult();
         std::vector<int32_t> gene(gene1);
         gene[turns] = (ahp << 20) | (ehp << 10) | BattleEmulator::HEAL;
-        BattleEmulator::Main(position, 200, gene, players, result3, seed, dummy, -1);
+        BattleEmulator::Main(position, 200, gene, players, result30, seed, dummy, -1);
         AnalyzeData analyzeData;
+        BattleResult& result3 = result30.value();
         analyzeData.FromBattleResult(result3);
         analyzeData.setGenome(gene);
         analyzeData.setLastInputTurn(lastInputTurn);

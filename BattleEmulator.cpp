@@ -63,7 +63,7 @@ std::string BattleEmulator::getActionName(int actionId) {
     }
 }
 
-bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players, BattleResult &result,
+bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players, std::optional<BattleResult> &result,
                           uint64_t seed, const int values[50], int maxElement) {
     camera::reset();
     player0_has_initiative = false;
