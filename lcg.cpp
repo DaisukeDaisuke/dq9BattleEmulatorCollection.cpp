@@ -3,43 +3,33 @@
 //
 
 #include "lcg.h"
-#include <stdint.h>
-#include <stdexcept>
+#include <cstdint>
 #include <cmath>  // cmathヘッダーをインクルードする
 #include <iostream>
-#include <chrono>
 
 // Define the size of the array
-const int ARRAY_SIZE = 1000;
+const int ARRAY_SIZE = 3000;
 
-double *precalculatedValues;
-uint64_t *seeds;
+double precalculatedValues[ARRAY_SIZE]; // 固定メモリ
+uint64_t seeds[ARRAY_SIZE];             // 固定メモリ
+int nowCounter = 1;
+uint64_t now_seed;
 
-lcg::lcg() {
-    // コンストラクタの実装
-
+void lcg::init(uint64_t seed) {
+    nowCounter = 1;
+    now_seed = seed;
 }
 
-lcg::~lcg() {
-    delete[] precalculatedValues;
-    // デストラクタの実装
-    // メモリの解放やその他のクリーンアップ作業をここで行う
-}
-
-void lcg::init(uint64_t seed, int size) {
-    // Calculate and store values in the array
-    precalculatedValues = new double[ARRAY_SIZE];
-    seeds = new uint64_t[ARRAY_SIZE];
-    for (int i = 1; i < ARRAY_SIZE; ++i) {
-        seed = lcg_rand(seed);
-        precalculatedValues[i] = calculatePercent(seed) * 0.01;
-        seeds[i] = seed >> 32;
+void lcg::GenerateifNeed(int need) {
+    // 配列に値を再計算して格納する
+    if(nowCounter > need){
+        return;
     }
-}
-
-void lcg::release() {
-    delete[] precalculatedValues;
-    delete[] seeds;
+    for (int i = nowCounter; i < need+2; ++i) {
+        now_seed = lcg_rand(now_seed);
+        precalculatedValues[nowCounter] = calculatePercent(now_seed) * 0.01;
+        seeds[nowCounter++] = now_seed >> 32;
+    }
 }
 
 // Linear congruential generator function
@@ -75,10 +65,11 @@ int lcg::getPercent(int *position, int max) {
     if (position == nullptr) {
         throw std::invalid_argument("Null pointer passed to incrementPosition.");
     }
-    if ((*position) >= ARRAY_SIZE){
+    if ((*position) >= ARRAY_SIZE) {
         std::cerr << "out of range!!!" << std::endl;
         return 0;
     }
+    GenerateifNeed((*position));
     double result = precalculatedValues[*position];
     double scaledResult = result * max;
 
@@ -90,27 +81,29 @@ int lcg::getPercent(int *position, int max) {
     return roundedResult;
 }
 
-double lcg::floatRand(int * position, double min, double max){
+double lcg::floatRand(int *position, double min, double max) {
     if (position == nullptr) {
         throw std::invalid_argument("Null pointer passed to incrementPosition.");
     }
-    if ((*position) >= ARRAY_SIZE){
+    if ((*position) >= ARRAY_SIZE) {
         std::cerr << "out of range!!!" << std::endl;
         return 0;
     }
+    GenerateifNeed((*position));
     double result = precalculatedValues[*position];
     (*position)++;
     return min + result * (max - min);
 }
 
-int lcg::intRangeRand(int * position, int min, int max){
+int lcg::intRangeRand(int *position, int min, int max) {
     return min + getPercent(position, max - min + 1);
 }
 
-uint64_t lcg::getSeed(int *position){
+uint64_t lcg::getSeed(int *position) {
     if (position == nullptr) {
         throw std::invalid_argument("Null pointer passed to incrementPosition.");
     }
+    GenerateifNeed((*position));
     uint64_t result = seeds[*position];
     (*position)++;
     return result;

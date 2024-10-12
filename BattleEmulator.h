@@ -11,28 +11,14 @@
 #include "BattleResult.h"
 
 class BattleEmulator {
-public:
-    static const int PUFF_PUFF = 1011;
-    static const int UNSPEAKABLE_EVIL = 1010;
-    static const int VICTIMISER = 1009;
-    static const int CRACK_ENEMY = 1008;
-    static const int INACTIVE_ENEMY = 1013;
-    static const int INACTIVE_ALLY = 1006;
-    static const int HP_HOOVER = 1005;
-    static const int BOLT_CUTTER = 0xf9;
-    static const int ATTACK_ENEMY = 1016;
-    static const int MULTITHRUST = 0x49;
-    static const int MEDICINAL_HERBS = 1002;
-    static const int PARALYSIS = 1017;
-    static const int COUNTER = 1022;
-    static const int ACROBATSTAR_KAIHI = 1023;
-    static const int CURE_PARALYSIS = 1024;
+public:;
+    static const int ATTACK_ENEMY = 0;
+    static const int MEDICINAL_HERBS = 1;
 
-    static const int ATTACK_ALLY = 1004;
-    static const int HEAL = 0x1E;
-    static const int ACROBATIC_STAR = 1021;
-    static const int DEFENCE = 1020;
-    static const int RUBBLE = 1030;
+    static const int ATTACK_ALLY = 2;
+    static const int HEAL = 3;
+    static const int DEFENCE = 4;
+    static const int RUBBLE = 5;
 
     static bool Main(int *position, const int32_t *Gene, Player *players, BattleResult &result, uint64_t seed);
 private:

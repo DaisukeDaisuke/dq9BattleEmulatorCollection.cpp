@@ -51,34 +51,19 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
 //        }
 
         actionsPosition = 0;
-        std::array<double, 2> speed{};
-        for (int k = 0; k < 2; ++k) {
-            speed[k] = players[k].speed;
-        }
-        for (double &element: speed) {
-            element *= lcg::floatRand(position, 0.51, 1.0);
-        }
+        double speed0 = players[0].speed * lcg::floatRand(position, 0.51, 1.0);
+        double speed1 = players[1].speed * lcg::floatRand(position, 0.51, 1.0);
 
-        // インデックスと要素をペアにして保持
-        std::vector<std::pair<double, size_t>> indexed_speed;
-        for (size_t k = 0; k < speed.size(); ++k) {
-            indexed_speed.emplace_back(speed[k], k);
+        bool player0_has_initiative = false;
+        // 素早さを比較
+        if (speed0 > speed1) {
+            player0_has_initiative = true;
         }
-
-        // ラムダ式を使用して要素を比較
-        auto compare_function = [](const auto &lhs, const auto &rhs) {
-            return lhs.first > rhs.first;
-        };
-
-        // ソート
-        std::sort(indexed_speed.begin(), indexed_speed.end(), compare_function);
 
 
         int table[6] = {ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, RUBBLE, ATTACK_ENEMY, ATTACK_ENEMY};
         int enemyAction = table[ProcessEnemyRandomAction(position, 0)];
 
-
-        bool player0_has_initiative = (indexed_speed[0].second == 0);
 
         if (enemyAction == ATTACK_ENEMY){
             (*position) += 3;
@@ -94,26 +79,23 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
 
         (*position)++;//0x02160d64
 
-        int32_t actionTable[1] = {0};
-        for (auto &j: actionTable) {
-            j = Gene[genePosition++];
-        }
+        int32_t actionTable = -1;
 
         if (players[0].hp >= 10 || players[1].hp <= 9) {
-            actionTable[0] = ATTACK_ALLY;
+            actionTable = ATTACK_ALLY;
         } else {
             if (players[0].mp >= 2) {
-                actionTable[0] = HEAL;
+                actionTable = HEAL;
             } else if (players[0].medicinal_herbs_count >= 1) {
-                actionTable[0] = MEDICINAL_HERBS;
+                actionTable = MEDICINAL_HERBS;
                 players[0].medicinal_herbs_count--;
             } else {
-                actionTable[0] = ATTACK_ALLY;
+                actionTable = ATTACK_ALLY;
             }
         }
-        //actionTable[0] = DEFENCE;
+        //actionTable = DEFENCE;
 
-        if (actionTable[0] == DEFENCE) {
+        if (actionTable == DEFENCE) {
             players[0].defence = 0.5;
         }
 
@@ -123,7 +105,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
         }
 
         // ソートされた結果を出力
-        for (const auto &element: indexed_speed) {
+        for (int t = 0; t < 2; ++t) {
             if (!Player::isPlayerAlive(players[1])) {
                 break;
             }
@@ -138,7 +120,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
             int basedamage = 0;
             DEBUG_COUT("start: " + std::to_string(*position));
             ////std::cout << "元の位置: " << element.second << ", 値: " << element.first << std::endl;
-            if (element.second == 1) {
+            if ((t == 0 && !player0_has_initiative) || (t == 1 && player0_has_initiative)) {
                 //--------start_FUN_02158dfc-------
                 // 敵の準備
                 (*position)+= 2;
@@ -162,7 +144,7 @@ bool BattleEmulator::Main(int *position, const int32_t Gene[], Player *players, 
                 //std::cout << "attack pos: " << (*position) << "\n";
                 //--------end_FUN_021594bc-------
             } else {
-                int32_t action = actionTable[element.second] & 0xffff;
+                int32_t action = actionTable & 0xffff;
                 doAction = action;
                 //--------start_FUN_02158dfc-------
                 (*position) += 1;
@@ -244,9 +226,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     for (int j = 0; j < 2; ++j) {
         preHP[j] = players[j].hp;
     }
-    if (Id != ACROBATSTAR_KAIHI && Id != COUNTER) {
-        actions[actionsPosition++] = Id;
-    }
+    actions[actionsPosition++] = Id;
     int baseDamage = 0;
     double tmp = 0;
     bool kaisinn = false;
@@ -257,7 +237,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     int list[4] = {0, 1, 2, 3};
     int target[4] = {-1, -1, -1, -1};
     ////std::cout << Id << std::endl;
-    double percent = FUN_021dbc04(players[1].hp, players[1].maxHp);
     double percent1 = 0.0;
     int attackCount;
     int percent_tmp;
@@ -391,6 +370,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
             if (percent1 < 0.5) {
+                double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
                 if (percent > 0.5) {
                     (*position)++;
                     players[1].rage = true;
@@ -398,6 +378,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
             }
             if (percent1 < 0.25) {
+                double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
                 if (percent > 0.25) {
                     (*position)++;
                     players[1].rage = true;
@@ -424,106 +405,6 @@ void BattleEmulator::resetCombo() {
     comboCounter = 0;
 }
 
-double BattleEmulator::processCombo(int32_t Id, double damage) {
-    if (previousAttack != -1) {
-        if (previousAttack == Id) {
-            comboCounter++;
-            switch (comboCounter) {
-                case 2:
-                    damage *= 1.2;
-                    break;
-                case 3:
-                    damage *= 1.5;
-                    break;
-                default:
-                    damage *= 2.0;
-                    break;
-            }
-            return damage;
-        } else {
-            resetCombo();
-        }
-    }
-    previousAttack = Id;
-    comboCounter = 1;
-    return damage;
-}
-
-//パーセントは絶対に100%にならないから誤差-1
-int BattleEmulator::FUN_021e8458_typeC(int *position, double min, double max, double base) {
-    //0x02075724
-    auto result = lcg::floatRand(position, min, max);
-    result += lcg::floatRand(position, -base, base);
-    return static_cast<int>(floor(result));
-}
-
-//パーセントは絶対に100%にならないから誤差-1
-int BattleEmulator::FUN_021e8458_typeD(int *position, double difference, double base) {
-    //0x021e8668
-    auto result = lcg::floatRand(position, -difference, difference);
-    result += base;
-    return static_cast<int>(floor(result));
-}
-
-
-int BattleEmulator::FUN_0207564c(int *position, int atk, int def) {
-    auto atk5 = static_cast<double>(atk);
-    auto def5 = static_cast<double>(def);
-
-    auto atk1 = (atk5 - (def5 / 2)) / 2;
-    if (atk1 <= 0) {
-        return 0;
-    } else {
-        auto atk2 = atk / 16.0000;
-        if (atk1 > atk2) {
-            auto atk4 = atk1 / 16;
-            auto atk3 = -atk4;
-            auto result = atk1 + lcg::floatRand(position, atk3, atk4);
-            result = result + lcg::floatRand(position, -1, 1);
-            if (result <= 0) {
-                result = 0.0;
-            }
-            return static_cast<int>(floor(result));
-        } else {
-            double result = lcg::floatRand(position, 0.0, atk2);
-            if (result <= 0) {
-                result = 0.0;
-            }
-            return static_cast<int>(floor(result));
-        }
-    }
-    //return 0;
-}
-
-int BattleEmulator::AttackTargetSelection(int *position, Player *players) {
-    int max = 0;
-    int tmp[5] = {0, 0, 0, 0};
-    for (int i = 0; i < 4; ++i) {
-        if (!Player::isPlayerAlive(players[i])) {
-            continue;
-        }
-        if (players[i].guard == FRONT) {
-            tmp[i] = 2;
-            max += 2;
-        } else {
-            tmp[i] = 1;
-            max += 1;
-        }
-    }
-    int result = lcg::getPercent(position, max);
-    for (int i = 0; i < 4; ++i) {
-        if (!Player::isPlayerAlive(players[i])) {
-            continue;
-        }
-        int element = tmp[i];
-        if (result <= element) {
-            return i;
-        }
-        result -= element;
-    }
-    throw std::logic_error("AttackTargetSelection error");
-}
-
 int BattleEmulator::ProcessEnemyRandomAction(int *position, int pattern) {//0x0208aca8
     int patternTable[6] = {43, 42, 43, 43, 42, 43};
     //125
@@ -539,22 +420,4 @@ int BattleEmulator::ProcessEnemyRandomAction(int *position, int pattern) {//0x02
         rand = rand - patternTable[i];
     }
     return 5;
-}
-
-int BattleEmulator::FUN_0208aecc(int *position) {
-    if (previousState == 3) {
-        previousState = 0;
-    }
-    int attack[6] = {BOLT_CUTTER, ATTACK_ENEMY, MULTITHRUST, HEAL, BOLT_CUTTER, MULTITHRUST};
-    uint64_t r0_var2 = lcg::getSeed(position);
-    uint64_t r3_var3 = previousState;
-    uint64_t r2_var5 = r0_var2 & 0x1;
-    uint64_t r0_var6 = r3_var3 << 0x1 & 0xFFFFFFFF;
-    uint64_t r1_var7 = r0_var6 & 0xff;
-    uint64_t r0_var8 = r3_var3 + 0x1;
-    uint64_t r3_var9 = r1_var7 + r2_var5;
-    previousState = r0_var8;
-    uint64_t r3_var12 = r3_var9 & 0xff;
-    DEBUG_COUT1(previousState);
-    return attack[r3_var12];
 }

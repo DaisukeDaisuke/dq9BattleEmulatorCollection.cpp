@@ -9,19 +9,16 @@
 #include <cstdint>
 
 class lcg {
-public:
-    lcg(); // コンストラクタ
-    ~lcg();
-
-    static void init(uint64_t seed, int size);
+private:
+    static void GenerateifNeed(int need);
 
     static uint64_t lcg_rand(uint64_t seed);
 
     static double calculatePercent(uint64_t input);
+public:
+    static void init(uint64_t seed);
 
     static int getPercent(int *position, int max);
-
-    static void release();
 
     static uint64_t getSeed(int *position);
 
