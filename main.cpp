@@ -10,6 +10,12 @@
 #include "AnalyzeData.h"
 #include "debug.h"
 
+#ifdef DEBUG
+
+#include <chrono>
+
+#endif
+
 int toint(char *string);
 
 void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector<int32_t> gene, int depth,
@@ -183,6 +189,9 @@ int main(int argc, char *argv[]) {
         std::cerr << "argc!!" << std::endl;
         return 1;
     }
+#ifdef DEBUG
+    auto t0 = std::chrono::high_resolution_clock::now();
+#endif
 
     //https://zenn.dev/reputeless/books/standard-cpp-for-competitive-programming/viewer/library-ios-iomanip#3.1-c-%E8%A8%80%E8%AA%9E%E3%81%AE%E5%85%A5%E5%87%BA%E5%8A%9B%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%E3%83%A0%E3%81%A8%E3%81%AE%E5%90%8C%E6%9C%9F%E3%82%92%E7%84%A1%E5%8A%B9%E3%81%AB%E3%81%99%E3%82%8B
     std::cin.tie(0)->sync_with_stdio(0);
@@ -255,10 +264,19 @@ int main(int argc, char *argv[]) {
     lcg::release();
     return 0;
 #endif
+    std::vector<int> values;
+
     std::stringstream ss10;
 
-    // argv[5]以降をstringstreamに入れる
+    int maxElement = 0;
     for (int i = 4; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "h") {
+            values.push_back(-1);  // "h" を -1 に置き換える
+        } else {
+            values.push_back(toint(argv[i]));  // 数値に変換
+        }
+        maxElement++;
         ss10 << argv[i] << " ";
     }
 
@@ -274,26 +292,21 @@ int main(int argc, char *argv[]) {
         }
         BattleResult result;
         BattleEmulator::Main(position, 25, gene, players, result, seed);
-        std::stringstream ss;
-        ss << seed << " ";
+        int counter = 0;
         for (int i = 0; i < result.position; ++i) {
             auto action = result.actions[i];
             auto damage = result.damages[i];
             if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
-                ss << "h ";
+                if(counter > maxElement||values[counter++] != -1){
+                    break;
+                }
             } else if (damage != 0) {
-                ss << damage << " ";
+                if(counter > maxElement||values[counter++] != damage){
+                    break;
+                }
             }
         }
-        if (players[0].hp <= 0) {
-            ss << "L ";
-        }
-        if (players[1].hp <= 0) {
-            ss << "W ";
-        }
-        std::string resultStr = ss.str();
-
-        if (resultStr.rfind(std::to_string(seed) + " " + str2, 0) == 0) {
+        if (counter > maxElement){
             processResult(copiedPlayers, seed, gene, 0, str2, -1);
             foundSeeds++;
         }
@@ -301,6 +314,13 @@ int main(int argc, char *argv[]) {
     delete position;
 
     std::cout << std::endl << "found: " << foundSeeds << std::endl;
+
+#ifdef DEBUG
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto elapsed_time =
+            std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+    std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
+#endif
     return 0;
 }
 
