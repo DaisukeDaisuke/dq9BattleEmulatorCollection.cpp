@@ -3,6 +3,7 @@
 name: CMake on a single platform
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "yo2" ]
   pull_request:
