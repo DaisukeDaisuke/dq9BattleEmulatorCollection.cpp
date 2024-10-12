@@ -8,7 +8,7 @@
 #include <iostream>
 
 // Define the size of the array
-const int ARRAY_SIZE = 2000;
+const int ARRAY_SIZE = 3000;
 
 double precalculatedValues[ARRAY_SIZE]; // 固定メモリ
 uint64_t seeds[ARRAY_SIZE];             // 固定メモリ
