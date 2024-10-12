@@ -197,8 +197,7 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                 (*position)++;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(enemyAction, position, players, 1, 0);
-                BattleResult::add(result, enemyAction, basedamage, true, players[0].paralysis,
-                                  isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
+
                 if (maxElement != -1){
                     if (basedamage != 0&&values[exCounter++] != basedamage){
                         return false;
@@ -206,6 +205,9 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                     if(maxElement <= exCounter){
                         return true;
                     }
+                }else{
+                    BattleResult::add(result, enemyAction, basedamage, true, players[0].paralysis,
+                                      isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
                 }
                 Player::reduceHp(players[0], basedamage);
                 doAction = enemyAction;
@@ -249,8 +251,10 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
 
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(action, position, players, 0, 1);
-                BattleResult::add(result, action, basedamage, false, players[0].paralysis,
-                                  isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
+                if (maxElement == -1) {
+                    BattleResult::add(result, action, basedamage, false, players[0].paralysis,
+                                      isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
+                }
                 if (action == HEAL || action == MEDICINAL_HERBS) {
                     Player::heal(players[0], basedamage);
 

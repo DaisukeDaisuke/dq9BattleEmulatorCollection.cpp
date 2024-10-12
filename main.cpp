@@ -243,8 +243,8 @@ int main(int argc, char *argv[]) {
     }
     vector<int32_t> gene1(gene);
     //gene1[19-1] = BattleEmulator::DEFENCE;
-    BattleResult result;
-    BattleEmulator::Main(position, 100, gene1, players, result, time1);
+    BattleResult dummy;
+    BattleEmulator::Main(position, 100, gene1, players, dummy, time1);
     delete position;
     lcg::release();
 
@@ -252,7 +252,7 @@ int main(int argc, char *argv[]) {
     ss1 << time1 << " ";
     int counter = 0;
 
-    std::cout << dumpTable(result, gene1, -1) << std::endl;
+    std::cout << dumpTable(dummy, gene1, -1) << std::endl;
     return 0;
 #endif
 
@@ -292,6 +292,7 @@ int main(int argc, char *argv[]) {
     std::string str2 = ss10.str();
 
     int *position = new int(1);
+    BattleResult dummy;
     for (uint64_t seed = time1; seed < time2; ++seed) {
         (*position) = 1;
         lcg::init(seed);
@@ -299,8 +300,7 @@ int main(int argc, char *argv[]) {
         for (int j = 0; j < 2; ++j) {
             players[j] = copiedPlayers[j];
         }
-        BattleResult result;
-        bool resultbool = BattleEmulator::Main(position, 25, gene, players, result, seed, values, maxElement);
+        bool resultbool = BattleEmulator::Main(position, 25, gene, players, dummy, seed, values, maxElement);
 
         if (resultbool){
             processResult(copiedPlayers, seed, gene, 0, str2, -1);
