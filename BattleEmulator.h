@@ -37,7 +37,7 @@ public:
     static const int CURE_PARALYSIS = 16;
 
     static bool
-    Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players, BattleResult &result, uint64_t seed, std::vector<int> values, int maxElement);
+    Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players, BattleResult &result, uint64_t seed, const int values[50], int maxElement);
 
     static std::string getActionName(int actionId);
 

@@ -64,14 +64,13 @@ std::string BattleEmulator::getActionName(int actionId) {
 }
 
 bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players, BattleResult &result,
-                          uint64_t seed, const std::vector<int> values, int maxElement) {
+                          uint64_t seed, const int values[50], int maxElement) {
     camera::reset();
     player0_has_initiative = false;
     actionsPosition = 0;
     int doAction = -1; // デバッグ用
     int genePosition = 0;
-
-
+    int exCounter = 0;
     for (int counterJ = 0; counterJ < RunCount; ++counterJ) {
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
@@ -200,6 +199,14 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                 basedamage = callAttackFun(enemyAction, position, players, 1, 0);
                 BattleResult::add(result, enemyAction, basedamage, true, players[0].paralysis,
                                   isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
+                if (maxElement != -1){
+                    if (basedamage != 0&&values[exCounter++] != basedamage){
+                        return false;
+                    }
+                    if(maxElement <= exCounter){
+                        return true;
+                    }
+                }
                 Player::reduceHp(players[0], basedamage);
                 doAction = enemyAction;
                 //--------start_FUN_021594bc-------
@@ -246,8 +253,27 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                                   isInactive || players[0].inactive, counterJ, player0_has_initiative, ehp, ahp);
                 if (action == HEAL || action == MEDICINAL_HERBS) {
                     Player::heal(players[0], basedamage);
+
+                    if (maxElement != -1){
+                        if (values[exCounter++] != -1){
+                            return false;
+                        }
+                        if(maxElement <= exCounter){
+                            return true;
+                        }
+                    }
+
                 } else {
                     Player::reduceHp(players[1], basedamage);
+
+                    if (maxElement != -1){
+                        if (basedamage != 0&&values[exCounter++] != basedamage){
+                            return false;
+                        }
+                        if(maxElement <= exCounter){
+                            return true;
+                        }
+                    }
                 }
                 //--------start_FUN_021594bc-------
                 if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {

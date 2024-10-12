@@ -225,11 +225,11 @@ int main(int argc, char *argv[]) {
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 15;
     //std::cout << totalSeconds << std::endl;
-    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1) * (1 / 0.12515)));
+    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1.5) * (1 / 0.12515)));
     time1 = (time1 & 0xffff) << 16;
     //std::cout << time1 << std::endl;
 
-    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1) * (1 / 0.125155)));
+    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1.5) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
 
 #ifdef DEBUG2
@@ -264,17 +264,26 @@ int main(int argc, char *argv[]) {
     lcg::release();
     return 0;
 #endif
-    std::vector<int> values;
 
     std::stringstream ss10;
 
     int maxElement = 0;
+    int values[50];
+    if (50 <= argc){
+        std::cerr << "Too much input!" << std::endl;
+        return 1;
+    }
+
     for (int i = 4; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "h") {
-            values.push_back(-1);  // "h" を -1 に置き換える
+            values[i-4] = -1;  // "h" を -1 に置き換える
         } else {
-            values.push_back(toint(argv[i]));  // 数値に変換
+            int tmp = toint(argv[i]);
+            if (tmp == -1){
+                return 1;
+            }
+            values[i-4] = tmp;  // 数値に変換
         }
         maxElement++;
         ss10 << argv[i] << " ";
@@ -319,7 +328,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed, std::vector
     vector<int> paralysis_map;
     int lastInputTurn = -1;
     auto respite = -1;
-    vector<int> dummy(0, 2);
+    int dummy[2];
 
     std::cout << "============" << seed << "============" << std::endl;
 

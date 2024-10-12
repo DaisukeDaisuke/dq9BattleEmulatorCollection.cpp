@@ -8,11 +8,12 @@
 #include <iostream>
 
 // Define the size of the array
-const int ARRAY_SIZE = 2500;
+const int ARRAY_SIZE = 2000;
 
 double precalculatedValues[ARRAY_SIZE]; // 固定メモリ
 uint64_t seeds[ARRAY_SIZE];             // 固定メモリ
-
+int nowCounter = 1;
+uint64_t now_seed;
 
 lcg::lcg() {
     // コンストラクタの実装
@@ -23,11 +24,19 @@ lcg::~lcg() {
 }
 
 void lcg::init(uint64_t seed) {
+    nowCounter = 1;
+    now_seed = seed;
+}
+
+void lcg::GenerateifNeed(int need) {
     // 配列に値を再計算して格納する
-    for (int i = 1; i < ARRAY_SIZE; ++i) {
-        seed = lcg_rand(seed);
-        precalculatedValues[i] = calculatePercent(seed) * 0.01;
-        seeds[i] = seed >> 32;
+    if(nowCounter > need){
+        return;
+    }
+    for (int i = nowCounter; i < need+2; ++i) {
+        now_seed = lcg_rand(now_seed);
+        precalculatedValues[nowCounter] = calculatePercent(now_seed) * 0.01;
+        seeds[nowCounter++] = now_seed >> 32;
     }
 }
 
@@ -68,6 +77,7 @@ int lcg::getPercent(int *position, int max) {
         std::cerr << "out of range!!!" << std::endl;
         return 0;
     }
+    GenerateifNeed((*position));
     double result = precalculatedValues[*position];
     double scaledResult = result * max;
 
@@ -87,6 +97,7 @@ double lcg::floatRand(int *position, double min, double max) {
         std::cerr << "out of range!!!" << std::endl;
         return 0;
     }
+    GenerateifNeed((*position));
     double result = precalculatedValues[*position];
     (*position)++;
     return min + result * (max - min);
@@ -100,6 +111,7 @@ uint64_t lcg::getSeed(int *position) {
     if (position == nullptr) {
         throw std::invalid_argument("Null pointer passed to incrementPosition.");
     }
+    GenerateifNeed((*position));
     uint64_t result = seeds[*position];
     (*position)++;
     return result;

@@ -15,6 +15,8 @@ public:
 
     static void init(uint64_t seed);
 
+    static void GenerateifNeed(int need);
+
     static uint64_t lcg_rand(uint64_t seed);
 
     static double calculatePercent(uint64_t input);
