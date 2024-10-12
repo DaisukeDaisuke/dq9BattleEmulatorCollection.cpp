@@ -15,14 +15,6 @@ uint64_t seeds[ARRAY_SIZE];             // 固定メモリ
 int nowCounter = 1;
 uint64_t now_seed;
 
-lcg::lcg() {
-    // コンストラクタの実装
-
-}
-
-lcg::~lcg() {
-}
-
 void lcg::init(uint64_t seed) {
     nowCounter = 1;
     now_seed = seed;
