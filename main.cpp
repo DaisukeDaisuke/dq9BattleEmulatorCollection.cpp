@@ -207,11 +207,11 @@ int main(int argc, char *argv[]) {
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 15;
     //std::cout << totalSeconds << std::endl;
-    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 4) * (1 / 0.12515)));
+    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1.5) * (1 / 0.12515)));
     time1 = (time1 & 0xffff) << 16;
     //std::cout << time1 << std::endl;
 
-    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 4) * (1 / 0.125155)));
+    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1.5) * (1 / 0.125155)));
     time2 = (time2 & 0xffff) << 16;
 
 #ifdef DEBUG2
