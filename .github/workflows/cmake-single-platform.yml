@@ -33,7 +33,6 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Rename the executable file
-      shell: pwsh
       run: |
         $source = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/newDirectory.exe"
         $destination = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
