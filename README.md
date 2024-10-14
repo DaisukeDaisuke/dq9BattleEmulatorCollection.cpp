@@ -29,6 +29,18 @@ i7 6700kでは総当たり(+-1.5秒)に0.3秒かかります。最新のcpuだ�
 
 ※2時間15分を越えるとバグって絶対に特定できない仕様があります。どちらかというとバグですが、あんまり影響ないのであえて放置します。  
 
+
+### Q
+VS版を実行しようとすると`VCRUNTIME140.dll`がなんちゃらって言われて動かないんだけど
+
+### A
+これを入れてください。virtual studio 22(msBuild)でビルドしたc++バイナリはこれないと動きません。
+mingw版(非公開)を実行する場合不要です。
+```
+https://aka.ms/vs/17/release/vc_redist.x64.exe
+```
+
+
 https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/yo2
 
 
