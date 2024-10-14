@@ -34,7 +34,7 @@ i7 6700kでは総当たり(+-1.5秒)に0.3秒かかります。最新のcpuだ�
 VS版を実行しようとすると`VCRUNTIME140.dll`がなんちゃらって言われて動かないんだけど
 
 ### A
-これを入れてください。virtual studio 22(msBuild)でビルドしたc++バイナリはこれないと動きません。
+これを入れてください。virtual studio 22(MsBuild)でビルドしたc++実行可能バイナリはこれないと動きません。
 mingw版(非公開)を実行する場合不要です。
 ```
 https://aka.ms/vs/17/release/vc_redist.x64.exe
