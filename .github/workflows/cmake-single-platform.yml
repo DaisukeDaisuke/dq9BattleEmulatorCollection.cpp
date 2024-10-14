@@ -46,7 +46,7 @@ jobs:
       run: Get-FileHash -Algorithm SHA1 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
 
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3.2.1-node20
+      uses: actions/upload-artifact@v4.4.3
       with:
         # Artifact name
         name: vs_be
