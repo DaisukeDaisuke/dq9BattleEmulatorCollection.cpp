@@ -12,13 +12,11 @@ int counter = 0;
 void camera::Main(int *position, const int32_t actions[5]) {
     int32_t before = -1;
     bool preemptive = true;
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 3; ++i) {
         //std::cout << "counter1: " << counter << std::endl;
         int32_t after = actions[i];
         if (after == BattleEmulator::ATTACK_ALLY) {
             onFreeCameraMove(position, after, preemptive ? 1 : 0);
-        } else if (after == BattleEmulator::ATTACK_ENEMY) {
-            (*position)++;
         }
         preemptive = false;
         before = after;

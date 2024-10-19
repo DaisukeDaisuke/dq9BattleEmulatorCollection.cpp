@@ -13,7 +13,9 @@ struct Player {
     int hp = 0;
     double maxHp = 0.0;
     int atk;
+    int defaultATK;
     int def;
+    int defaultDEF;
     int speed;
     bool specialCharge = false;
     bool dirtySpecialCharge = false;
@@ -29,6 +31,10 @@ struct Player {
     double defence = 1.0;
     bool acrobaticStar = false;
     int acrobaticStarTurn = 0;
+    bool sleeping = false;
+    int sleepingTurn = -1;
+    int BuffLevel = 0;
+    int BuffTurns = 0;
 
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 
