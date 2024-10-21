@@ -451,8 +451,17 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position) += 2;
             (*position)++; //会心 0x02158584
             (*position)++; //0x021ec6f8 不明
-            (*position)++;//盾ガード 0x021586fc 0%
-
+            if (!players[0].paralysis&&!players[0].sleeping) {
+                (*position)++;//盾ガード 0x021586fc 0%
+            }
+            (*position)++;//ニセ回避 0x02157f58 100%
+            baseDamage = FUN_021e8458_typeD(position, 15, 80);
+            tmp = baseDamage * Equipments::calculateTotalResistance(Attribute::ThunderExplosion);
+            baseDamage = static_cast<int>(floor(tmp));
+            (*position)++;//?? 0x02158ac4
+            (*position)++;//?? 0x021e54fc
+            process7A8(position, baseDamage, players, defender);
+            resetCombo();
             break;
         case MULTITHRUST:
             attackCount = lcg::intRangeRand(position, 3, 4);
@@ -469,7 +478,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 (*position)++;//盾ガード 0x021586fc 0%
                 (*position)++;//ニセ回避 0x02157f58 100%
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
-                tmp = floor(baseDamage * 0.5) * 1.25;
+                tmp = floor(baseDamage * 0.5) * 1.25;//1.25倍は雷属性になってるから
                 baseDamage = static_cast<int>(tmp);
                 if (kaisinn) {//0x020759ec
                     tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
@@ -499,6 +508,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[attacker].specialChargeTurn = 6;
                 }
             }
+            resetCombo();
             return totalDamage;
             break;
         case MERA_ZOMA:
@@ -521,6 +531,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }else{
                 std::cout << "error2" << std::endl;
             }
+            resetCombo();
             break;
         case BattleEmulator::FREEZING_BLIZZARD:
             (*position) += 2;
@@ -542,6 +553,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = 0;
             }
             process7A8(position, baseDamage, players, defender);
+            resetCombo();
             break;
         case BattleEmulator::DOUBLE_UP:
             (*position) += 2;
@@ -573,6 +585,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
 
             RecalculateBuff(players);
+            resetCombo();
             break;
         case BattleEmulator::MORE_HEAL:
             (*position) += 2;
@@ -611,6 +624,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
             }
             players[attacker].mp -= 8;
+            resetCombo();
             break;
         case BattleEmulator::MAGIC_MIRROR:
             (*position) += 5;
@@ -625,6 +639,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             players[0].hasMagicMirror = true;
             players[0].MagicMirrorTurn = 6;
+            resetCombo();
             break;
         case BattleEmulator::CRITICAL_ATTACK:
             (*position) += 2;
