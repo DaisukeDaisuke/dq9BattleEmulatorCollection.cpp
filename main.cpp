@@ -38,10 +38,10 @@ void printHeader(std::stringstream &ss);
 // ヘッダーを出力する関数
 void printHeader(std::stringstream &ss) {
     ss << std::left << std::setw(6) << "turn"
-       << std::setw(16) << "sp"
-       << std::setw(16) << "aAct"
-       << std::setw(16) << "eAct1"
-       << std::setw(16) << "eAct2"
+       << std::setw(18) << "sp"
+       << std::setw(18) << "aAct"
+       << std::setw(18) << "eAct1"
+       << std::setw(18) << "eAct2"
        << std::setw(6) << "aD"
        << std::setw(6) << "eD1"
        << std::setw(6) << "eD2"
@@ -50,8 +50,9 @@ void printHeader(std::stringstream &ss) {
 
        << std::setw(6) << "ini"
        << std::setw(6) << "Para"
-       << std::setw(6) << "Ina" << "\n";
-    ss << std::string(95, '-') << "\n";  // 区切り線を出力
+       << std::setw(6) << "Sle"
+       << std::setw(6) << "Tab" << "\n";
+    ss << std::string(130, '-') << "\n";  // 区切り線を出力
 }
 
 std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastTurns);
@@ -62,7 +63,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
     int currentTurn = -1;
     int eDamage[2] = {-1, -1}, aDamage = -1;
     bool isP1, isI1, initiative_tmp = false;
-    std::string eAction[2], aAction, sp;
+    std::string eAction[2], aAction, sp, tmpState;
     auto counter = 0;
     // データのループ
     for (int i = 0; i < result.position; ++i) {
@@ -75,6 +76,17 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
         auto ehp1 = result.ehp[i];
         auto ahp1 = result.ahp[i];
         auto isEnemy = result.isEnemy[i];
+        auto state = result.state[i] & 0xff;
+
+        if (state == BattleEmulator::TYPE_2A) {
+            tmpState = "A";
+        } else if (state == BattleEmulator::TYPE_2B) {
+            tmpState = "B";
+        } else if (state == BattleEmulator::TYPE_2C) {
+            tmpState = "C";
+        } else if (state == BattleEmulator::TYPE_2D) {
+            tmpState = "D";
+        }
 
         auto special = gene[turn];
 
@@ -90,10 +102,10 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                 if (turn > PastTurns) {
                     ss6
                             << std::left << std::setw(6) << (currentTurn + 1)
-                            << std::setw(16) << sp
-                            << std::setw(16) << aAction
-                            << std::setw(16) << eAction[0]
-                            << std::setw(16) << eAction[1]
+                            << std::setw(18) << sp
+                            << std::setw(18) << aAction
+                            << std::setw(18) << eAction[0]
+                            << std::setw(18) << eAction[1]
                             << std::setw(6) << aDamage
                             << std::setw(6) << eDamage[0]
                             << std::setw(6) << eDamage[1]
@@ -102,6 +114,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                             << std::setw(6) << (initiative_tmp ? "yes" : "")
                             << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
                             << std::setw(6) << ((aAction == "Inactive") ? "yes" : "")
+                            << std::setw(6) << tmpState
                             << std::setw(11) << "" << "\n";
                 }
             }
@@ -138,10 +151,10 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
     if (currentTurn != -1) {
         ss6
                 << std::left << std::setw(6) << (currentTurn + 1)
-                << std::setw(16) << sp
-                << std::setw(16) << aAction
-                << std::setw(16) << eAction[0]
-                << std::setw(16) << eAction[1]
+                << std::setw(18) << sp
+                << std::setw(18) << aAction
+                << std::setw(18) << eAction[0]
+                << std::setw(18) << eAction[1]
                 << std::setw(6) << aDamage
                 << std::setw(6) << eDamage[0]
                 << std::setw(6) << eDamage[1]
@@ -150,6 +163,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                 << std::setw(6) << (initiative_tmp ? "yes" : "")
                 << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
                 << std::setw(6) << ((aAction == "Inactive") ? "yes" : "")
+                << std::setw(6) << tmpState
                 << std::setw(11) << "" << "\n";
     }
 
@@ -207,8 +221,8 @@ int main(int argc, char *argv[]) {
     std::cin.tie(0)->sync_with_stdio(0);
 
     const Player copiedPlayers[2] = {
-            {309,  309.0,  312, 312, 298, 298, 193, false, false, 0, false, false, 0, -1, false, 0, 24,  8, 1.0, false, 0, false, -1, 0, -1},
-            {4800, 4800.0, 248, 248, 278, 278, 157, false, false, 0, false, false, 0, -1, false, 0, 255, 8, 1.0, false, 0, false, -1, 0, -1}
+            {309,  309.0,  312, 312, 298, 298, 193, 234, false, false, 0, false, false, 0, -1, false, 0, 24,  8, 1.0, false, 0, false, -1, 0, -1, false, -1},
+            {4800, 4800.0, 248, 248, 278, 278, 157, 0,   false, false, 0, false, false, 0, -1, false, 0, 255, 8, 1.0, false, 0, false, -1, 0, -1, false, -1}
     };
 
     const int hours = toint(argv[1]);
@@ -239,17 +253,22 @@ int main(int argc, char *argv[]) {
     std::memcpy(players1, copiedPlayers, sizeof(players1));
     vector<int32_t> gene1(100, 0);
     //gene1[19-1] = BattleEmulator::DEFENCE;
-    gene1[1 - 1] = BattleEmulator::BUFF;
-    gene1[2 - 1] = BattleEmulator::BUFF;
+    int counter = 0;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::MORE_HEAL;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
     std::optional<BattleResult> dummy1;
     dummy1 = BattleResult();
-    BattleEmulator::Main(position1, 0, 2, gene1, players1, dummy1, time1, dummy, -1, NowState);
+    BattleEmulator::Main(position1, 0, 7, gene1, players1, dummy1, time1, dummy, -1, NowState);
     delete position1;
     delete NowState;
 
     std::stringstream ss1;
     ss1 << time1 << " ";
-    int counter = 0;
 
     if (dummy1.has_value()) {
         std::cout << dumpTable(dummy1.value(), gene1, -1) << std::endl;

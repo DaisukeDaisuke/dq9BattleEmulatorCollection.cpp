@@ -17,6 +17,7 @@ struct Player {
     int def;
     int defaultDEF;
     int speed;
+    int HealPower;
     bool specialCharge = false;
     bool dirtySpecialCharge = false;
     int specialChargeTurn = 0;
@@ -34,7 +35,11 @@ struct Player {
     bool sleeping = false;
     int sleepingTurn = -1;
     int BuffLevel = 0;
-    int BuffTurns = 0;
+    int BuffTurns = -1;
+    bool hasMagicMirror = false;
+    int MagicMirrorTurn = -1;
+    int AtkBuffLevel = 0;
+    int AtkBuffTurn = -1;
 
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 

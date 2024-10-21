@@ -10,7 +10,7 @@ class BattleResult {
 public:
     static void
     add(std::optional<BattleResult> &obj1, int action, int damage, bool isEnemy, bool isParalysis, bool isInactive, int turn,
-        bool player0_has_initiative, int ehp, int ahp) {
+        bool player0_has_initiative, int ehp, int ahp, int nowState) {
         if (obj1.has_value()) {
             BattleResult& obj = obj1.value();
             obj.actions[obj.position] = action;
@@ -22,6 +22,7 @@ public:
             obj.initiative[obj.position] = player0_has_initiative;
             obj.ehp[obj.position] = ehp;
             obj.ahp[obj.position] = ahp;
+            obj.state[obj.position] = nowState;
             obj.turn = turn;
             obj.position++;
         }
@@ -38,6 +39,7 @@ public:
     bool initiative[1000] = {};
     int ehp[1000] = {};
     int ahp[1000] = {};
+    int state[1000] = {};
 };
 
 #endif //NEWDIRECTORY_BATTLERESULT_H

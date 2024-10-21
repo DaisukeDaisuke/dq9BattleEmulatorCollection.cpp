@@ -7,16 +7,14 @@
 #include "BattleEmulator.h"
 #include "lcg.h"
 
-int counter = 0;
-
-void camera::Main(int *position, const int32_t actions[5]) {
+void camera::Main(int *position, const int32_t actions[5], int * NowState) {
     int32_t before = -1;
     bool preemptive = true;
     for (int i = 0; i < 3; ++i) {
         //std::cout << "counter1: " << counter << std::endl;
         int32_t after = actions[i];
-        if (after == BattleEmulator::ATTACK_ALLY) {
-            onFreeCameraMove(position, after, preemptive ? 1 : 0);
+        if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
+            onFreeCameraMove(position, after, preemptive ? 1 : 0, NowState);
         }
         preemptive = false;
         before = after;
@@ -24,34 +22,36 @@ void camera::Main(int *position, const int32_t actions[5]) {
     }
 }
 
-void camera::onFreeCameraMove(int *position, const int action, const int param5) {
-    if (param5 == 0) {
-        (*position)++;
-        if (counter == 0) {
-            counter++;
-            return;
-        }
-        auto ret = lcg::getPercent(position, 5 - counter);
-        if (ret == 0 || counter == 5) {
-            counter = 0;
-            (*position) += 1;
+void camera::onFreeCameraMove(int *position, const int action, const int param5, int * NowState) {
+    auto counter = ((*NowState) << (8*2));
+    do {
+        if (param5 == 0) {
+            (*position)++;
+            if (counter == 0) {
+                counter++;
+                break;
+            }
+            auto ret = lcg::getPercent(position, 5 - counter);
+            if (ret == 0 || counter == 5) {
+                counter = 0;
+                (*position) += 1;
+            } else {
+                counter++;
+            }
         } else {
-            counter++;
-        }
-    } else {
-        (*position)++;
-        if (counter == 0) {
-            (*position)++;//引数5が1なら強制的に実行
+            (*position)++;
+            if (counter == 0) {
+                (*position)++;//引数5が1なら強制的に実行
+                counter = 0;
+                break;
+            }
+            (*position)++;
             counter = 0;
-            return;
+            (*position)++;
+
         }
-        (*position)++;
-        counter = 0;
-        (*position)++;
+    } while (false);
+    (*NowState) &= ~0xff0000;
+    (*NowState) |= (counter << (8*2));
 
-    }
-}
-
-void camera::reset() {
-    counter = 0;
 }

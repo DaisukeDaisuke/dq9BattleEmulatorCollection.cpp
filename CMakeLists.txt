@@ -15,6 +15,7 @@ add_executable(newDirectory main.cpp
         debug.h
         BattleResult.h
         AnalyzeData.h
+        Equipment.h
 )
 
 if(MINGW)
