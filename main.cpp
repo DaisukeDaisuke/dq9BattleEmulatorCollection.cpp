@@ -150,7 +150,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
             aAction = BattleEmulator::getActionName(action);
             aDamage = damage;
             if (ATKTurn > 0) {
-                ATKTurn1 =  std::to_string(ATKTurn);
+                ATKTurn1 = std::to_string(ATKTurn);
             }
             if (DEFTurn > 0) {
                 DEFTurn1 = std::to_string(DEFTurn);
@@ -227,7 +227,7 @@ int main(int argc, char *argv[]) {
 #ifdef DEBUG2
     std::cout << sizeof(int) << std::endl;
     std::cout << sizeof(long) << std::endl;
-    std::cout << sizeof( long long) << std::endl;
+    std::cout << sizeof(long long) << std::endl;
     std::cout << sizeof(uint64_t) << std::endl;
 #endif
 
