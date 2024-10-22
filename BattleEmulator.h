@@ -59,12 +59,15 @@ public:
     static const int MORE_HEAL = 32;//ベホイム
     static const int DOUBLE_UP = 33;//すてみ
     static const int MULTITHRUST = 34;//すてみ
+    static const int SLEEPING = 35;
+    static const int MIDHEAL = 36;//ベホイミ
+    static const int FULLHEAL = 37;//ベホマ
 
 
 
     static bool
-    Main(int *position, int startPos, int RunCount, std::vector<int32_t> Gene, Player *players,
-         std::optional<BattleResult> &result, uint64_t seed, const int values[50], int maxElement, int *NowState);
+    Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players,
+         std::optional<BattleResult> &result, uint64_t seed, const int values[50], int maxElement, uint64_t *NowState);
 
     static std::string getActionName(int actionId);
 
@@ -72,7 +75,8 @@ private:
     static void ProcessRage(int * position, int baseDamage, int preHP[3], Player players[2]);
     static void RecalculateBuff(Player players[0]);
     static int CalculateMoreHealBase(Player players[2]);
-    static int FUN_0208aecc(int *position, int * NowState);
+    static int CalculateMidHealBase(Player players[2]);
+    static int FUN_0208aecc(int *position, uint64_t * NowState);
     static void resetCombo();
     static double processCombo(int32_t Id, double damage);
     static int FUN_0207564c(int *position, int atk, int def);

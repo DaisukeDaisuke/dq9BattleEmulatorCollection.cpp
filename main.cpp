@@ -51,6 +51,9 @@ void printHeader(std::stringstream &ss) {
        << std::setw(6) << "ini"
        << std::setw(6) << "Para"
        << std::setw(6) << "Sle"
+       << std::setw(6) << "ATT"
+       << std::setw(6) << "DET"
+       << std::setw(6) << "MMT"
        << std::setw(6) << "Tab" << "\n";
     ss << std::string(130, '-') << "\n";  // 区切り線を出力
 }
@@ -63,14 +66,15 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
     int currentTurn = -1;
     int eDamage[2] = {-1, -1}, aDamage = -1;
     bool isP1, isI1, initiative_tmp = false;
-    std::string eAction[2], aAction, sp, tmpState;
+    std::string eAction[2], aAction, sp, tmpState, ATKTurn1, DEFTurn1, magicMirrorTurn1;
     auto counter = 0;
     // データのループ
     for (int i = 0; i < result.position; ++i) {
         auto action = result.actions[i];
         auto damage = result.damages[i];
-        auto isP = result.isParalysis[i];
-        auto isI = result.isInactive[i];
+        auto ATKTurn = result.AtkBuffTurns[i];
+        auto DEFTurn = result.BuffTurnss[i];
+        auto magicMirrorTurn = result.MagicMirrorTurns[i];
         auto turn = result.turns[i];
         auto initiative = result.initiative[i];
         auto ehp1 = result.ehp[i];
@@ -113,7 +117,10 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                             << std::setw(6) << ehp1
                             << std::setw(6) << (initiative_tmp ? "yes" : "")
                             << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
-                            << std::setw(6) << ((aAction == "Inactive") ? "yes" : "")
+                            << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
+                            << std::setw(6) << ATKTurn1
+                            << std::setw(6) << DEFTurn1
+                            << std::setw(6) << magicMirrorTurn1
                             << std::setw(6) << tmpState
                             << std::setw(11) << "" << "\n";
                 }
@@ -129,19 +136,28 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
             sp = "";
             initiative_tmp = false;
             counter = 0;
+            ATKTurn1 = "";
+            DEFTurn1 = "";
+            magicMirrorTurn1 = "";
         }
 
         // 敵か味方の行動を適切な変数に格納
         if (isEnemy) {
             eAction[counter] = BattleEmulator::getActionName(action);
             eDamage[counter] = damage;
-            isI1 = isI1 || isI;
             counter++;
         } else {
             aAction = BattleEmulator::getActionName(action);
             aDamage = damage;
-            isP1 = isP;
-            isI1 = isI;
+            if (ATKTurn > 0) {
+                ATKTurn1 =  std::to_string(ATKTurn);
+            }
+            if (DEFTurn > 0) {
+                DEFTurn1 = std::to_string(DEFTurn);
+            }
+            if (magicMirrorTurn > 0) {
+                magicMirrorTurn1 = std::to_string(magicMirrorTurn);
+            }
             initiative_tmp = initiative;
             sp = specialAction;
         }
@@ -162,7 +178,10 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                 << std::setw(6) << result.ehp[result.position - 1]
                 << std::setw(6) << (initiative_tmp ? "yes" : "")
                 << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
-                << std::setw(6) << ((aAction == "Inactive") ? "yes" : "")
+                << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
+                << std::setw(6) << ATKTurn1
+                << std::setw(6) << DEFTurn1
+                << std::setw(6) << magicMirrorTurn1
                 << std::setw(6) << tmpState
                 << std::setw(11) << "" << "\n";
     }
@@ -179,20 +198,11 @@ std::string normalDump(AnalyzeData data) {
     for (int i = 0; i < result.position; ++i) {
         auto action = result.actions[i];
         auto damage = result.damages[i];
-        auto isP = result.isParalysis[i];
-        auto isI = result.isInactive[i];
         if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
             ss << "h ";
             counter++;
         } else if (damage != 0) {
-            counter++;
-            if (isP) {
-                ss << damage << "-m" << " ";
-            } else if (isI) {
-                ss << damage << "-i" << " ";
-            } else {
-                ss << damage << " ";
-            }
+            ss << damage << " ";
         }
         if (counter == 10) {
             ss << std::endl;
@@ -213,6 +223,14 @@ int main(int argc, char *argv[]) {
         std::cerr << "argc!!" << std::endl;
         return 1;
     }
+
+#ifdef DEBUG2
+    std::cout << sizeof(int) << std::endl;
+    std::cout << sizeof(long) << std::endl;
+    std::cout << sizeof( long long) << std::endl;
+    std::cout << sizeof(uint64_t) << std::endl;
+#endif
+
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
@@ -248,22 +266,44 @@ int main(int argc, char *argv[]) {
     int dummy[100];
     lcg::init(time1);
     int *position1 = new int(1);
-    auto *NowState = new int(0);//ローテの状態を表すshort
+    auto *NowState = new uint64_t(0);//エミュレーターの内部ステートを表すint
     Player players1[2];
     std::memcpy(players1, copiedPlayers, sizeof(players1));
     vector<int32_t> gene1(100, 0);
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::MORE_HEAL;
+    gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::DOUBLE_UP;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MIDHEAL;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::FULLHEAL;
+
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::MORE_HEAL;
+//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
     std::optional<BattleResult> dummy1;
     dummy1 = BattleResult();
-    BattleEmulator::Main(position1, 0, 7, gene1, players1, dummy1, time1, dummy, -1, NowState);
+    BattleEmulator::Main(position1, 10, gene1, players1, dummy1, time1, dummy, -1, NowState);
     delete position1;
     delete NowState;
 
@@ -312,7 +352,7 @@ int main(int argc, char *argv[]) {
     std::string str2 = ss10.str();
 
     int *position = new int(1);
-    auto *nowState = new int(0);
+    auto *nowState = new uint64_t(0);
     Player players[2];
     for (uint64_t seed = time1; seed < time2; ++seed) {
         (*nowState) = 0;
@@ -321,7 +361,7 @@ int main(int argc, char *argv[]) {
 
         std::memcpy(players, copiedPlayers, sizeof(players));
 
-        bool resultBool = BattleEmulator::Main(position, 0, 25, std::vector<int32_t>(), players,
+        bool resultBool = BattleEmulator::Main(position, 25, std::vector<int32_t>(), players,
                                                (optional<BattleResult> &) std::nullopt, seed, values, maxElement,
                                                nowState);
 
@@ -355,7 +395,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed,
     auto respite = -1;
     int dummy[2];
     std::vector<int32_t> gene1(100, 0);
-    auto *Nowstate1 = new int(0);
+    auto *Nowstate1 = new uint64_t(0);
 
     std::cout << "============" << seed << "============" << std::endl;
 
@@ -373,7 +413,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed,
         std::vector<int32_t> gene(gene1);
 
         (*Nowstate1) = 0;
-        BattleEmulator::Main(position, 0, 200, gene, players, result20, seed, dummy, -1, Nowstate1);
+        BattleEmulator::Main(position, 200, gene, players, result20, seed, dummy, -1, Nowstate1);
         BattleResult &result2 = result20.value();
         int counter = 0;
         AnalyzeData analyzeData;
@@ -384,24 +424,14 @@ void processResult(const Player *copiedPlayers, const uint64_t seed,
         for (int i = 0; i < result2.position; ++i) {
             auto action = result2.actions[i];
             auto damage = result2.damages[i];
-            auto isP = result2.isParalysis[i];
-            auto isI = result2.isInactive[i];
             auto turn = result2.turns[i];
             if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
                 ss1 << "h ";
                 ss5 << "h ";
                 counter++;
             } else if (damage != 0) {
-                if (isP) {
-                    ss1 << damage << "-m" << " ";
-                    ss5 << damage << " ";
-                } else if (isI) {
-                    ss1 << damage << "-i" << " ";
-                    ss5 << damage << " ";
-                } else {
-                    ss1 << damage << " ";
-                    ss5 << damage << " ";
-                }
+                ss1 << damage << " ";
+                ss5 << damage << " ";
                 counter++;
             }
             std::string trimmedInput = trim(input);
@@ -442,8 +472,6 @@ void processResult(const Player *copiedPlayers, const uint64_t seed,
         if (!result2.isEnemy[j]) {
             // ss1 << lastParalysis << ": " << paralysisTurns << ", ";
             int action = result2.actions[j];
-            auto paralysis = result2.isParalysis[j];
-            auto inactive = result2.isInactive[j];
             auto player0_has_initiative = result2.initiative[j];
             auto turn = result2.turns[j];
             auto ehp = result2.ehp[j];
@@ -460,7 +488,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed,
             //ss1 << action << ": " << enemy.ehp << ": " << result.turn[j] << ", ";
             if (action == BattleEmulator::PARALYSIS ||
                 (action == BattleEmulator::INACTIVE_ALLY) ||
-                action == BattleEmulator::CURE_PARALYSIS || inactive || paralysis) {
+                action == BattleEmulator::CURE_PARALYSIS) {
                 continue;
             }
             paralysis_map.push_back((turn << 20) | (ehp << 10) | ahp);
@@ -483,7 +511,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed,
         std::vector<int32_t> gene(gene1);
         gene[turns] = (ahp << 20) | (ehp << 10) | BattleEmulator::DEFENCE;
         (*Nowstate1) = 0;
-        BattleEmulator::Main(position, 0, 200, gene, players, result10, seed, dummy, -1, Nowstate1);
+        BattleEmulator::Main(position, 200, gene, players, result10, seed, dummy, -1, Nowstate1);
         AnalyzeData analyzeData;
         analyzeData.FromBattleResult(result10.value());
         BattleResult &result1 = result10.value();
@@ -522,7 +550,7 @@ void processResult(const Player *copiedPlayers, const uint64_t seed,
         std::vector<int32_t> gene(gene1);
         gene[turns] = (ahp << 20) | (ehp << 10) | BattleEmulator::HEAL;
         (*Nowstate1) = 0;
-        BattleEmulator::Main(position, 0, 200, gene, players, result30, seed, dummy, -1, Nowstate1);
+        BattleEmulator::Main(position, 200, gene, players, result30, seed, dummy, -1, Nowstate1);
         AnalyzeData analyzeData;
         BattleResult &result3 = result30.value();
         analyzeData.FromBattleResult(result3);

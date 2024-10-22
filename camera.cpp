@@ -7,23 +7,19 @@
 #include "BattleEmulator.h"
 #include "lcg.h"
 
-void camera::Main(int *position, const int32_t actions[5], int * NowState) {
-    int32_t before = -1;
+void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, bool preemptive1) {
     bool preemptive = true;
     for (int i = 0; i < 3; ++i) {
-        //std::cout << "counter1: " << counter << std::endl;
         int32_t after = actions[i];
         if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
             onFreeCameraMove(position, after, preemptive ? 1 : 0, NowState);
         }
         preemptive = false;
-        before = after;
-        //std::cout << "counter2: " << counter << std::endl;
     }
 }
 
-void camera::onFreeCameraMove(int *position, const int action, const int param5, int * NowState) {
-    auto counter = ((*NowState) << (8*2));
+void camera::onFreeCameraMove(int *position, const int action, const int param5, uint64_t * NowState) {
+    auto counter = ((*NowState) >> 16) & 0xff;
     do {
         if (param5 == 0) {
             (*position)++;
@@ -52,6 +48,6 @@ void camera::onFreeCameraMove(int *position, const int action, const int param5,
         }
     } while (false);
     (*NowState) &= ~0xff0000;
-    (*NowState) |= (counter << (8*2));
+    (*NowState) |= (counter << 16);
 
 }
