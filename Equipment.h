@@ -58,7 +58,7 @@ const Equipment EnchantedGloves("せいれいのこて", {
         {Attribute::Ice, 7},
         {Attribute::Wind, 7},
         {Attribute::ThunderExplosion, 7},
-        {Attribute::Darkness, 10},
+        {Attribute::Darkness, 7},
 });
 
 const Equipment DragonWarriorBoots("竜戦士のブーツ", {

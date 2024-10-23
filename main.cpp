@@ -282,6 +282,11 @@ int main(int argc, char *argv[]) {
     gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::FULLHEAL;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
 
 //    gene1[counter++] = BattleEmulator::BUFF;
 //    gene1[counter++] = BattleEmulator::BUFF;
@@ -303,7 +308,7 @@ int main(int argc, char *argv[]) {
 //    gene1[counter++] = BattleEmulator::MULTITHRUST;
     std::optional<BattleResult> dummy1;
     dummy1 = BattleResult();
-    BattleEmulator::Main(position1, 10, gene1, players1, dummy1, time1, dummy, -1, NowState);
+    BattleEmulator::Main(position1, 15, gene1, players1, dummy1, time1, dummy, -1, NowState);
     delete position1;
     delete NowState;
 

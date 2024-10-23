@@ -109,6 +109,12 @@ std::string BattleEmulator::getActionName(int actionId) {
             return "Lullab Eye";
         case BattleEmulator::SLEEPING:
             return "Sleeping";
+        case BattleEmulator::FULLHEAL:
+            return "Full heal(behoma)";
+        case BattleEmulator::DEFENDING_CHAMPION:
+            return "Defense Champion";//defending champion
+        case BattleEmulator::PSYCHE_UP:
+            return "Psyche up";
 
         default:
             return "Unknown Action";
@@ -149,7 +155,7 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 646) {
+        if ((*position) == 952) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -241,7 +247,8 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                     (*position)++;//攻撃先決定 0x021ee074
                 }
             } else if (state == TYPE_2B) {
-                enemyAction[counter] = FUN_0208aecc(position, NowState);
+                const int attack[6] = {LAUGH, DISRUPTIVE_WAVE, BURNING_BREATH, DARK_BREATH, SWITCH_2C, SWITCH_2D};
+                enemyAction[counter] = attack[FUN_0208aecc(position, NowState)];
                 if (enemyAction[counter] == SWITCH_2C) {
                     (*NowState) &= ~0xffff;
                     (*NowState) |= TYPE_2C;
@@ -256,6 +263,28 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                     (*position) += 2;
                 } else if (enemyAction[counter] == DISRUPTIVE_WAVE) {
                     (*position) += 2;
+                }
+            } else if(state == TYPE_2D){
+                const int attack[6] = {PSYCHE_UP, ULTRA_HIGH_SPEED_COMBO, ATTACK_ENEMY, SKY_ATTACK, SWITCH_2A, SWITCH_2B};
+                enemyAction[counter] = attack[FUN_0208aecc(position, NowState)];
+                if (enemyAction[counter] == SWITCH_2A) {
+                    (*NowState) &= ~0xffff;
+                    (*NowState) |= TYPE_2A;
+                    (*position) += 2;
+                    continue;
+                } else if (enemyAction[counter] == SWITCH_2B) {
+                    (*NowState) &= ~0xffff;
+                    (*NowState) |= TYPE_2B;
+                    (*position) += 2;
+                    continue;
+                }
+
+                if (enemyAction[counter] == ULTRA_HIGH_SPEED_COMBO) {
+                    (*position) += 4;
+                }else if (enemyAction[counter] == SKY_ATTACK) {
+                    (*position)++;
+                }else if (enemyAction[counter] == ATTACK_ENEMY) {
+                    (*position) += 3;
                 }
             }
             if (counter == 0) {
@@ -515,6 +544,27 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     auto totalDamage = 0;
     auto attackCount = 0;
     switch (Id & 0xffff) {
+        case DARK_BREATH:
+            (*position) += 2;
+            (*position)++;//会心
+            (*position)++;//不明
+            if (lcg::getPercent(position, 100) < 2) {
+                kaihi = true;
+            }
+            (*position)++;//ニセ回避 0x02157f58
+            baseDamage = FUN_021e8458_typeD(position, 10 ,65);
+            tmp = baseDamage * Equipments::calculateTotalResistance(Attribute::Darkness);
+            baseDamage = static_cast<int>(floor(tmp));
+            if (!kaihi) {
+                (*position)++;//0x021e54fc 不明
+            } else {
+                baseDamage = 0;
+            }
+            process7A8(position, baseDamage, players, defender);
+            break;
+        case PSYCHE_UP:
+            (*position) += 2;
+            break;
         case FULLHEAL:
             (*position) += 2;
             (*position)++;//不明　0x021ec6f8
@@ -820,7 +870,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
             }
             players[0].hasMagicMirror = true;
-            players[0].MagicMirrorTurn = 6;//ターン終了時にチェックされるため+1
+            players[0].MagicMirrorTurn = 6;
             resetCombo();
             break;
         case BattleEmulator::CRITICAL_ATTACK:
@@ -1012,7 +1062,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 players[0].sleepingTurn = -1;
                 FUN_0207564c(position, players[attacker].atk, players[defender].def);
             }
-            (*position)++;//0x021ed7a8 必殺(敵)
+            if (!players[0].specialCharge) {
+                (*position)++;//0x021ed7a8 必殺(敵)
+            }
             baseDamage = 0;
             resetCombo();
             break;
@@ -1284,7 +1336,6 @@ int BattleEmulator::FUN_0208aecc(int *position, uint64_t *NowState) {
     if (previousState == 3) {
         previousState = 0;
     }
-    const int attack[6] = {LAUGH, DISRUPTIVE_WAVE, BURNING_BREATH, DARK_BREATH, SWITCH_2C, SWITCH_2D};
     uint64_t r0_var2 = lcg::getSeed(position);
     uint64_t r3_var3 = previousState;
     uint64_t r2_var5 = r0_var2 & 0x1;
@@ -1297,7 +1348,7 @@ int BattleEmulator::FUN_0208aecc(int *position, uint64_t *NowState) {
     DEBUG_COUT2(previousState);
     (*NowState) &= ~0xff00;
     (*NowState) |= (previousState << 8);
-    return attack[r3_var12];
+    return static_cast<int>(r3_var12);
 }
 
 int BattleEmulator::CalculateMoreHealBase(Player *players) {//ベホイミ

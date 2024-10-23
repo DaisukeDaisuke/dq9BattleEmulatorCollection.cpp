@@ -62,7 +62,11 @@ public:
     static const int SLEEPING = 35;
     static const int MIDHEAL = 36;//ベホイミ
     static const int FULLHEAL = 37;//ベホマ
+    static const int DEFENDING_CHAMPION = 38;//大防御
 
+
+    //2D
+    static const int PSYCHE_UP = 39;
 
 
     static bool
