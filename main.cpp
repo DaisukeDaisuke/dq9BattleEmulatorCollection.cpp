@@ -215,26 +215,29 @@ int main(int argc, char *argv[]) {
     time2 = (time2 & 0xffff) << 16;
 
 #ifdef DEBUG2
-    time1 = 2304586611;
+    std::vector<int32_t> gene1(100, 0);
+
+    time1 = 2286170367;
     time2 = 2501309586;
 
-    lcg::init(time1, 57927105);
-    int *position = new int(1);
-    for (int j = 0; j < 2; ++j) {
-        players[j] = copiedPlayers[j];
-    }
-    vector<int32_t> gene1(gene);
+    lcg::init(time1);
+    int *position1 = new int(1);
+    Player players1[2];
+    std::memcpy(players1, copiedPlayers, sizeof(players1));
+
+    int values1[1];
+
     //gene1[19-1] = BattleEmulator::DEFENCE;
-    BattleResult dummy;
-    BattleEmulator::Main(position, 100, gene1, players, dummy, time1);
-    delete position;
-    lcg::release();
+    std::optional<BattleResult> dummy;
+    dummy = BattleResult();
+    BattleEmulator::Main(position1, 100, gene1, players1, dummy, time1,values1, -1);
+    delete position1;
 
     std::stringstream ss1;
     ss1 << time1 << " ";
     int counter = 0;
 
-    std::cout << dumpTable(dummy, gene1, -1) << std::endl;
+    std::cout << dumpTable(dummy.value(), gene1, -1) << std::endl;
     return 0;
 #endif
 
