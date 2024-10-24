@@ -63,10 +63,15 @@ public:
     static const int MIDHEAL = 36;//ベホイミ
     static const int FULLHEAL = 37;//ベホマ
     static const int DEFENDING_CHAMPION = 38;//大防御
-
-
     //2D
     static const int PSYCHE_UP = 39;
+
+    static const int CURE_SLEEPING = 40;//表示用
+
+    //2E
+    static const int MEDITATION = 41;//瞑想
+    static const int MAGIC_BURST = 42;//瞑想
+    static const int RESTORE_MP = 43;//瞑想
 
 
     static bool
@@ -76,6 +81,7 @@ public:
     static std::string getActionName(int actionId);
 
 private:
+    static int ProcessMagicBurst(int * position);
     static void ProcessRage(int * position, int baseDamage, int preHP[3], Player players[2]);
     static void RecalculateBuff(Player players[0]);
     static int CalculateMoreHealBase(Player players[2]);

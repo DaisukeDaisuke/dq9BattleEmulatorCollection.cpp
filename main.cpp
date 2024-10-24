@@ -90,6 +90,8 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
             tmpState = "C";
         } else if (state == BattleEmulator::TYPE_2D) {
             tmpState = "D";
+        }if (state == BattleEmulator::TYPE_2E) {
+            tmpState = "E";
         }
 
         auto special = gene[turn];
@@ -239,9 +241,19 @@ int main(int argc, char *argv[]) {
     std::cin.tie(0)->sync_with_stdio(0);
 
     const Player copiedPlayers[2] = {
-            {309,  309.0,  312, 312, 298, 298, 193, 234, false, false, 0, false, false, 0, -1, false, 0, 24,  8, 1.0, false, 0, false, -1, 0, -1, false, -1},
-            {4800, 4800.0, 248, 248, 278, 278, 157, 0,   false, false, 0, false, false, 0, -1, false, 0, 255, 8, 1.0, false, 0, false, -1, 0, -1, false, -1}
+            // プレイヤー1
+            {309,  309.0,  312, 312, 298, 298, 193, 234, 24,   // 最初のメンバー
+                    false, false, 0, false, false, 0, -1,              // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+                    8, 1.0, false, -1, 0, -1,                                            // medicinal_herbs_count, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+                    false, -1, 0, -1, 0, false},                                      // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+
+            // プレイヤー2
+            {4800, 4800.0, 248, 248, 278, 278, 157, 0,   255,    // 最初のメンバー
+                    false, false, 0, false, false, 0, -1,             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+                    8, 1.0, false, -1, 0, -1,                         // medicinal_herbs_count, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+                    false, -1, 0, -1, 0, false}                             // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
+
 
     const int hours = toint(argv[1]);
     const int minutes = toint(argv[2]);
@@ -266,6 +278,17 @@ int main(int argc, char *argv[]) {
     int dummy[100];
     lcg::init(time1);
     int *position1 = new int(1);
+/*
+    *NowStateの各ビットの使用状況は下記の通りである。
+    +-+-+-+-+ (* NowState) +-+-+-+-+
+       | 1  2  3  4  5  6  7  8  | size  |
+    0  | Current Rotation Table  | 1byte |
+    8  | Rotation Internal State | 1byte |
+    16 | Free Camera State       | 1byte |
+    24 | Turn Count Processed    | 2byte |
+    32 | Turn Count Processed    |   *   |　合計40ビット
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
     auto *NowState = new uint64_t(0);//エミュレーターの内部ステートを表すint
     Player players1[2];
     std::memcpy(players1, copiedPlayers, sizeof(players1));
@@ -286,29 +309,20 @@ int main(int argc, char *argv[]) {
     gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
     gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::BUFF;
+    //   gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MORE_HEAL;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
     gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
 
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::MORE_HEAL;
-//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
     std::optional<BattleResult> dummy1;
     dummy1 = BattleResult();
-    BattleEmulator::Main(position1, 15, gene1, players1, dummy1, time1, dummy, -1, NowState);
+    BattleEmulator::Main(position1, 23, gene1, players1, dummy1, time1, dummy, -1, NowState);
     delete position1;
     delete NowState;
 
