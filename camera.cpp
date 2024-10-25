@@ -13,13 +13,17 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
         int32_t after = actions[i];
         if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
             onFreeCameraMove(position, after, preemptive ? 1 : 0, NowState);
+        }else if(after == BattleEmulator::MERCURIAL_THRUST){
+            (*position)++;//追尾カメラ
         }
-        preemptive = false;
+        if (after != BattleEmulator::ATTACK_ALLY) {//味方の攻撃→上空だとフリーカメラが特異点の挙動する
+            preemptive = false;
+        }
     }
 }
 
 void camera::onFreeCameraMove(int *position, const int action, const int param5, uint64_t * NowState) {
-    auto counter = ((*NowState) >> 16) & 0xff;
+    auto counter = ((*NowState) >> 8) & 0xf;
     do {
         if (param5 == 0) {
             (*position)++;
@@ -31,6 +35,9 @@ void camera::onFreeCameraMove(int *position, const int action, const int param5,
             if (ret == 0 || counter == 5) {
                 counter = 0;
                 (*position) += 1;
+                if (action == BattleEmulator::ATTACK_ALLY){
+                    (*position)+=2;
+                }
             } else {
                 counter++;
             }
@@ -39,15 +46,21 @@ void camera::onFreeCameraMove(int *position, const int action, const int param5,
             if (counter == 0) {
                 (*position)++;//引数5が1なら強制的に実行
                 counter = 0;
+                if (action == BattleEmulator::ATTACK_ALLY){
+                    (*position)+=2;
+                }
                 break;
             }
             (*position)++;
             counter = 0;
             (*position)++;
+            if (action == BattleEmulator::ATTACK_ALLY){
+                (*position)+=2;
+            }
 
         }
     } while (false);
-    (*NowState) &= ~0xff0000;
-    (*NowState) |= (counter << 16);
+    (*NowState) &= ~0xf00;
+    (*NowState) |= (counter << 8);
 
 }

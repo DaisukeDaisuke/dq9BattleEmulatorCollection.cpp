@@ -28,7 +28,7 @@ void lcg::GenerateifNeed(int need) {
     for (int i = nowCounter; i < need+2; ++i) {
         now_seed = lcg_rand(now_seed);
         precalculatedValues[nowCounter] = calculatePercent(now_seed) * 0.01;
-        seeds[nowCounter++] = now_seed >> 32;
+        seeds[nowCounter++] = now_seed >> 32;//これがないとlcgのパフォーマンスが大幅に落ちる
     }
 }
 

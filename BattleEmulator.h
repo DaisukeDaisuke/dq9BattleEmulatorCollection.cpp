@@ -20,6 +20,8 @@ public:
     static const int TYPE_2D = 4;
 
 
+    //0は配列の初期であり、永久欠番とする
+
     //2A
     static const int ATTACK_ENEMY = 1;
     static const int ULTRA_HIGH_SPEED_COMBO = 2;
@@ -58,20 +60,24 @@ public:
     static const int MAGIC_MIRROR = 31;
     static const int MORE_HEAL = 32;//ベホイム
     static const int DOUBLE_UP = 33;//すてみ
-    static const int MULTITHRUST = 34;//すてみ
+    static const int MULTITHRUST = 34;//さみだれ
     static const int SLEEPING = 35;
     static const int MIDHEAL = 36;//ベホイミ
     static const int FULLHEAL = 37;//ベホマ
     static const int DEFENDING_CHAMPION = 38;//大防御
+
     //2D
-    static const int PSYCHE_UP = 39;
+    static const int PSYCHE_UP = 39;//ためる(敵)
 
     static const int CURE_SLEEPING = 40;//表示用
 
     //2E
     static const int MEDITATION = 41;//瞑想
-    static const int MAGIC_BURST = 42;//瞑想
-    static const int RESTORE_MP = 43;//瞑想
+    static const int MAGIC_BURST = 42;//マダンテ
+    static const int RESTORE_MP = 43;//いのり
+    static const int MERCURIAL_THRUST = 44;//しっぷう突き
+    static const int THUNDER_THRUST = 45;//一閃突き
+    static const int TURN_SKIPPED = 45;//スキップしたとき
 
 
     static bool
@@ -87,15 +93,15 @@ private:
     static int CalculateMoreHealBase(Player players[2]);
     static int CalculateMidHealBase(Player players[2]);
     static int FUN_0208aecc(int *position, uint64_t * NowState);
-    static void resetCombo();
-    static double processCombo(int32_t Id, double damage);
+    static void resetCombo(uint64_t * NowState);
+    static double processCombo(int32_t Id, double damage, uint64_t * NowState);
     static int FUN_0207564c(int *position, int atk, int def);
 
     static int FUN_021e8458_typeC(int *position, double min, double max, double base);
 
     static int FUN_021e8458_typeD(int *position, double difference, double base);
 
-    static int callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender);
+    static int callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender, uint64_t * NowState);
 
     static double FUN_021dbc04(int baseHp, double maxHp);
 

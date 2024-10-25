@@ -54,8 +54,9 @@ void printHeader(std::stringstream &ss) {
        << std::setw(6) << "ATT"
        << std::setw(6) << "DET"
        << std::setw(6) << "MMT"
-       << std::setw(6) << "Tab" << "\n";
-    ss << std::string(130, '-') << "\n";  // 区切り線を出力
+       << std::setw(6) << "Tab"
+       << std::setw(6) << "Deg" << "\n";
+    ss << std::string(140, '-') << "\n";  // 区切り線を出力
 }
 
 std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastTurns);
@@ -80,7 +81,15 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
         auto ehp1 = result.ehp[i];
         auto ahp1 = result.ahp[i];
         auto isEnemy = result.isEnemy[i];
-        auto state = result.state[i] & 0xff;
+        auto state = result.state[i] & 0xf;
+        auto debug = result.state[i] >> 4 & 0xff;
+        // sprintfで16進数文字列に変換
+        char buffer[10];  // 0x + 2桁 + 終端文字のため、最小で10バイトあれば十分
+        std::sprintf(buffer, "%02X", static_cast<unsigned int>(debug));
+
+        // std::stringとして結果を取得
+        std::string hexString(buffer);
+
 
         if (state == BattleEmulator::TYPE_2A) {
             tmpState = "A";
@@ -124,6 +133,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                             << std::setw(6) << DEFTurn1
                             << std::setw(6) << magicMirrorTurn1
                             << std::setw(6) << tmpState
+                            << std::setw(6) << hexString
                             << std::setw(11) << "" << "\n";
                 }
             }
@@ -167,6 +177,15 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
 
     // 最後のターンのデータを出力
     if (currentTurn != -1) {
+
+        auto debug = result.state[result.position - 1] >> 4 & 0xff;
+        // sprintfで16進数文字列に変換
+        char buffer[10];  // 0x + 2桁 + 終端文字のため、最小で10バイトあれば十分
+        std::sprintf(buffer, "%02X", static_cast<unsigned int>(debug));
+
+        // std::stringとして結果を取得
+        std::string hexString(buffer);
+
         ss6
                 << std::left << std::setw(6) << (currentTurn + 1)
                 << std::setw(18) << sp
@@ -185,6 +204,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                 << std::setw(6) << DEFTurn1
                 << std::setw(6) << magicMirrorTurn1
                 << std::setw(6) << tmpState
+                << std::setw(6) << hexString
                 << std::setw(11) << "" << "\n";
     }
 
@@ -280,49 +300,77 @@ int main(int argc, char *argv[]) {
     int *position1 = new int(1);
 /*
     *NowStateの各ビットの使用状況は下記の通りである。
-    +-+-+-+-+ (* NowState) +-+-+-+-+
-       | 1  2  3  4  5  6  7  8  | size  |
-    0  | Current Rotation Table  | 1byte |
-    8  | Rotation Internal State | 1byte |
-    16 | Free Camera State       | 1byte |
-    24 | Turn Count Processed    | 2byte |
-    32 | Turn Count Processed    |   *   |　合計40ビット
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
+       |            Name            |     size      |
+    0  | Current Rotation Table     |     4bit      |
+    4  | Rotation Internal State    |     4bit      |
+    8  | Free Camera State          |     4bit      |
+    12 | Turn Count Processed       |     20bit     |
+    32 | Combo Previous Attack Id   |     2byte     |
+    40 | Combo Counter              |     1byte     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                 合計 6Byte
 */
+
     auto *NowState = new uint64_t(0);//エミュレーターの内部ステートを表すint
     Player players1[2];
     std::memcpy(players1, copiedPlayers, sizeof(players1));
     vector<int32_t> gene1(100, 0);
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MIDHEAL;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::FULLHEAL;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    //   gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MORE_HEAL;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+//    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+//    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::MORE_HEAL;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    //gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
+
+
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MIDHEAL;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::FULLHEAL;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    //   gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MORE_HEAL;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
 
     std::optional<BattleResult> dummy1;
     dummy1 = BattleResult();
-    BattleEmulator::Main(position1, 23, gene1, players1, dummy1, time1, dummy, -1, NowState);
+    BattleEmulator::Main(position1, 1, gene1, players1, dummy1, time1, dummy, -1, NowState);
     delete position1;
     delete NowState;
 
