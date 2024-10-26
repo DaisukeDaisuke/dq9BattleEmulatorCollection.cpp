@@ -290,7 +290,8 @@ int main(int argc, char *argv[]) {
     time2 = (time2 & 0xffff) << 16;
 
 #ifdef DEBUG2
-    time1 = 0x199114b2;
+    //time1 = 0x199114b2;
+    time1 = 0x226d97a6;
     time2 = 2501309586;
 
     //127はカメラの消費が足りない
@@ -318,59 +319,18 @@ int main(int argc, char *argv[]) {
     vector<int32_t> gene1(100, 0);
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
+
+    gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-//    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-//    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::MORE_HEAL;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    //gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
 
-
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MIDHEAL;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::FULLHEAL;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    gene1[counter++] = BattleEmulator::BUFF;
-//    //   gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MORE_HEAL;
-//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
-//    gene1[counter++] = BattleEmulator::MULTITHRUST;
 
     std::optional<BattleResult> dummy1;
     dummy1 = BattleResult();
-    BattleEmulator::Main(position1, 1, gene1, players1, dummy1, time1, dummy, -1, NowState);
+    BattleEmulator::Main(position1, 45, gene1, players1, dummy1, time1, dummy, -1, NowState);
     delete position1;
     delete NowState;
 
