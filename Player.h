@@ -19,6 +19,7 @@ struct Player {
     int speed;
     int HealPower;
     int mp = 0;
+    int maxMp = 0;
     bool specialCharge = false;
     bool dirtySpecialCharge = false;
     int specialChargeTurn = 0;
@@ -27,7 +28,7 @@ struct Player {
     int paralysisLevel = 0;
     int paralysisTurns = -1;
 
-    int medicinal_herbs_count = 8;
+    int SpecialMedicineCount = 8;
     double defence = 1.0;
     bool sleeping = false;
     int sleepingTurn = -1;
@@ -39,6 +40,9 @@ struct Player {
     int AtkBuffTurn = -1;
     int TensionLevel = 0;
     bool rage = false;
+    int SageElixirCount = 1;
+    int ElfinElixirCount = 1;
+    int MagicWaterCount = 1;
 
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 

@@ -10,7 +10,7 @@ class BattleResult {
 public:
     static void
     add(std::optional<BattleResult> &obj1, int action, int damage, bool isEnemy, int AtkBuffTurn, int BuffTurns, int MagicMirrorTurn, int turn,
-        bool player0_has_initiative, int ehp, int ahp, uint64_t nowState) {
+        bool player0_has_initiative, int ehp, int ahp, uint64_t nowState, int scTurn, int amp) {
         if (obj1.has_value()) {
             BattleResult& obj = obj1.value();
             obj.actions[obj.position] = action;
@@ -24,6 +24,8 @@ public:
             obj.ehp[obj.position] = ehp;
             obj.ahp[obj.position] = ahp;
             obj.state[obj.position] = nowState;
+            obj.scTurn[obj.position] = scTurn;
+            obj.amp[obj.position] = amp;
             obj.turn = turn;
             obj.position++;
         }
@@ -41,6 +43,8 @@ public:
     bool initiative[1000] = {};
     int ehp[1000] = {};
     int ahp[1000] = {};
+    int scTurn[1000] = {};
+    int amp[1000] = {};
     uint64_t state[1000] = {};
 };
 

@@ -47,6 +47,7 @@ void printHeader(std::stringstream &ss) {
        << std::setw(6) << "eD2"
        << std::setw(6) << "ahp"
        << std::setw(6) << "ehp"
+       << std::setw(6) << "amp"
 
        << std::setw(6) << "ini"
        << std::setw(6) << "Para"
@@ -55,7 +56,7 @@ void printHeader(std::stringstream &ss) {
        << std::setw(6) << "DET"
        << std::setw(6) << "MMT"
        << std::setw(6) << "Tab"
-       << std::setw(6) << "Deg" << "\n";
+       << std::setw(6) << "Sct" << "\n";
     ss << std::string(140, '-') << "\n";  // 区切り線を出力
 }
 
@@ -67,7 +68,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
     int currentTurn = -1;
     int eDamage[2] = {-1, -1}, aDamage = -1;
     bool isP1, isI1, initiative_tmp = false;
-    std::string eAction[2], aAction, sp, tmpState, ATKTurn1, DEFTurn1, magicMirrorTurn1;
+    std::string eAction[2], aAction, sp, tmpState, ATKTurn1, DEFTurn1, magicMirrorTurn1, specialChargeTurn1, amp1;
     auto counter = 0;
     // データのループ
     for (int i = 0; i < result.position; ++i) {
@@ -82,13 +83,8 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
         auto ahp1 = result.ahp[i];
         auto isEnemy = result.isEnemy[i];
         auto state = result.state[i] & 0xf;
-        auto debug = result.state[i] >> 4 & 0xff;
-        // sprintfで16進数文字列に変換
-        char buffer[10];  // 0x + 2桁 + 終端文字のため、最小で10バイトあれば十分
-        std::sprintf(buffer, "%02X", static_cast<unsigned int>(debug));
-
-        // std::stringとして結果を取得
-        std::string hexString(buffer);
+        auto specialChargeTurn = result.scTurn[i];
+        auto amp = result.amp[i];
 
 
         if (state == BattleEmulator::TYPE_2A) {
@@ -99,7 +95,8 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
             tmpState = "C";
         } else if (state == BattleEmulator::TYPE_2D) {
             tmpState = "D";
-        }if (state == BattleEmulator::TYPE_2E) {
+        }
+        if (state == BattleEmulator::TYPE_2E) {
             tmpState = "E";
         }
 
@@ -126,6 +123,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                             << std::setw(6) << eDamage[1]
                             << std::setw(6) << ahp1
                             << std::setw(6) << ehp1
+                            << std::setw(6) << amp1
                             << std::setw(6) << (initiative_tmp ? "yes" : "")
                             << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
                             << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
@@ -133,7 +131,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                             << std::setw(6) << DEFTurn1
                             << std::setw(6) << magicMirrorTurn1
                             << std::setw(6) << tmpState
-                            << std::setw(6) << hexString
+                            << std::setw(6) << specialChargeTurn1
                             << std::setw(11) << "" << "\n";
                 }
             }
@@ -151,6 +149,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
             ATKTurn1 = "";
             DEFTurn1 = "";
             magicMirrorTurn1 = "";
+            specialChargeTurn1 = "";
         }
 
         // 敵か味方の行動を適切な変数に格納
@@ -170,6 +169,12 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
             if (magicMirrorTurn > 0) {
                 magicMirrorTurn1 = std::to_string(magicMirrorTurn);
             }
+            if (specialChargeTurn > 0) {
+                specialChargeTurn1 = std::to_string(specialChargeTurn);
+            }
+
+            amp1 = std::to_string(amp);
+
             initiative_tmp = initiative;
             sp = specialAction;
         }
@@ -177,15 +182,6 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
 
     // 最後のターンのデータを出力
     if (currentTurn != -1) {
-
-        auto debug = result.state[result.position - 1] >> 4 & 0xff;
-        // sprintfで16進数文字列に変換
-        char buffer[10];  // 0x + 2桁 + 終端文字のため、最小で10バイトあれば十分
-        std::sprintf(buffer, "%02X", static_cast<unsigned int>(debug));
-
-        // std::stringとして結果を取得
-        std::string hexString(buffer);
-
         ss6
                 << std::left << std::setw(6) << (currentTurn + 1)
                 << std::setw(18) << sp
@@ -197,6 +193,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                 << std::setw(6) << eDamage[1]
                 << std::setw(6) << result.ahp[result.position - 1]
                 << std::setw(6) << result.ehp[result.position - 1]
+                << std::setw(6) << result.amp[result.position - 1]
                 << std::setw(6) << (initiative_tmp ? "yes" : "")
                 << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
                 << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
@@ -204,7 +201,7 @@ std::string dumpTable(BattleResult &result, std::vector<int32_t> gene, int PastT
                 << std::setw(6) << DEFTurn1
                 << std::setw(6) << magicMirrorTurn1
                 << std::setw(6) << tmpState
-                << std::setw(6) << hexString
+                << std::setw(6) << specialChargeTurn1
                 << std::setw(11) << "" << "\n";
     }
 
@@ -262,16 +259,16 @@ int main(int argc, char *argv[]) {
 
     const Player copiedPlayers[2] = {
             // プレイヤー1
-            {309,  309.0,  312, 312, 298, 298, 193, 234, 24,   // 最初のメンバー
-                    false, false, 0, false, false, 0, -1,              // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-                    8, 1.0, false, -1, 0, -1,                                            // medicinal_herbs_count, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-                    false, -1, 0, -1, 0, false},                                      // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+            {309,  309.0,  312, 312, 298, 298, 193, 234, 165,   // 最初のメンバー
+                    165, false, false, 0, false, false, 0, -1,              // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+                    8, 1.0, false, -1, 0, -1,                                            // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+                    false, -1, 0, -1, 0, false, 1, 1, 1},                                      // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
             // プレイヤー2
             {4800, 4800.0, 248, 248, 278, 278, 157, 0,   255,    // 最初のメンバー
-                    false, false, 0, false, false, 0, -1,             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-                    8, 1.0, false, -1, 0, -1,                         // medicinal_herbs_count, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-                    false, -1, 0, -1, 0, false}                             // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+                    255, false, false, 0, false, false, 0, -1,             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+                    8, 1.0, false, -1, 0, -1,                         // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+                    false, -1, 0, -1, 0, false, 0, 0, 0}                             // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
 
@@ -291,7 +288,9 @@ int main(int argc, char *argv[]) {
 
 #ifdef DEBUG2
     //time1 = 0x199114b2;
-    time1 = 0x226d97a6;
+    //time1 = 0x226d97a6;
+    //time1 = 0x1c2a9bda;
+    time1 = 0x1dcac7e5;
     time2 = 2501309586;
 
     //127はカメラの消費が足りない
@@ -321,16 +320,54 @@ int main(int argc, char *argv[]) {
     int counter = 0;
 
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::SAGE_ELIXIR;
+    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
     gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::FULLHEAL;
+    gene1[counter++] = BattleEmulator::FULLHEAL;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::DEFENCE;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
 
+
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+//    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+//    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
+//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::BUFF;
+//    gene1[counter++] = BattleEmulator::MULTITHRUST;
 
     std::optional<BattleResult> dummy1;
     dummy1 = BattleResult();
-    BattleEmulator::Main(position1, 45, gene1, players1, dummy1, time1, dummy, -1, NowState);
+    BattleEmulator::Main(position1, 43, gene1, players1, dummy1, time1, dummy, -1, NowState);
     delete position1;
     delete NowState;
 

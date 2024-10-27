@@ -79,6 +79,12 @@ public:
     static const int THUNDER_THRUST = 45;//一閃突き
     static const int TURN_SKIPPED = 45;//スキップしたとき
 
+    static const int SAGE_ELIXIR = 46;//賢者の聖水
+    static const int ELFIN_ELIXIR = 47;//エルフののみぐすり
+    static const int MAGIC_WATER = 48;//まほうのせいすい
+    static const int SPECIAL_MEDICINE = 49;//特やくそう
+
+
 
     static bool
     Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players,

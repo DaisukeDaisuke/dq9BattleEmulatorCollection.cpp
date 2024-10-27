@@ -9,6 +9,7 @@
 
 void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, bool preemptive1) {
     bool preemptive = true;
+    uint64_t before = -1;
     for (int i = 0; i < 3; ++i) {
         int32_t after = actions[i];
         if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
@@ -17,8 +18,11 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
             (*position)++;//追尾カメラ
         }
         if (after != BattleEmulator::ATTACK_ALLY) {//味方の攻撃→上空だとフリーカメラが特異点の挙動する
-            preemptive = false;
+            //if (!(before == BattleEmulator::ATTACK_ALLY&&after == BattleEmulator::SKY_ATTACK)) { // TODO: 攻撃→スカイアタック→メラゾーマの場合、ガチもんの不定消費が発生する。これは回避しなければならない。
+                preemptive = false;
+            //}
         }
+        before = after;
     }
 }
 
