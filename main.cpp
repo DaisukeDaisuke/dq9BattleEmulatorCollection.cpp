@@ -297,7 +297,7 @@ int main(int argc, char *argv[]) {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    time1 = 0x1a1308ce;
+    time1 = 0x1aa6c05d;
     time2 = 2501309586;
 
     //127はカメラの消費が足りない
@@ -326,12 +326,7 @@ int main(int argc, char *argv[]) {
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::FULLHEAL;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
 
 
 

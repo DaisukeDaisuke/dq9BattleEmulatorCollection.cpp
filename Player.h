@@ -28,7 +28,7 @@ struct Player {
     int paralysisLevel = 0;
     int paralysisTurns = -1;
 
-    int SpecialMedicineCount = 8;
+    int SpecialMedicineCount = 3;
     double defence = 1.0;
     bool sleeping = false;
     int sleepingTurn = -1;
