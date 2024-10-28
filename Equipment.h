@@ -79,13 +79,13 @@ public:
 
 // 指定された属性に基づいて合計耐性を計算し、0.01で掛けた結果を返す関数
 double Equipments::calculateTotalResistance(Attribute attribute) {
-    int totalResistance = 0;
+    int totalResistance = 100;
 
     for (const auto& equipment : allEquipments) {
-        totalResistance += equipment.resistances[static_cast<int>(attribute)];
+        totalResistance -= equipment.resistances[static_cast<int>(attribute)];
     }
 
-    return 1.0 - (totalResistance * 0.01); // 結果を0.01で掛けて返す
+    return totalResistance * 0.01; // 結果を0.01で掛けて返す
 }
 
 

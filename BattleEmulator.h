@@ -85,13 +85,12 @@ public:
     static const int SPECIAL_MEDICINE = 49;//特やくそう
 
 
-
     static bool
     Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players,
          std::optional<BattleResult> &result, uint64_t seed, const int values[50], int maxElement, uint64_t *NowState);
 
     static std::string getActionName(int actionId);
-
+    static int roundCustom(double value);
 private:
     static int ProcessMagicBurst(int * position);
     static void ProcessRage(int * position, int baseDamage, int preHP[3], Player players[2]);

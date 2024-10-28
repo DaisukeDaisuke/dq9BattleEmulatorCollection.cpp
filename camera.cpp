@@ -7,12 +7,16 @@
 #include "BattleEmulator.h"
 #include "lcg.h"
 
-void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, bool preemptive1) {
+void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, bool preemptive1, const bool isSleeping) {
     bool preemptive = true;
     uint64_t before = -1;
     for (int i = 0; i < 3; ++i) {
         int32_t after = actions[i];
-        if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
+        //一部の特異点の挙動について対策する
+        if (before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA&&isSleeping){
+            //寝ていて、スカイアタックで起きず、メラゾーマされるとparam5がtrueになる。マジで謎
+            onFreeCameraMove(position, after, 1, NowState);
+        }else if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
             onFreeCameraMove(position, after, preemptive ? 1 : 0, NowState);
         }else if(after == BattleEmulator::MERCURIAL_THRUST){
             (*position)++;//追尾カメラ
