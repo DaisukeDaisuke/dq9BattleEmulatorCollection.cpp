@@ -138,6 +138,8 @@ std::string BattleEmulator::getActionName(int actionId) {
             return "Elfin Elixir";
         case BattleEmulator::MAGIC_WATER:
             return "Magic Water";
+        case BattleEmulator::GOSPEL_SONG:
+            return "gospel song";
         default:
             return "Unknown Action";
     }
@@ -178,7 +180,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 397) {
+        if ((*position) == 205) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -302,6 +304,8 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
                     (*position) += 2;
                 } else if (enemyAction[counter] == DISRUPTIVE_WAVE) {
                     (*position) += 2;
+                }else if(enemyAction[counter] == BURNING_BREATH&&players[0].paralysis){
+                    enemyAction[counter] = DARK_BREATH;//??????
                 }
             } else if (state == TYPE_2D) {
                 const int attack[6] = {PSYCHE_UP, ULTRA_HIGH_SPEED_COMBO, ATTACK_ENEMY, SKY_ATTACK, SWITCH_2A,
@@ -717,8 +721,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (baseDamage != 0){
                 (*position)++;//0x021e54fc
             }
-            baseDamage = static_cast<int>(floor(players[attacker].maxHp * 0.4));
+            baseDamage = static_cast<int>(std::round(players[attacker].maxHp * 0.4));
             resetCombo(NowState);
+            if (player0_has_initiative) {
+                players[0].specialCharge = false;
+            } else {
+                players[0].dirtySpecialCharge = true;
+            }
             break;
         case SPECIAL_MEDICINE:
             players[attacker].SpecialMedicineCount--;
@@ -1035,8 +1044,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (baseDamage != 0) {
                 (*position)++;//不明 0x021e54fc
             }
-            players[0].sleeping = true;
-            players[0].sleepingTurn = 2;
+            if (!players[0].paralysis){
+                players[0].sleeping = true;
+                players[0].sleepingTurn = 2;
+            }
             baseDamage = 0;
             resetCombo(NowState);
             break;
