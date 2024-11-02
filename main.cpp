@@ -286,7 +286,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x2a5034ca;
+    uint64_t time1 = 0xf9f2526e;
 
     int dummy[100];
     lcg::init(time1);
@@ -313,14 +313,11 @@ int main() {
     int counter = 0;
 
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::FULLHEAL;
+    gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::GOSPEL_SONG;
-    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
 
     //for (int i = 0; i < 10; ++i) {
         (*NowState) = 0;

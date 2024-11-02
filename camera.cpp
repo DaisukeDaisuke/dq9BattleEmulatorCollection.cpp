@@ -13,10 +13,10 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
     for (int i = 0; i < 3; ++i) {
         int32_t after = actions[i];
         //一部の特異点の挙動について対策する
-        if (!preemptive1&&before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA){//寝てる必要ないの???? isSleeping
+/*        if (before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA){//寝てる必要ないの???? isSleeping
             //寝ていて、スカイアタックで起きず、メラゾーマされるとparam5がtrueになる。マジで謎
             onFreeCameraMove(position, after, 1, NowState);
-        }else /*if (!preemptive1&&before == BattleEmulator::MERA_ZOMA&&after == BattleEmulator::SKY_ATTACK){//寝てる必要ないの???? isSleeping
+        }else *//*if (!preemptive1&&before == BattleEmulator::MERA_ZOMA&&after == BattleEmulator::SKY_ATTACK){//寝てる必要ないの???? isSleeping
             //暫定
             onFreeCameraMove(position, after, 1, NowState);
         }else*/ if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
@@ -34,7 +34,7 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
 }
 
 void camera::onFreeCameraMove(int *position, const int action, const int param5, uint64_t * NowState) {
-    int counter = ((*NowState) >> 8) & 0xf;
+    auto counter = ((*NowState) >> 8) & 0xf;
     do {
         if (param5 == 0) {
             (*position)++;
