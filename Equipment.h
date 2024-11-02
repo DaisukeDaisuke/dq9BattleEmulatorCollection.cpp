@@ -29,8 +29,8 @@ struct Equipment {
     std::array<int, static_cast<int>(Attribute::AttributeCount)> resistances{};
 
     // コンストラクタで特定の属性のみ設定可能に
-    Equipment(std::string  name, std::initializer_list<std::pair<Attribute, int>> initList)
-            : name(std::move(name)) {
+    Equipment(std::string  inputName, std::initializer_list<std::pair<Attribute, int>> initList)
+            : name(std::move(inputName)) {
         resistances.fill(0); // 全ての耐性を0に初期化
         for (const auto& entry : initList) {
             resistances[static_cast<int>(entry.first)] = entry.second;

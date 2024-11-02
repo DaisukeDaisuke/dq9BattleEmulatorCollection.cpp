@@ -40,22 +40,6 @@ public:
         return genome;
     }
 
-    // ゲノムのセッター（個別）
-    void setGenome(int index, int32_t value) {
-        if (index < 0 || index >= genome.size()) {
-            throw std::out_of_range("Index out of range");
-        }
-        genome[index] = value;
-    }
-
-    // ゲノムのゲッター（個別）
-    [[nodiscard]] int32_t getGenome(int index) const {
-        if (index < 0 || index >= genome.size()) {
-            throw std::out_of_range("Index out of range");
-        }
-        return genome[index];
-    }
-
     void setBattleTrace(std::string trace) {
         BattleTrace = std::move(trace);
     }

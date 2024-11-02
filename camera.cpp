@@ -7,16 +7,19 @@
 #include "BattleEmulator.h"
 #include "lcg.h"
 
-void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, bool preemptive1, const bool isSleeping) {
+void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, bool preemptive1) {
     bool preemptive = true;
     uint64_t before = -1;
     for (int i = 0; i < 3; ++i) {
         int32_t after = actions[i];
         //一部の特異点の挙動について対策する
-        if (before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA&&isSleeping){
+        if (!preemptive1&&before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA){//寝てる必要ないの???? isSleeping
             //寝ていて、スカイアタックで起きず、メラゾーマされるとparam5がtrueになる。マジで謎
             onFreeCameraMove(position, after, 1, NowState);
-        }else if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
+        }else /*if (!preemptive1&&before == BattleEmulator::MERA_ZOMA&&after == BattleEmulator::SKY_ATTACK){//寝てる必要ないの???? isSleeping
+            //暫定
+            onFreeCameraMove(position, after, 1, NowState);
+        }else*/ if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
             onFreeCameraMove(position, after, preemptive ? 1 : 0, NowState);
         }else if(after == BattleEmulator::MERCURIAL_THRUST){
             (*position)++;//追尾カメラ
@@ -31,7 +34,7 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
 }
 
 void camera::onFreeCameraMove(int *position, const int action, const int param5, uint64_t * NowState) {
-    auto counter = ((*NowState) >> 8) & 0xf;
+    int counter = ((*NowState) >> 8) & 0xf;
     do {
         if (param5 == 0) {
             (*position)++;
@@ -70,5 +73,4 @@ void camera::onFreeCameraMove(int *position, const int action, const int param5,
     } while (false);
     (*NowState) &= ~0xf00;
     (*NowState) |= (counter << 8);
-
 }

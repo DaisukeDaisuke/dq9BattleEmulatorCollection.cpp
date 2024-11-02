@@ -77,24 +77,26 @@ public:
     static const int RESTORE_MP = 43;//いのり
     static const int MERCURIAL_THRUST = 44;//しっぷう突き
     static const int THUNDER_THRUST = 45;//一閃突き
-    static const int TURN_SKIPPED = 45;//スキップしたとき
+    static const int TURN_SKIPPED = 46;//スキップしたとき
 
-    static const int SAGE_ELIXIR = 46;//賢者の聖水
-    static const int ELFIN_ELIXIR = 47;//エルフののみぐすり
-    static const int MAGIC_WATER = 48;//まほうのせいすい
-    static const int SPECIAL_MEDICINE = 49;//特やくそう
+
+    static const int SAGE_ELIXIR = 47;//賢者の聖水
+    static const int ELFIN_ELIXIR = 48;//エルフののみぐすり
+    static const int MAGIC_WATER = 49;//まほうのせいすい
+    static const int SPECIAL_MEDICINE = 50;//特やくそう
+    static const int GOSPEL_SONG = 51;//ゴスペルソング
 
 
     static bool
-    Main(int *position, int RunCount, std::vector<int32_t> Gene, Player *players,
-         std::optional<BattleResult> &result, uint64_t seed, const int values[50], int maxElement, uint64_t *NowState);
+    Main(int *position, int RunCount, const int32_t Gene[500], Player *players,
+         std::optional<BattleResult> &result, uint64_t seed, const int eActions[500],const int damages[500], int maxElement, uint64_t *NowState);
 
     static std::string getActionName(int actionId);
     static int roundCustom(double value);
 private:
     static int ProcessMagicBurst(int * position);
-    static void ProcessRage(int * position, int baseDamage, int preHP[3], Player players[2]);
-    static void RecalculateBuff(Player players[0]);
+    static void ProcessRage(int * position, int baseDamage, Player players[2]);
+    static void RecalculateBuff(Player players[2]);
     static int CalculateMoreHealBase(Player players[2]);
     static int CalculateMidHealBase(Player players[2]);
     static int FUN_0208aecc(int *position, uint64_t * NowState);
