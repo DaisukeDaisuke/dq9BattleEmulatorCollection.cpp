@@ -452,8 +452,11 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
                             if (damages[exCounter] == -1) {
                                 return true;
                             }
-                            int need = damages[exCounter++] - basedamage;
-                            if (std::abs(need) > 1) {
+//                            int need = damages[exCounter++] - basedamage;
+//                            if (std::abs(need) == 0) {
+//                                return false;
+//                            }
+                            if (damages[exCounter++] != basedamage) {
                                 return false;
                             }
                         }
@@ -580,8 +583,8 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
                                 if (damages[exCounter] == -1) {
                                     return true;
                                 }
-                                int need = damages[exCounter++] - basedamage;
-                                if (std::abs(need) > 1) {
+                                //int need = ;
+                                if (damages[exCounter++] != basedamage) {
                                     return false;
                                 }
                             }

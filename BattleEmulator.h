@@ -84,7 +84,8 @@ public:
     static const int ELFIN_ELIXIR = 48;//エルフののみぐすり
     static const int MAGIC_WATER = 49;//まほうのせいすい
     static const int SPECIAL_MEDICINE = 50;//特やくそう
-    static const int GOSPEL_SONG = 51;//ゴスペルソング
+    static const int DEAD1 = 51;//ゴスペルソング
+    static const int GOSPEL_SONG = 52;//ゴスペルソング
 
 
     static bool

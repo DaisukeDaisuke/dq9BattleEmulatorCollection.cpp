@@ -286,7 +286,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0xf9f2526e;
+    uint64_t time1 = 1650655705;
 
     int dummy[100];
     lcg::init(time1);
@@ -313,11 +313,14 @@ int main() {
     int counter = 0;
 
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::FULLHEAL;
-    gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
     gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    gene1[counter++] = BattleEmulator::FULLHEAL;
 
     //for (int i = 0; i < 10; ++i) {
         (*NowState) = 0;
@@ -385,8 +388,8 @@ void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, in
     time2 = (time2 & 0xffff) << 16;
     std::cout << time2 << std::endl;
 ////
-//    time1 = 0;
-//    time2 = 4294967296;
+    time1 = 0;
+    time2 = 4294967296;
 //
     int32_t gene[500] = {0};
     for (int i = 0; i < 500; ++i) {
