@@ -217,8 +217,8 @@ int main(int argc, char *argv[]) {
 #ifdef DEBUG2
     std::vector<int32_t> gene1(100, 0);
 
-    time1 = 2286170367;
-    time2 = 2501309586;
+    time1 = 2198360580;
+    //time2 = 2501309586;
 
     lcg::init(time1);
     int *position1 = new int(1);
@@ -227,7 +227,7 @@ int main(int argc, char *argv[]) {
 
     int values1[1];
 
-    //gene1[19-1] = BattleEmulator::DEFENCE;
+    gene1[24-1] = BattleEmulator::HEAL;
     std::optional<BattleResult> dummy;
     dummy = BattleResult();
     BattleEmulator::Main(position1, 100, gene1, players1, dummy, time1,values1, -1);

@@ -160,7 +160,7 @@ bool BattleEmulator::Main(int *position, int RunCount, std::vector<int32_t> Gene
                 //休み時消費:   タナトス バンパイアエッジ ヒャド 攻撃 まなざし まなざし
                 //バンパイアエッジ(制限行動: タナトスハント) バンパイアエッジ ヒャド 通常攻撃 まなざし ぱふぱふ
                 //見惚れ判定
-                if (lcg::getPercent(position, 100) < 0.0160) {//0x021588ec
+                if (lcg::getPercent(position, 100) < -0.0160) {//0x021588ec
                     //次の乱数が90%以上(一致含む)なら見惚れないらしい。
                     int mitore = lcg::getPercent(position, 100);//0x02158964
                     if (mitore < 90) {
