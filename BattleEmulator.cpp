@@ -159,8 +159,12 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
     auto startPos = static_cast<int>(((*NowState) >> 12) & 0xfffff);
     if (startPos != 0) {
         startPos++;
+        RunCount++;
     }
     for (int counterJ = startPos; counterJ < RunCount; ++counterJ) {
+        if (genePosition != -1) {
+            genePosition = counterJ;
+        }
         //現在ターンを保存
         (*NowState) &= ~0xfffff0000;
         (*NowState) |= (counterJ << 12);
@@ -357,7 +361,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
             if (counter == 0) {
                 (*position)++;
             }
-            if (maxElement != -1) {
+            if (maxElement != -1&&maxElement != -2) {
                 int need = eActions[exCounter1++];
                 if (need == -1){
                     return true;
@@ -372,12 +376,12 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
 
         int32_t actionTable = -1;
 
-        if (Gene[genePosition] == -1){
+        if (Gene[genePosition] == 0||Gene[genePosition] == -1){
             genePosition = -1;
         }
-        if (genePosition != -1&&Gene[genePosition] != 0) {
+        if (genePosition != -1&&Gene[genePosition] != 0&&Gene[genePosition] != -1) {
             actionTable = Gene[genePosition];
-            genePosition++;
+            //genePosition++;
             if (actionTable == HEAL && players[0].mp <= 0) {
                 if (players[0].SpecialMedicineCount >= 1) {
                     actionTable = MEDICINAL_HERBS;
@@ -436,7 +440,30 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
                         actionTable = SLEEPING;
                     }
 
-                    if (maxElement != -1) {
+                    if(maxElement == -1){
+                        auto atk1 = -1;
+                        if (players[0].AtkBuffTurn > 0) {
+                            atk1 = players[0].AtkBuffTurn;
+                        } else if (players[0].AtkBuffLevel != 0) {
+                            atk1 = 0;
+                        }
+                        auto def1 = -1;
+                        if (players[0].BuffTurns > 0) {
+                            def1 = players[0].BuffTurns;
+                        } else if (players[0].BuffLevel != 0) {
+                            def1 = 0;
+                        }
+                        auto mmt1 = -1;
+                        if (players[0].MagicMirrorTurn > 0) {
+                            mmt1 = players[0].MagicMirrorTurn;
+                        } else if (players[0].hasMagicMirror) {
+                            mmt1 = 0;
+                        }
+                        BattleResult::add(result, c, basedamage, true, atk1,
+                                          def1, mmt1, counterJ,
+                                          player0_has_initiative, ehp,
+                                          ahp, tmpState, players[0].specialChargeTurn, players[0].mp);
+                    }else if (maxElement != -1&&maxElement != -2) {
                         if (
                                 c == ATTACK_ENEMY ||
                                 c == ULTRA_HIGH_SPEED_COMBO ||
@@ -460,29 +487,6 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
                                 return false;
                             }
                         }
-                    } else {
-                        auto atk1 = -1;
-                        if (players[0].AtkBuffTurn > 0) {
-                            atk1 = players[0].AtkBuffTurn;
-                        } else if (players[0].AtkBuffLevel != 0) {
-                            atk1 = 0;
-                        }
-                        auto def1 = -1;
-                        if (players[0].BuffTurns > 0) {
-                            def1 = players[0].BuffTurns;
-                        } else if (players[0].BuffLevel != 0) {
-                            def1 = 0;
-                        }
-                        auto mmt1 = -1;
-                        if (players[0].MagicMirrorTurn > 0) {
-                            mmt1 = players[0].MagicMirrorTurn;
-                        } else if (players[0].hasMagicMirror) {
-                            mmt1 = 0;
-                        }
-                        BattleResult::add(result, c, basedamage, true, atk1,
-                                          def1, mmt1, counterJ,
-                                          player0_has_initiative, ehp,
-                                          ahp, tmpState, players[0].specialChargeTurn, players[0].mp);
                     }
                     if (c == BattleEmulator::MEDITATION) {
                         Player::heal(players[1], basedamage);
@@ -578,7 +582,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
                     } else {
                         Player::reduceHp(players[1], basedamage);
 
-                        if (maxElement != -1) {
+                        if (maxElement != -1&&maxElement != -2) {
                             if (action == MULTITHRUST || action == ATTACK_ALLY || action == MERCURIAL_THRUST) {
                                 if (damages[exCounter] == -1) {
                                     return true;
@@ -675,7 +679,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
         Player::heal(players[0], 25);
 
     }
-    if (maxElement != -1) {
+    if (maxElement != -1&&maxElement != -2) {
         return true;
     } else {
         return false;

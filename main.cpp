@@ -9,6 +9,7 @@
 #include "BattleEmulator.h"
 #include "AnalyzeData.h"
 #include "debug.h"
+#include "GeneticAlgorithm.h"
 
 #ifdef DEBUG
 
@@ -26,17 +27,21 @@ std::string rtrim(const std::string &s);
 
 std::string trim(const std::string &s);
 
+void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[500],
+                   int aActions[500], int damages[500]);
+
 void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[500],
                        int aActions[500], int damages[500]);
+
 
 void mainLoop(const Player copiedPlayers[2]);
 
 using namespace std;
 
-int CandidateID = 0;
 int foundSeeds = 0;
 std::vector<AnalyzeData> analyzeDataMap;
 
+uint32_t FoundSeed = 0;
 
 void printHeader(std::stringstream &ss);
 
@@ -65,7 +70,7 @@ void printHeader(std::stringstream &ss) {
     ss << std::string(140, '-') << "\n";  // 区切り線を出力
 }
 
-std::string dumpTable(BattleResult &result, int32_t gene[500],  int PastTurns);
+std::string dumpTable(BattleResult &result, int32_t gene[500], int PastTurns);
 
 std::string dumpTable(BattleResult &result, int32_t gene[500], int PastTurns) {
     stringstream ss6;
@@ -111,7 +116,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[500], int PastTurns) {
         auto special = gene[turn];
 
         std::string specialAction;
-        if (special != 0&&special != -1) {
+        if (special != 0 && special != -1) {
             specialAction = BattleEmulator::getActionName(special & 0x3ff);
         }
 
@@ -134,7 +139,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[500], int PastTurns) {
                             << std::setw(6) << amp2
                             << std::setw(6) << (initiative_tmp ? "yes" : "")
                             << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
-                            << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
+                            << std::setw(6) << ((aAction == "Sleeping" || aAction == "Cure Sleeping") ? "yes" : "")
                             << std::setw(6) << ATKTurn1
                             << std::setw(6) << DEFTurn1
                             << std::setw(6) << magicMirrorTurn1
@@ -167,6 +172,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[500], int PastTurns) {
             counter++;
             ahp2 = std::to_string(ahp1);
         } else {
+
             ehp2 = std::to_string(ehp1);
             amp2 = std::to_string(amp);
             aAction = BattleEmulator::getActionName(action);
@@ -188,6 +194,17 @@ std::string dumpTable(BattleResult &result, int32_t gene[500], int PastTurns) {
 
             initiative_tmp = initiative;
             sp = specialAction;
+
+            if (eAction[0] != "magic Burst"&&eAction[1] != "magic Burst") {
+                if (!initiative && action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
+                    action == BattleEmulator::SLEEPING) {
+                    sp = "---------------";
+                }
+                if ((action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
+                    sp = "---------------";
+                }
+            }
+
         }
     }
 
@@ -252,17 +269,10 @@ std::string normalDump(AnalyzeData data) {
 int main() {
 
     std::cout << "dq9 Corvus battle emulator v1.0.0" << std::endl << "Waiting for input[q/u/b/s]: " << std::endl;
-
-#ifdef DEBUG2
-    std::cout << sizeof(int) << std::endl;
-    std::cout << sizeof(long) << std::endl;
-    std::cout << sizeof(long long) << std::endl;
-    std::cout << sizeof(uint64_t) << std::endl;
-#endif
-
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
+
 
     //https://zenn.dev/reputeless/books/standard-cpp-for-competitive-programming/viewer/library-ios-iomanip#3.1-c-%E8%A8%80%E8%AA%9E%E3%81%AE%E5%85%A5%E5%87%BA%E5%8A%9B%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%E3%83%A0%E3%81%A8%E3%81%AE%E5%90%8C%E6%9C%9F%E3%82%92%E7%84%A1%E5%8A%B9%E3%81%AB%E3%81%99%E3%82%8B
     //std::cin.tie(0)->sync_with_stdio(0);
@@ -281,12 +291,13 @@ int main() {
                     false, -1, 0, -1, 0, false, 0, 0, 0}                             // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
+
 #ifdef DEBUG2
     //time1 = 0x199114b2;
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 1650655705;
+    uint64_t time1 = 14514216519;
 
     int dummy[100];
     lcg::init(time1);
@@ -305,7 +316,7 @@ int main() {
                                  合計 6Byte
 */
 
-    auto *NowState = new uint64_t(0);//エミュレーターの内部ステートを表すint
+    auto *NowState = new uint64_t(-1);//エミュレーターの内部ステートを表すint
 
     Player players1[2];
     int32_t gene1[500] = {0};
@@ -316,19 +327,14 @@ int main() {
     gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
     gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    gene1[counter++] = BattleEmulator::FULLHEAL;
 
     //for (int i = 0; i < 10; ++i) {
-        (*NowState) = 0;
+        (*NowState) = BattleEmulator::TYPE_2A;
         (*position1) = 1;
         std::optional<BattleResult> dummy1;
         dummy1 = BattleResult();
         std::memcpy(players1, copiedPlayers, sizeof(players1));
-        BattleEmulator::Main(position1, 43, gene1, players1, dummy1, time1, dummy, dummy, -1, NowState);
+        BattleEmulator::Main(position1, 5, gene1, players1, dummy1, time1, dummy, dummy, -1, NowState);
 
         std::stringstream ss1;
         ss1 << time1 << " ";
@@ -344,11 +350,32 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    time1 = 57086815;
+    uint64_t time1 = 0x3611D5E47;
 
-    lcg::init(time1, 5000);
-    processResult(copiedPlayers, time1, gene, 0, "11 18 15 9 18 9 10 16 h", -1);
-    lcg::release();
+    const int actions[500] = {
+            30, 31, 30, 35, 35
+    };
+
+    int turns = 4;
+
+    lcg::init(time1);
+
+    auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 20, actions);
+
+    Player players[2];
+    players[0] = copiedPlayers[0];
+    players[1] = copiedPlayers[1];
+
+    auto *position = new int(1);
+    auto *nowState = new uint64_t(0);
+
+
+    std::optional<BattleResult> result1;
+    result1 = BattleResult();
+    BattleEmulator::Main(position, turns + 10, genome.actions, players, result1, time1, nullptr, nullptr, -1, nowState);
+    std::cout << dumpTable(result1.value(), genome.actions, 0) << std::endl;
+
+
     return 0;
 #endif
 
@@ -364,9 +391,66 @@ int main() {
     return 0;
 }
 
+constexpr int32_t actions1[100] = {
+        BattleEmulator::BUFF,
+        BattleEmulator::MAGIC_MIRROR,
+        BattleEmulator::MORE_HEAL,
+        BattleEmulator::DOUBLE_UP,
+        BattleEmulator::MULTITHRUST,
+        BattleEmulator::MIDHEAL,
+        BattleEmulator::FULLHEAL,
+        BattleEmulator::DEFENDING_CHAMPION,
+        BattleEmulator::SAGE_ELIXIR,
+        BattleEmulator::ELFIN_ELIXIR,
+        BattleEmulator::SPECIAL_MEDICINE,
+        BattleEmulator::ATTACK_ALLY,
+        BattleEmulator::DEFENCE,
+};
+
+void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[500],
+                   int aActions[500], int damages[500]) {
+
+    int32_t gene[500] = {0};
+    for (int i = 0; i < 500; ++i) {
+        gene[i] = aActions[i];
+        if (aActions[i] == -1) {
+            gene[i] = -1;
+            gene[i + 1] = -1;
+            break;
+        }
+    }
+
+    /*
+    *NowStateの各ビットの使用状況は下記の通りである。
+    +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
+       |            Name            |     size      |
+    0  | Current Rotation Table     |     4bit      |
+    4  | Rotation Internal State    |     4bit      |
+    8  | Free Camera State          |     4bit      |
+    12 | Turn Count Processed       |     20bit     |
+    32 | Combo Previous Attack Id   |     2byte     |
+    40 | Combo Counter              |     1byte     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                 合計 6Byte
+    */
+    int *position = new int(1);
+    auto *nowState = new uint64_t(0);
+    uint32_t seed = FoundSeed;
+
+    Player players[2];
+    players[0] = copiedPlayers[0];
+    players[1] = copiedPlayers[1];
+    optional<BattleResult> result;
+    result = BattleResult();
+    int dummy[500] = {0};
+    BattleEmulator::Main(position, turns, gene, players,
+                         result, seed, dummy, dummy,
+                         -1,
+                         nowState);
+}
 
 // ブルートフォースリクエスト関数
-void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds,int turns,  int eActions[500],
+void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[500],
                        int aActions[500], int damages[500]) {
     std::cout << "BruteForceRequest executed with time " << hours << ":" << minutes << ":" << seconds << std::endl;
     std::cout << "eActions: ";
@@ -378,23 +462,27 @@ void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, in
     std::cout << std::endl;
 
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    totalSeconds = totalSeconds - 15;
+    totalSeconds = totalSeconds - 17;
     //std::cout << totalSeconds << std::endl;
-    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 60) * (1 / 0.12515)));
-    time1 = (time1 & 0xffff) << 16;
+    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 30) * (1 / 0.12515)));
+    time1 = time1 << 16;
     std::cout << time1 << std::endl;
 
-    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 60) * (1 / 0.125155)));
-    time2 = (time2 & 0xffff) << 16;
+    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 30) * (1 / 0.125155)));
+    time2 = time2 << 16;
     std::cout << time2 << std::endl;
 ////
-    time1 = 0;
-    time2 = 4294967296;
+//    time1 = 0;
+//    time2 = 4294967296;
+////    time1 = 0x04b8d631 - 100000;
+////    time2 = 0x04b8d631 + 100000;
 //
     int32_t gene[500] = {0};
     for (int i = 0; i < 500; ++i) {
         gene[i] = aActions[i];
-        if (aActions[i] == -1){
+        if (aActions[i] == -1) {
+            gene[i] = -1;
+            gene[i + 1] = -1;
             break;
         }
     }
@@ -416,83 +504,44 @@ void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, in
     auto *nowState = new uint64_t(0);
     int maxElement = 500;
     Player players[2];
-
-    if (time1 < time2) {
-        for (uint64_t seed = time1; seed < time2; ++seed) {
-            if (seed % 1000000000 == 0){
-                std::cout << seed << std::endl;
-            }
-            lcg::init(seed);
-            for (int st = BattleEmulator::TYPE_2A; st < BattleEmulator::TYPE_2D; ++st) {
-                (*nowState) = st;
-                (*position) = 1;
-                //std::memcpy(players, copiedPlayers, sizeof(players));
-                players[0] = copiedPlayers[0];
-                players[1] = copiedPlayers[1];
-
-
-
-                bool resultBool = BattleEmulator::Main(position, turns, gene, players,
-                                                       (optional<BattleResult> &) std::nullopt, seed, eActions, damages,
-                                                       maxElement,
-                                                       nowState);
-                if (resultBool) {
-                    std::cout << seed << ", " << st << std::endl;
-                }
-            }
-        }
-    } else {
-        bool reset = false;
-        // オーバーフローが発生している場合
-        for (uint64_t seed = time1; seed < 4294967296; ++seed) {
-            for (int st = BattleEmulator::TYPE_2A; st < BattleEmulator::TYPE_2E; ++st) {
-                (*nowState) = st;
-                (*position) = 1;
-                lcg::init(seed);
-                // ここに処理を書く
-                std::memcpy(players, copiedPlayers, sizeof(players));
-
-                bool resultBool = BattleEmulator::Main(position, turns, gene, players,
-                                                       (optional<BattleResult> &) std::nullopt, seed, eActions, damages,
-                                                       maxElement,
-                                                       nowState);
-                if (resultBool) {
-                    std::cout << seed << std::endl;
-                }
-            }
-            if (seed == 4294967295) {
-                seed = 0; // seed を 0 にリセット
-                reset = true;
-            }
-
-            if (reset && seed >= time2) {
-                break; // time2 に達したらループを終了
-            }
-        }
-    }
-
-
-
-//    for (uint64_t seed = time1; seed < time2; ++seed) {
-//        (*nowState) = 0;
-//        (*position) = 1;
-//        lcg::init(seed);
-//
-//        std::memcpy(players, copiedPlayers, sizeof(players));
-//
-//        bool resultBool = BattleEmulator::Main(position, 25, std::vector<int32_t>(), players,
-//                                               (optional<BattleResult> &) std::nullopt, seed, eActions, damages, maxElement,
-//                                               nowState);
-//
-//        if (resultBool) {
-//            processResult(copiedPlayers, seed, "str2");
-//            foundSeeds++;
+    for (uint64_t seed = time1; seed < time2; ++seed) {
+//        if (seed % 1000000000 == 0) {
+//            std::cout << seed << std::endl;
 //        }
-//    }
+        lcg::init(seed);
+        // for (int st = BattleEmulator::TYPE_2A; st < BattleEmulator::TYPE_2D; ++st) {
+        (*nowState) = BattleEmulator::TYPE_2A;
+        (*position) = 1;
+        //std::memcpy(players, copiedPlayers, sizeof(players));
+        players[0] = copiedPlayers[0];
+        players[1] = copiedPlayers[1];
+
+
+        bool resultBool = BattleEmulator::Main(position, turns, gene, players,
+                                               (optional<BattleResult> &) std::nullopt, seed, eActions, damages,
+                                               maxElement,
+                                               nowState);
+        if (resultBool) {
+            //std::cout << seed << ", " << st << std::endl;
+            std::cout << seed << std::endl;
+            FoundSeed = seed;
+            foundSeeds++;
+        }
+        //}
+    }
     delete position;
     delete nowState;
 
     std::cout << std::endl << "found: " << foundSeeds << std::endl;
+
+    if (foundSeeds == 1) {
+        return;
+    }
+    if (foundSeeds == 0) {
+        std::cout << "not found!!!" << std::endl;
+    }
+    FoundSeed = 0;
+    foundSeeds = 0;
 }
 
 // 入力文字列を配列に分割するヘルパー関数
@@ -544,7 +593,10 @@ void mainLoop(const Player copiedPlayers[2]) {
 
         // コマンドに応じた処理
         if (command == 'b') {
-            BruteForceRequest(copiedPlayers, hours, minutes, seconds,turns, eActions, aActions, damages);
+            BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
+            if (foundSeeds == 1) {
+                GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, FoundSeed, turns, 100, aActions);
+            }
         } else if (command == 'u') {
             std::cout << "Updating state..." << std::endl;
             // 状態更新の処理を実装
