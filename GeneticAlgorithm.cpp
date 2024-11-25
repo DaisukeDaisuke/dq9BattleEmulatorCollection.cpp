@@ -10,6 +10,8 @@
 #include "BattleEmulator.h"
 #include "Genome.h"
 #include "lcg.h"
+#include "GenomeLogger.h"
+#include "ActionBanManager.h"
 
 constexpr int NUM_GENERATIONS = 100;
 constexpr int POPULATION_SIZE = 50;
@@ -33,171 +35,183 @@ constexpr int32_t actions1[13] = {
 
 constexpr int ACTION_COUNT = sizeof(actions1) / sizeof(actions1[0]);
 
-double calculateFitness(double hp, double maxHp, double k) {
-    double x = (hp / maxHp) * 0.1;
-    return std::exp(k * x) - 1.0; // スコア計算
-}
-
 // 適応度関数
-double
+BattleResult
 EvaluateFitness(const Genome &genome, int *position, Player *players, uint64_t seed, uint64_t *nowState, int turns) {
     // バトルエミュを実行してスコアを計算
     (*position) = 1;
     (*nowState) = BattleEmulator::TYPE_2A;
-    BattleEmulator::Main(position, turns, genome.actions, players, (std::optional<BattleResult> &) std::nullopt, seed,
-                         nullptr, nullptr, -2, nowState);
-    // スコア例: ターン数やHP、MPを考慮
-    if (players[0].hp <= 0) {
-        return -1.0;
-    }
+    std::optional<BattleResult> result;
+    result = BattleResult();
+    BattleEmulator::Main(position, turns, genome.actions, players, result, seed,
+                         nullptr, nullptr, -1, nowState);
 
-    uint8_t state = (*nowState) & 0xf;
-    auto previousState = ((*nowState) >> 4) & 0xf;
-
-    auto action = genome.actions[turns - 1];
-
-    if (players[0].mp >= 50 && action == BattleEmulator::ELFIN_ELIXIR || action == BattleEmulator::SAGE_ELIXIR) {
-        return -1;
-    }
-
-
-    if (state == BattleEmulator::TYPE_2E && previousState < 5 &&
-        action == BattleEmulator::DEFENDING_CHAMPION) {//強攻撃対応
-        return 100;
-    }
-
-    double point = 0.0;
-
-    if (action == BattleEmulator::DOUBLE_UP && players[0].AtkBuffLevel == 0) {
-        point -= 1.5;
-    } else if (action == BattleEmulator::ATTACK_ALLY ||
-               action == BattleEmulator::MULTITHRUST) {
-        point -= 1;
-    }
-
-    point += (1 - players[0].ElfinElixirCount);
-    point += (3 - players[0].SpecialMedicineCount);
-    point += (2 - players[0].SageElixirCount);
-
-    point += (1 - (players[1].hp / players[1].maxHp));
-    point += calculateFitness(players[0].hp, players[0].maxHp, 1);
-    if (players[0].AtkBuffTurn >= 0 && players[0].BuffTurns <= 2) {
-        point += (2 - players[0].BuffTurns) * 0.3;
-    } else {
-        point += (2 - players[0].BuffLevel);
-    }
-    if (players[0].AtkBuffTurn >= 0 && players[0].AtkBuffTurn <= 2) {
-        point += (2 - players[0].AtkBuffTurn) * 0.3;
-    } else {
-        point += (2 - players[0].AtkBuffLevel) * 0.5;
-    }
-    if (players[0].MagicMirrorTurn >= 0 && players[0].MagicMirrorTurn <= 2) {
-        point += (2 - players[0].MagicMirrorTurn) * 0.3;
-    } else {
-        point -= players[0].hasMagicMirror ? 0.5 : 0.0;
-    }
-
-    if (action == BattleEmulator::MIDHEAL ||
-        action == BattleEmulator::MORE_HEAL ||
-        action == BattleEmulator::FULLHEAL) {
-        if (players[0].hp / players[0].maxHp > 0.7) {
-            point += 3.0; // HPが十分高いとき補助行動をペナルティ
-        }
-        if (players[1].hp / players[1].maxHp < 0.2) {
-            point += 2.0; // 敵が瀕死なら補助行動をペナルティ
-        }
-    }
-
-    point -= turns * 0.5;
-
-
-    return 100.0 - point;
+    return result.value();
     //return  + ((static_cast<int>(((*nowState) >> 12) & 0xfffff) + 1) * 0.125); // ターンが短いほどスコアが高い
 }
 
 // 遺伝的アルゴリズム実行
 Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
-                                             const int actions[500]) {
-    constexpr int populationSize = 1500;
-    constexpr double mutationRate = 0.1;
-    std::vector<Genome> population(populationSize);
-
-    auto nowState = new uint64_t(0);
-    auto position = new int(1);
-
-    // 初期集団生成
+                                             int actions[500]) {
     std::mt19937 rng(seed);
-    Player CopyPlayers[2];
-
-    for (auto &genome: population) {
-        for (int i = 0; i < turns + 1; ++i) {
-            if (actions[i] == -1 || actions[i] == 0) {
-                genome.actions[i] = actions1[rng() % ACTION_COUNT]; // ランダムに行動を設定
-            } else {
-                genome.actions[i] = actions[i];
-            }
+    auto *position = new int(1);
+    auto *nowState = new uint64_t(0);
+    int PreviousPosition = 1;
+    uint64_t PreviousState = BattleEmulator::TYPE_2A;
+    auto *PreviousActions = actions;
+    auto counter = 0;
+    auto CanAct = false;
+    Genome genome;
+    GenomeLogger Logger;
+    ActionBanManager Bans;
+    for (int i = 0; i < 500; ++i) {
+        if (actions[i] == 0 || actions[i] == -1) {
+            break;
         }
+        genome.actions[i] = actions[i];
     }
-    lcg::init(seed);
 
-    // 世代交代
-    for (int generation = 0; generation < maxGenerations; generation++) {
+    Player nowPlayer[2];
+    nowPlayer[0] = players[0];
+    nowPlayer[1] = players[1];
+    Player CopedPlayers[2];
+    auto action = -1;
+    auto Aactions = -1;
+    int Eactions[2] = {-1, -1};
+    int Edamage[2] = {-1, -1};
+    auto counter1 = 0;
+    auto processed = 0;
+    auto Initialized = false;
+    auto backToPasted = false;
+    auto Past = turns;
+    while (maxGenerations >= counter) {
+        if (Eactions[0] == BattleEmulator::MEDITATION || Eactions[1] == BattleEmulator::MEDITATION) {
+            if (!Initialized) {
+                genome.actions[turns] = BattleEmulator::DEFENDING_CHAMPION;
+            }/*else if(Past < turns-1){
+                auto tmp = Logger.getLog(1);
+                nowPlayer[0] = tmp.AllyPlayer;
+                nowPlayer[0] = tmp.EnemyPlayer;
+                PreviousPosition = tmp.position;
+                PreviousState = tmp.state;
+                Eactions[0] = -1;
+                Eactions[1] = -1;
+                continue;
+            }*/
+        }
 
-        for (auto &genome: population) {
-            for (int i = turns; i < turns + 2; ++i) {
-                genome.actions[i] = actions1[rng() % ACTION_COUNT]; // ランダムに行動を設定
+
+        genome.EnemyPlayer = nowPlayer[1];
+        genome.AllyPlayer = nowPlayer[0];
+        genome.position = (*position);
+        genome.state = (*nowState);
+        genome.EActions[0] = Eactions[0];
+        genome.EActions[1] = Eactions[1];
+        genome.Aactions = Aactions;
+
+        Logger.saveLog(genome);
+
+        CopedPlayers[0] = nowPlayer[0];
+        CopedPlayers[1] = nowPlayer[1];
+        (*position) = PreviousPosition;
+        (*nowState) = PreviousState;
+        std::optional<BattleResult> result;
+        result = BattleResult();
+        BattleEmulator::Main(position, turns + 1 - processed, genome.actions, CopedPlayers, result, seed,
+                             nullptr, nullptr, -1, nowState);
+
+
+        counter1 = 0;
+        for (int i = result->position - 3; i < result->position; ++i) {
+            if (result->isEnemy[i]) {
+                Eactions[counter1] = result->actions[i];
+                Edamage[counter1++] = result->damages[i];
+            } else {
+                Aactions = result->actions[i];
             }
         }
 
-        turns += 1;
-        for (int i = 0; i < 5; ++i) {
+        //この時点で副作用が分かる。
 
-            CopyPlayers[0] = players[0];
-            CopyPlayers[1] = players[1];
+        auto backToPast = false;
 
-
-            // 適応度計算
-            for (auto &genome: population) {
-                genome.fitness = EvaluateFitness(genome, position, CopyPlayers, seed, nowState, turns);
-            }
-
-            // 選択・交叉・突然変異
-            std::vector<Genome> nextGeneration;
-            std::sort(population.begin(), population.end(), [](const Genome &a, const Genome &b) {
-                return a.fitness > b.fitness;
-            });
-
-            // 上位個体の選択
-            nextGeneration.insert(nextGeneration.end(), population.begin(), population.begin() + 20);
-
-            // 交叉
-            while (nextGeneration.size() < populationSize) {
-                const auto &parent1 = population[rng() % 10];
-                const auto &parent2 = population[rng() % 10];
-                Genome child = parent1;
-                int crossoverPoint = turns + (rng() % (500 - turns));
-                for (int i = crossoverPoint; i < 500; ++i) {
-                    child.actions[i] = parent2.actions[i];
-                }
-                nextGeneration.push_back(child);
-            }
-
-            // 突然変異
-            for (auto &genome: nextGeneration) {
-                if (rng() / double(std::mt19937::max()) < mutationRate) {
-                    genome.actions[turns + rng() % (500 - turns)] = actions1[rng() % ACTION_COUNT];
-                }
-            }
-
-            population = std::move(nextGeneration);
+        if (Eactions[1] == BattleEmulator::LULLAB_EYE) {
+            backToPast = true;
         }
+        if (Eactions[0] == BattleEmulator::LULLAB_EYE) {
+            if ((Eactions[1] != BattleEmulator::ATTACK_ENEMY && Eactions[1] != BattleEmulator::LIGHTNING_STORM &&
+                 Eactions[1] != BattleEmulator::CRITICAL_ATTACK &&
+                 Eactions[1] != BattleEmulator::ULTRA_HIGH_SPEED_COMBO)) {
+                backToPast = true;
+            } else if (Edamage[1] == 0) {
+                backToPast = true;
+            }
+        }
+
+        if (Initialized && backToPast) {
+            if (!backToPasted) {
+                Bans.previous_turn();
+                backToPasted = true;
+            }
+            auto tmp = Logger.getLog(2);
+            CopedPlayers[0] = tmp.AllyPlayer;
+            CopedPlayers[1] = tmp.EnemyPlayer;
+            PreviousPosition = tmp.position;
+            PreviousState = tmp.state;
+            Eactions[0] = tmp.EActions[0];
+            Eactions[1] = tmp.EActions[1];
+            Aactions = tmp.Aactions;
+            action = -1;
+            turns -= 2;
+        }else{
+            Bans.advance_turn();
+            backToPasted = false;
+        }
+
+
+        if (genome.actions[turns] == BattleEmulator::DEFENDING_CHAMPION) {
+            goto update;
+        }
+
+        if (Aactions == BattleEmulator::SLEEPING || Aactions == BattleEmulator::PARALYSIS) {
+            action = BattleEmulator::ATTACK_ALLY;
+            goto update;
+        } else if (Aactions == BattleEmulator::CURE_SLEEPING || Aactions == BattleEmulator::CURE_PARALYSIS) {
+            action = BattleEmulator::ATTACK_ALLY;
+            goto update;
+        }
+
+        if (CopedPlayers[0].AtkBuffLevel == 0 && CopedPlayers[0].BuffLevel == 2 &&
+            !Bans.is_action_banned(BattleEmulator::DOUBLE_UP)) {
+            action = BattleEmulator::DOUBLE_UP;
+            Bans.ban_current_turn_action(action);
+        } else if (CopedPlayers[0].BuffLevel <= 1 && !Bans.is_action_banned(BattleEmulator::BUFF)) {
+            action = BattleEmulator::BUFF;
+            Bans.ban_current_turn_action(action);
+        } else if (CopedPlayers[0].MagicMirrorTurn < 3 && !Bans.is_action_banned(BattleEmulator::MAGIC_MIRROR)) {
+            action = BattleEmulator::MAGIC_MIRROR;
+            Bans.ban_current_turn_action(action);
+        } else if (!Bans.is_action_banned(BattleEmulator::MULTITHRUST)) {
+            action = BattleEmulator::MULTITHRUST;
+            Bans.ban_current_turn_action(action);
+        }
+
+        Initialized = true;
+
+        update:
+        PreviousPosition = (*position);
+        PreviousState = (*nowState);
+
+        turns++;
+        processed = turns;
+        genome.actions[turns] = action;
+        nowPlayer[0] = CopedPlayers[0];
+        nowPlayer[1] = CopedPlayers[1];
+
+        counter++;
     }
 
     delete position;
     delete nowState;
-
-    // 最適な遺伝子を返す
-    return *std::max_element(population.begin(), population.end(), [](const Genome &a, const Genome &b) {
-        return a.fitness < b.fitness;
-    });
+    return genome;
 }

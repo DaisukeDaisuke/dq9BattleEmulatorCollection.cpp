@@ -352,7 +352,7 @@ int main() {
 #ifdef DEBUG3
     uint64_t time1 = 0x3611D5E47;
 
-    const int actions[500] = {
+    int actions[500] = {
             30, 31, 30, 35, 35
     };
 
@@ -360,7 +360,7 @@ int main() {
 
     lcg::init(time1);
 
-    auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 20, actions);
+    auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 11, actions);
 
     Player players[2];
     players[0] = copiedPlayers[0];

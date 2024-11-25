@@ -10,8 +10,15 @@
 
 // 遺伝子型
 struct Genome {
+    Player AllyPlayer;
+    Player EnemyPlayer;
+    uint64_t state;
+    int position;
     int actions[500];
-    double fitness;
+    int EActions[2];
+    int Aactions;
+    int turn;
+    int fitness;
 };
 
 

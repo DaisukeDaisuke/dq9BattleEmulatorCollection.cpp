@@ -156,17 +156,18 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[500], P
     int exCounter = 0;
     int exCounter1 = 0;
     uint64_t tmpState = -1;
+
     auto startPos = static_cast<int>(((*NowState) >> 12) & 0xfffff);
     if (startPos != 0) {
         startPos++;
-        RunCount++;
+        RunCount += startPos;
     }
     for (int counterJ = startPos; counterJ < RunCount; ++counterJ) {
         if (genePosition != -1) {
             genePosition = counterJ;
         }
         //現在ターンを保存
-        (*NowState) &= ~0xfffff0000;
+        (*NowState) &= ~0xFFFFF000;
         (*NowState) |= (counterJ << 12);
 
         if (players[0].dirtySpecialCharge) {
