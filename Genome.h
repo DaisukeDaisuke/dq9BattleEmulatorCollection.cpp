@@ -13,13 +13,32 @@ struct Genome {
     Player AllyPlayer;
     Player EnemyPlayer;
     uint64_t state;
+    int turn;
     int position;
-    int actions[500];
+    int fitness;
+    int Visited;
     int EActions[2];
     int Aactions;
-    int turn;
-    int fitness;
+    int compromiseScore;      // 状態異常などの妥協可能度（小さい方が良い）
+    bool isEliminated;        // 閾値超えで切り捨てるフラグ
+    int actions[200];
+    bool Initialized;
+    int processed;
+
+    // 比較演算子（優先度付きキュー用、fitnessが高い方が優先）
+    bool operator<(const Genome& other) const {
+        return (fitness - compromiseScore) < (other.fitness + other.compromiseScore);
+        //return fitness< other.fitness;
+    }
+
+
+    bool operator>(const Genome& other) const {
+        return (fitness - compromiseScore) > (other.fitness + other.compromiseScore);
+        //return fitness > other.fitness;
+
+    }
 };
+
 
 
 #endif //NEWDIRECTORY_GENOME_H

@@ -89,8 +89,8 @@ public:
 
 
     static bool
-    Main(int *position, int RunCount, const int32_t Gene[500], Player *players,
-         std::optional<BattleResult> &result, uint64_t seed, const int eActions[500],const int damages[500], int maxElement, uint64_t *NowState);
+    Main(int *position, int RunCount, const int32_t Gene[200], Player *players,
+         std::optional<BattleResult> &result, uint64_t seed, const int eActions[200],const int damages[200], int maxElement, uint64_t *NowState);
 
     static std::string getActionName(int actionId);
     static int roundCustom(double value);

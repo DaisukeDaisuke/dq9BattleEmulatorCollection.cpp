@@ -27,11 +27,11 @@ std::string rtrim(const std::string &s);
 
 std::string trim(const std::string &s);
 
-void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[500],
-                   int aActions[500], int damages[500]);
+void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[200],
+                   int aActions[200], int damages[200]);
 
-void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[500],
-                       int aActions[500], int damages[500]);
+void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[200],
+                       int aActions[200], int damages[200]);
 
 
 void mainLoop(const Player copiedPlayers[2]);
@@ -70,9 +70,9 @@ void printHeader(std::stringstream &ss) {
     ss << std::string(140, '-') << "\n";  // 区切り線を出力
 }
 
-std::string dumpTable(BattleResult &result, int32_t gene[500], int PastTurns);
+std::string dumpTable(BattleResult &result, int32_t gene[200], int PastTurns);
 
-std::string dumpTable(BattleResult &result, int32_t gene[500], int PastTurns) {
+std::string dumpTable(BattleResult &result, int32_t gene[200], int PastTurns) {
     stringstream ss6;
     printHeader(ss6);
     int currentTurn = -1;
@@ -267,7 +267,6 @@ std::string normalDump(AnalyzeData data) {
 
 //int main(int argc, char *argv[]) {
 int main() {
-
     std::cout << "dq9 Corvus battle emulator v1.0.0" << std::endl << "Waiting for input[q/u/b/s]: " << std::endl;
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
@@ -280,13 +279,13 @@ int main() {
     const Player copiedPlayers[2] = {
             // プレイヤー1
             {309,  309.0,  312, 312, 298, 298, 193, 234, 165,   // 最初のメンバー
-                    165, false, false, 0, false, false, 0, -1,              // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+                    165, false, false, 0, false, 0, -1,              // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
                     8, 1.0, false, -1, 0, -1,                                            // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
                     false, -1, 0, -1, 0, false, 1, 1, 1},                                      // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
             // プレイヤー2
             {4800, 4800.0, 248, 248, 278, 278, 157, 0,   255,    // 最初のメンバー
-                    255, false, false, 0, false, false, 0, -1,             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+                    255, false, false, 0, false, 0, -1,             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
                     8, 1.0, false, -1, 0, -1,                         // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
                     false, -1, 0, -1, 0, false, 0, 0, 0}                             // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
@@ -319,7 +318,7 @@ int main() {
     auto *NowState = new uint64_t(-1);//エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[500] = {0};
+    int32_t gene1[200] = {0};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
@@ -352,15 +351,15 @@ int main() {
 #ifdef DEBUG3
     uint64_t time1 = 0x3611D5E47;
 
-    int actions[500] = {
+    int actions[200] = {
             30, 31, 30, 35, 35
     };
 
-    int turns = 4;
+    int turns = 5;
 
     lcg::init(time1);
 
-    auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 11, actions);
+    auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 100, actions);
 
     Player players[2];
     players[0] = copiedPlayers[0];
@@ -372,7 +371,7 @@ int main() {
 
     std::optional<BattleResult> result1;
     result1 = BattleResult();
-    BattleEmulator::Main(position, turns + 10, genome.actions, players, result1, time1, nullptr, nullptr, -1, nowState);
+    BattleEmulator::Main(position, turns + 15, genome.actions, players, result1, time1, nullptr, nullptr, -1, nowState);
     std::cout << dumpTable(result1.value(), genome.actions, 0) << std::endl;
 
 
@@ -407,11 +406,11 @@ constexpr int32_t actions1[100] = {
         BattleEmulator::DEFENCE,
 };
 
-void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[500],
-                   int aActions[500], int damages[500]) {
+void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[200],
+                   int aActions[200], int damages[200]) {
 
-    int32_t gene[500] = {0};
-    for (int i = 0; i < 500; ++i) {
+    int32_t gene[200] = {0};
+    for (int i = 0; i < 200; ++i) {
         gene[i] = aActions[i];
         if (aActions[i] == -1) {
             gene[i] = -1;
@@ -442,7 +441,7 @@ void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int se
     players[1] = copiedPlayers[1];
     optional<BattleResult> result;
     result = BattleResult();
-    int dummy[500] = {0};
+    int dummy[200] = {0};
     BattleEmulator::Main(position, turns, gene, players,
                          result, seed, dummy, dummy,
                          -1,
@@ -450,15 +449,15 @@ void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int se
 }
 
 // ブルートフォースリクエスト関数
-void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[500],
-                       int aActions[500], int damages[500]) {
+void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[200],
+                       int aActions[200], int damages[200]) {
     std::cout << "BruteForceRequest executed with time " << hours << ":" << minutes << ":" << seconds << std::endl;
     std::cout << "eActions: ";
-    for (int i = 0; i < 500 && eActions[i] != -1; ++i) std::cout << eActions[i] << " ";
+    for (int i = 0; i < 200 && eActions[i] != -1; ++i) std::cout << eActions[i] << " ";
     std::cout << "\naActions: ";
-    for (int i = 0; i < 500 && aActions[i] != -1; ++i) std::cout << aActions[i] << " ";
+    for (int i = 0; i < 200 && aActions[i] != -1; ++i) std::cout << aActions[i] << " ";
     std::cout << "\ndamages: ";
-    for (int i = 0; i < 500 && damages[i] != -1; ++i) std::cout << damages[i] << " ";
+    for (int i = 0; i < 200 && damages[i] != -1; ++i) std::cout << damages[i] << " ";
     std::cout << std::endl;
 
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
@@ -477,8 +476,8 @@ void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, in
 ////    time1 = 0x04b8d631 - 100000;
 ////    time2 = 0x04b8d631 + 100000;
 //
-    int32_t gene[500] = {0};
-    for (int i = 0; i < 500; ++i) {
+    int32_t gene[200] = {0};
+    for (int i = 0; i < 200; ++i) {
         gene[i] = aActions[i];
         if (aActions[i] == -1) {
             gene[i] = -1;
@@ -502,7 +501,7 @@ void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, in
     */
     int *position = new int(1);
     auto *nowState = new uint64_t(0);
-    int maxElement = 500;
+    int maxElement = 200;
     Player players[2];
     for (uint64_t seed = time1; seed < time2; ++seed) {
 //        if (seed % 1000000000 == 0) {
@@ -545,10 +544,10 @@ void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, in
 }
 
 // 入力文字列を配列に分割するヘルパー関数
-void parseActions(const std::string &str, int actions[500]) {
+void parseActions(const std::string &str, int actions[200]) {
     std::istringstream iss(str);
     int value, index = 0;
-    while (iss >> value && index < 500) {
+    while (iss >> value && index < 200) {
         actions[index++] = value;
     }
     actions[index++] = -1;
@@ -559,9 +558,9 @@ void parseActions(const std::string &str, int actions[500]) {
 
 // メインループ
 void mainLoop(const Player copiedPlayers[2]) {
-    int eActions[500] = {0};
-    int aActions[500] = {0};
-    int damages[500] = {0};
+    int eActions[200] = {0};
+    int aActions[200] = {0};
+    int damages[200] = {0};
 
     while (true) {
         std::string input;

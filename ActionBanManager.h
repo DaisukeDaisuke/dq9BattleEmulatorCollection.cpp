@@ -1,7 +1,3 @@
-//
-// Created by Owner on 2024/11/22.
-//
-
 #ifndef NEWDIRECTORY_ACTIONBANMANAGER_H
 #define NEWDIRECTORY_ACTIONBANMANAGER_H
 
@@ -15,51 +11,50 @@ constexpr uint64_t action_to_bit(int action) {
     return static_cast<uint64_t>(1) << (action - 24);
 }
 
-// 最大10ターン分の管理
-constexpr int MAX_TURNS = 10;
+// 最大200ターン分の管理
+constexpr int MAX_TURNS = 200;
 
 class ActionBanManager {
 private:
     // 各ターンごとに行動を記録するビットフィールド
     std::array<uint64_t, MAX_TURNS> ban_actions{};
-    int current_turn = 0;
 
 public:
-    // 現在のターンのインデックスを取得
-    int get_current_turn() const {
-        return current_turn;
-    }
-
-    // 現在のターンで行動をBANする
-    void ban_current_turn_action(int action) {
-        if (action < 25 || action > 51) {
-            std::cerr << "Invalid action value (must be between 25 and 51)\n";
+    // 指定ターンで行動をBANする
+    void ban_action(int turn, int action) {
+        if (turn < 0 || turn >= MAX_TURNS) {
+            std::cerr << "Invalid turn value (must be between 0 and " << MAX_TURNS - 1 << ")\n";
             return;
         }
-        ban_actions[current_turn] |= action_to_bit(action);
+        if (action < 25 || action > 51) {
+            std::cerr << "Invalid action value (must be between 25 and 51)" << action  << "\n";
+            return;
+        }
+        ban_actions[turn] |= action_to_bit(action);
     }
 
-    // 過去1ターンで指定された行動がBANされているかをチェック
-    bool is_action_banned(int action) const {
+    // 指定されたターン範囲内で行動がBANされているかをチェック
+    bool is_action_banned(int action, int current_turn, int lookback_turns = 0) const {
         if (action < 25 || action > 51) {
-            std::cerr << "Invalid action value (must be between 25 and 51)\n";
+            std::cerr << "Invalid action value (must be between 25 and 51): " << action  << "\n";
             return false;
         }
-        return (ban_actions[current_turn] & action_to_bit(action)) != 0;
+        if (current_turn < 0 || current_turn >= MAX_TURNS) {
+            std::cerr << "Invalid current_turn value (must be between 0 and " << MAX_TURNS - 1 << ")\n";
+            return false;
+        }
+
+        return (ban_actions[current_turn-lookback_turns] & action_to_bit(action)) != 0; // BANされている
     }
 
-
-    // 次のターンに進む（古いデータを破棄）
-    void advance_turn() {
-        current_turn = (current_turn + 1) % MAX_TURNS;
-        ban_actions[current_turn] = 0; // 古いデータをクリア
+    // 指定ターンの行動をクリア（BAN解除）
+    void clear_turn(int turn) {
+        if (turn < 0 || turn >= MAX_TURNS) {
+            std::cerr << "Invalid turn value (must be between 0 and " << MAX_TURNS - 1 << ")\n";
+            return;
+        }
+        ban_actions[turn] = 0;
     }
-
-    // 過去1ターンのインデックスを計算
-    void previous_turn() {
-        current_turn = ((current_turn - 1 + MAX_TURNS) % MAX_TURNS);
-    }
-
 
     // デバッグ用：現在のBAN状態を表示
     void debug_print() const {
@@ -68,6 +63,5 @@ public:
         }
     }
 };
-
 
 #endif //NEWDIRECTORY_ACTIONBANMANAGER_H

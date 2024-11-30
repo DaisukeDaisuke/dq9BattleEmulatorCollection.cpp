@@ -23,7 +23,6 @@ struct Player {
     bool specialCharge = false;
     bool dirtySpecialCharge = false;
     int specialChargeTurn = 0;
-    bool inactive = false;
     bool paralysis = false;
     int paralysisLevel = 0;
     int paralysisTurns = -1;

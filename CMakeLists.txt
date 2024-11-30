@@ -30,7 +30,6 @@ add_executable(newDirectory main.cpp
         GeneticAlgorithm.cpp
         GeneticAlgorithm.h
         Genome.h
-        GenomeLogger.h
         ActionBanManager.h
 )
 
