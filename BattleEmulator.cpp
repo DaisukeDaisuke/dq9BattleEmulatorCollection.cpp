@@ -163,8 +163,9 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[350], P
         RunCount += startPos;
     }else {
         startPos = 1;
+        RunCount++;
     }
-    for (int counterJ = startPos; counterJ <= RunCount; ++counterJ) {
+    for (int counterJ = startPos; counterJ < RunCount; ++counterJ) {
         if (genePosition != -1) {
             genePosition = counterJ-1;
         }

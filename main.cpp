@@ -195,7 +195,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
             initiative_tmp = initiative;
             sp = specialAction;
 
-            if (eAction[0] != "magic Burst"&&eAction[1] != "magic Burst") {
+            /*if (eAction[0] != "magic Burst"&&eAction[1] != "magic Burst") {
                 if (!initiative && action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
                     action == BattleEmulator::SLEEPING) {
                     sp = "---------------";
@@ -203,7 +203,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
                 if ((action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
                     sp = "---------------";
                 }
-            }
+            }*/
 
         }
     }

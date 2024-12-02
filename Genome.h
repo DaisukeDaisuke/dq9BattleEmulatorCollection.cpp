@@ -24,6 +24,7 @@ struct Genome {
     int actions[350];
     bool Initialized;
     int processed;
+    bool canMove;
 
     // 比較演算子（優先度付きキュー用、fitnessが高い方が優先）
     bool operator<(const Genome& other) const {
