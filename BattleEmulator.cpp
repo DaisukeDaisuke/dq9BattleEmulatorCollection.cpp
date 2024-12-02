@@ -145,9 +145,9 @@ std::string BattleEmulator::getActionName(int actionId) {
     }
 }
 
-bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], Player *players,
+bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[350], Player *players,
                           std::optional<BattleResult> &result,
-                          uint64_t seed, const int eActions[200], const int damages[200], int maxElement,
+                          uint64_t seed, const int eActions[350], const int damages[350], int mode,
                           uint64_t *NowState) {
     resetCombo(NowState);
     player0_has_initiative = false;
@@ -161,10 +161,12 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
     if (startPos != 0) {
         startPos++;
         RunCount += startPos;
+    }else {
+        startPos = 1;
     }
-    for (int counterJ = startPos; counterJ < RunCount; ++counterJ) {
+    for (int counterJ = startPos; counterJ <= RunCount; ++counterJ) {
         if (genePosition != -1) {
-            genePosition = counterJ;
+            genePosition = counterJ-1;
         }
         //現在ターンを保存
         (*NowState) &= ~0xFFFFF000;
@@ -362,7 +364,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
             if (counter == 0) {
                 (*position)++;
             }
-            if (maxElement != -1&&maxElement != -2) {
+            if (mode != -1&&mode != -2) {
                 int need = eActions[exCounter1++];
                 if (need == -1){
                     return true;
@@ -441,7 +443,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
                         actionTable = SLEEPING;
                     }
 
-                    if(maxElement == -1){
+                    if(mode == -1){
                         auto atk1 = -1;
                         if (players[0].AtkBuffTurn > 0) {
                             atk1 = players[0].AtkBuffTurn;
@@ -461,10 +463,10 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
                             mmt1 = 0;
                         }
                         BattleResult::add(result, c, basedamage, true, atk1,
-                                          def1, mmt1, counterJ,
+                                          def1, mmt1, counterJ-1,
                                           player0_has_initiative, ehp,
                                           ahp, tmpState, players[0].specialChargeTurn, players[0].mp);
-                    }else if (maxElement != -1&&maxElement != -2) {
+                    }else if (mode != -1&&mode != -2) {
                         if (
                                 c == ATTACK_ENEMY ||
                                 c == ULTRA_HIGH_SPEED_COMBO ||
@@ -552,7 +554,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
 
                     //--------end_FUN_02158dfc-------
                     basedamage = callAttackFun(action, position, players, 0, 1, NowState);
-                    if (maxElement == -1) {
+                    if (mode == -1) {
                         auto atk1 = -1;
                         if (players[0].AtkBuffTurn > 0) {
                             atk1 = players[0].AtkBuffTurn;
@@ -572,7 +574,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
                             mmt1 = 0;
                         }
                         BattleResult::add(result, action, basedamage, false, atk1,
-                                          def1, mmt1, counterJ,
+                                          def1, mmt1, counterJ-1,
                                           player0_has_initiative, ehp, ahp,
                                           tmpState, players[0].specialChargeTurn, players[0].mp);
                     }
@@ -583,7 +585,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
                     } else {
                         Player::reduceHp(players[1], basedamage);
 
-                        if (maxElement != -1&&maxElement != -2) {
+                        if (mode != -1&&mode != -2) {
                             if (action == MULTITHRUST || action == ATTACK_ALLY || action == MERCURIAL_THRUST) {
                                 if (damages[exCounter] == -1) {
                                     return true;
@@ -630,7 +632,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
                         }
                     }
                 } else {
-                    if (maxElement == -1) {
+                    if (mode == -1) {
                         auto atk1 = -1;
                         if (players[0].AtkBuffTurn > 0) {
                             atk1 = players[0].AtkBuffTurn;
@@ -650,7 +652,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
                             mmt1 = 0;
                         }
                         BattleResult::add(result, TURN_SKIPPED, 0, false, atk1,
-                                          def1, mmt1, counterJ,
+                                          def1, mmt1, counterJ-1,
                                           player0_has_initiative, ehp, ahp,
                                           tmpState, players[0].specialChargeTurn, players[0].mp);
                     }
@@ -680,7 +682,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[200], P
         Player::heal(players[0], 25);
 
     }
-    if (maxElement != -1&&maxElement != -2) {
+    if (mode != -1&&mode != -2) {
         return true;
     } else {
         return false;
@@ -888,7 +890,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//不明 0x021e54fc
             baseDamage = 0;
             resetCombo(NowState);
-            return 200;
+            return 350;
         case DEFENDING_CHAMPION:
             (*position) += 2;
             (*position)++;//不明　0x021ec6f8
@@ -1311,7 +1313,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//回避
 
             FUN_0207564c(position, players[attacker].atk, players[defender].def);
-            baseDamage = static_cast<int>(floor(players[1].defaultATK * lcg::floatRand(position, 0.8200, 0.9200)));
+            baseDamage = static_cast<int>(floor(players[1].defaultATK * lcg::floatRand(position, 0.8350, 0.9350)));
 
             if (kaihi) {
                 if (!players[0].paralysis && !players[0].sleeping && !players[0].specialCharge) {
@@ -1707,7 +1709,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;
             //会心
             percent_tmp = lcg::getPercent(position, 0x2710);
-            if (((Id & 0xffff) == BattleEmulator::ATTACK_ALLY && percent_tmp < 200) ||
+            if (((Id & 0xffff) == BattleEmulator::ATTACK_ALLY && percent_tmp < 350) ||
                 ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST && percent_tmp < 250)) {
                 kaisinn = true;
             }
@@ -1900,7 +1902,7 @@ int BattleEmulator::FUN_0208aecc(int *position, uint64_t *NowState) {
 }
 
 int BattleEmulator::CalculateMoreHealBase(Player *players) {//ベホイミ
-    double tmp1 = (players[0].HealPower - 200) * 0.5194;
+    double tmp1 = (players[0].HealPower - 350) * 0.5194;
     auto tmp2 = static_cast<int>(floor(tmp1));
     return 185 + tmp2;
 }

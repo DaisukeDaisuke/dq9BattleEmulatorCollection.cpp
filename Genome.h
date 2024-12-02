@@ -21,7 +21,7 @@ struct Genome {
     int Aactions;
     int compromiseScore;      // 状態異常などの妥協可能度（小さい方が良い）
     bool isEliminated;        // 閾値超えで切り捨てるフラグ
-    int actions[200];
+    int actions[350];
     bool Initialized;
     int processed;
 
