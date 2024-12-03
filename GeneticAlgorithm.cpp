@@ -243,6 +243,13 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
                 counter++;
                 continue;
             }
+            if (currentGenome.Visited == 0) {
+                currentGenome.fitness -= 2;
+                currentGenome.Visited++;
+                que.push(currentGenome);
+                counter++;
+                continue;
+            }
         }
         if (Eactions[0] == BattleEmulator::MAGIC_BURST || Eactions[1] == BattleEmulator::MAGIC_BURST) {
             currentGenome.actions[turns - 1] = BattleEmulator::DEFENDING_CHAMPION;
@@ -349,7 +356,11 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
         }
         if (!Bans.is_action_banned(BattleEmulator::MULTITHRUST, turns)) {
             action = BattleEmulator::MULTITHRUST;
-            currentGenome.fitness = baseFitness + 3 + static_cast<int>(rng() % 6);
+            if (AllyPlayer.AtkBuffLevel != 0&&AllyPlayer.hasMagicMirror) {
+                currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 6);
+            }else {
+                currentGenome.fitness = baseFitness + 6 + static_cast<int>(rng() % 6);
+            }
             currentGenome.actions[turns - 1] = action;
 
             CopedPlayers[0] = tmpgenomu.AllyPlayer;

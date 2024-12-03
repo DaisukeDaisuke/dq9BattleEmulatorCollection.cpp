@@ -359,7 +359,7 @@ int main() {
 
     lcg::init(time1);
 
-    auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 13, actions);
+    auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 17, actions);
 
     Player players[2];
     players[0] = copiedPlayers[0];
