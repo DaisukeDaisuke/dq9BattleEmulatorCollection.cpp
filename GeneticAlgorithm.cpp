@@ -148,6 +148,12 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
             continue;
         }
 
+        if (CopedPlayers[1].hp <= 0) {
+            currentGenome.fitness += 100;
+            que.push(currentGenome);
+            break;
+        }
+
         counter1 = 0;
         for (int i = result->position - 3; i < result->position; ++i) {
             if (result->isEnemy[i]) {
@@ -187,13 +193,17 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
             backToPast = true;
         }
 
+        if (Aactions == BattleEmulator::PARALYSIS || CopedPlayers[0].paralysis) {
+            backToPast = true;
+        }
+
         if (tmpgenomu.Initialized && (Eactions[0] == BattleEmulator::MEDITATION || Eactions[1] == BattleEmulator::MEDITATION)) {
             backToPast = true;
         }
 
-        if (currentGenome.Visited == 1) {
-            std::cout << std::endl;
-        }
+        // if (currentGenome.Visited == 1) {
+        //     std::cout << std::endl;
+        // }
 
         if (currentGenome.Initialized && backToPast && currentGenome.Visited == 0) {
             // &&
@@ -203,7 +213,6 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
             counter++;
             continue;
         }
-
         bool skip = false;
 
         if (currentGenome.canMove || Eactions[0] == BattleEmulator::MAGIC_BURST || Eactions[1] ==
@@ -438,7 +447,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
         }
 
         if (!Bans.is_action_banned(BattleEmulator::FULLHEAL, turns) && (AllyPlayer.hp / AllyPlayer.maxHp) <
-            0.7) {
+            0.5) {
             action = BattleEmulator::FULLHEAL;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
