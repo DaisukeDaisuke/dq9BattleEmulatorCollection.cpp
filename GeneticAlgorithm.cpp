@@ -84,7 +84,8 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
     auto Initialized = false;
     auto backToPasted = false;
     auto Past = turns;
-    std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
+    //std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
+    std::priority_queue<Genome> que;
 
     genome = {};
 
@@ -169,6 +170,9 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
         if (Eactions[1] == BattleEmulator::LULLAB_EYE) {
             backToPast = true;
         }
+        if (Eactions[0] == BattleEmulator::CRITICAL_ATTACK || Eactions[1] == BattleEmulator::CRITICAL_ATTACK) {
+            backToPast = true;
+        }
         if (Eactions[0] == BattleEmulator::LULLAB_EYE) {
             if ((Eactions[1] != BattleEmulator::ATTACK_ENEMY && Eactions[1] != BattleEmulator::LIGHTNING_STORM &&
                  Eactions[1] != BattleEmulator::CRITICAL_ATTACK &&
@@ -177,6 +181,10 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
             } else if (Edamage[1] == 0) {
                 backToPast = true;
             }
+        }
+
+        if (Eactions[0] == BattleEmulator::DISRUPTIVE_WAVE || Eactions[1] == BattleEmulator::DISRUPTIVE_WAVE) {
+            backToPast = true;
         }
 
         if (currentGenome.Initialized && backToPast && currentGenome.Visited == 0) {
@@ -214,6 +222,9 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
                 currentGenome.canMove = true;
             }
         }
+
+
+        currentGenome.canMove = !CopedPlayers[0].sleeping;
 
         auto baseFitness = currentGenome.fitness;
 
@@ -258,12 +269,15 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
             continue;
         }
 
+        auto AllyPlayer = CopedPlayers[0];
+        auto EnemyPlayer = CopedPlayers[1];
+
         currentGenome.Initialized = true;
         //if (!skip) {
-        if (CopedPlayers[0].AtkBuffLevel == 0 && CopedPlayers[0].BuffLevel == 2 && !Bans.is_action_banned(
+        if (AllyPlayer.AtkBuffLevel == 0 && AllyPlayer.BuffLevel == 2 && !Bans.is_action_banned(
                 BattleEmulator::DOUBLE_UP, turns)) {
             action = BattleEmulator::DOUBLE_UP;
-            currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 6);
+            currentGenome.fitness = baseFitness + 8 + static_cast<int>(rng() % 6);
             currentGenome.actions[turns - 1] = action;
 
             CopedPlayers[0] = tmpgenomu.AllyPlayer;
@@ -285,9 +299,9 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
             que.push(currentGenome);
         }
-        if (CopedPlayers[0].BuffLevel <= 1 && !Bans.is_action_banned(BattleEmulator::BUFF, turns)) {
+        if (AllyPlayer.BuffLevel <= 1 && !Bans.is_action_banned(BattleEmulator::BUFF, turns)) {
             action = BattleEmulator::BUFF;
-            currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 6);
+            currentGenome.fitness = baseFitness + 8 + static_cast<int>(rng() % 6);
             currentGenome.actions[turns - 1] = action;
 
             CopedPlayers[0] = tmpgenomu.AllyPlayer;
@@ -309,9 +323,9 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
             que.push(currentGenome);
         }
-        if (CopedPlayers[0].MagicMirrorTurn < 3 && !Bans.is_action_banned(BattleEmulator::MAGIC_MIRROR, turns)) {
+        if (AllyPlayer.MagicMirrorTurn < 3 && !Bans.is_action_banned(BattleEmulator::MAGIC_MIRROR, turns)) {
             action = BattleEmulator::MAGIC_MIRROR;
-            currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 6);
+            currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 6);
             currentGenome.actions[turns - 1] = action;
 
             CopedPlayers[0] = tmpgenomu.AllyPlayer;
@@ -335,7 +349,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
         }
         if (!Bans.is_action_banned(BattleEmulator::MULTITHRUST, turns)) {
             action = BattleEmulator::MULTITHRUST;
-            currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 6);
+            currentGenome.fitness = baseFitness + 3 + static_cast<int>(rng() % 6);
             currentGenome.actions[turns - 1] = action;
 
             CopedPlayers[0] = tmpgenomu.AllyPlayer;
@@ -357,7 +371,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
             que.push(currentGenome);
         }
-        if (!Bans.is_action_banned(BattleEmulator::MORE_HEAL, turns) && (CopedPlayers[0].hp / CopedPlayers[0].maxHp) <
+        if (!Bans.is_action_banned(BattleEmulator::MORE_HEAL, turns) && (AllyPlayer.hp / AllyPlayer.maxHp) <
             0.7) {
             action = BattleEmulator::MORE_HEAL;
             currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 6);
@@ -383,11 +397,31 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
             que.push(currentGenome);
         }
 
-        //        }else{
-        //            currentGenome.fitness = 0;
-        //            currentGenome.actions[turns - 1] = BattleEmulator::ATTACK_ALLY;
-        //            que.push(currentGenome);
-        //        }
+        if (!Bans.is_action_banned(BattleEmulator::FULLHEAL, turns) && (AllyPlayer.hp / AllyPlayer.maxHp) <
+            0.7) {
+            action = BattleEmulator::FULLHEAL;
+            currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 6);
+            currentGenome.actions[turns - 1] = action;
+
+            CopedPlayers[0] = tmpgenomu.AllyPlayer;
+            CopedPlayers[1] = tmpgenomu.EnemyPlayer;
+
+            (*position) = tmpgenomu.position;
+            (*nowState) = tmpgenomu.state;
+
+            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+                                 CopedPlayers,
+                                 (std::optional<BattleResult> &) std::nullopt, seed,
+                                 nullptr, nullptr, -2, nowState);
+            currentGenome.position = (*position);
+            currentGenome.state = (*nowState);
+            currentGenome.turn = turns + 1;
+            currentGenome.processed = turns;
+            currentGenome.AllyPlayer = CopedPlayers[0];
+            currentGenome.EnemyPlayer = CopedPlayers[1];
+
+            que.push(currentGenome);
+        }
         counter++;
     }
 
