@@ -12,7 +12,7 @@
 
 class GeneticAlgorithm {
 public:
-    static Genome RunGeneticAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[350]);
+    static Genome RunGeneticAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[350], int seedOffset);
 };
 
 

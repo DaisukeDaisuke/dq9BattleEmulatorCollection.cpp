@@ -39,7 +39,7 @@ struct Player {
     int AtkBuffTurn = -1;
     int TensionLevel = 0;
     bool rage = false;
-    int SageElixirCount = 1;
+    int SageElixirCount = 2;
     int ElfinElixirCount = 1;
     int MagicWaterCount = 1;
 
