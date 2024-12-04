@@ -303,7 +303,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 14514216519;
+    uint64_t time1 = 0x3611D5E47;
 
     int dummy[100];
     lcg::init(time1);
@@ -333,6 +333,14 @@ int main() {
     gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
     gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::FULLHEAL;
 
     //for (int i = 0; i < 10; ++i) {
         (*NowState) = BattleEmulator::TYPE_2A;
@@ -340,7 +348,7 @@ int main() {
         std::optional<BattleResult> dummy1;
         dummy1 = BattleResult();
         std::memcpy(players1, copiedPlayers, sizeof(players1));
-        BattleEmulator::Main(position1, 5, gene1, players1, dummy1, time1, dummy, dummy, -1, NowState);
+        BattleEmulator::Main(position1, 15, gene1, players1, dummy1, time1, dummy, dummy, -1, NowState);
 
         std::stringstream ss1;
         ss1 << time1 << " ";
@@ -366,9 +374,13 @@ int main() {
 
     lcg::init(time1);
 
-    priority_queue<Genome, vector<Genome>, std::greater<>> que;
+    BattleResult bestResult;
+    Genome bestGenome;
+    int maxTurns = INT_MAX-1;
 
-    for (int i = 0; i < 200; ++i) {
+    priority_queue<Genome> que;
+
+    for (int i = 0; i < 250; ++i) {
         auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 10000, actions, i * 2);
 
         Player players[2];
@@ -384,29 +396,16 @@ int main() {
         BattleEmulator::Main(position, turns + 100, genome.actions, players, result1, time1, nullptr, nullptr, -1,
                              nowState);
 
-        if (players[0].hp >= 0 && players[1].hp == 0 && players[0].mp >= 0) {
-            genome.fitness = result1->turn;
-            que.push(genome);
+        if (players[0].hp >= 0&& players[1].hp == 0 && players[0].mp >= 0) {
+            if (result1->turn < maxTurns) {
+                maxTurns = result1->turn;
+                bestResult = result1.value();
+                bestGenome = genome;
+            }
         }
     }
 
-    for (int i = 0; i < 50; ++i) {
-        auto genome = que.top();
-        que.pop();
-        Player players[2];
-        players[0] = copiedPlayers[0];
-        players[1] = copiedPlayers[1];
-
-        auto *position = new int(1);
-        auto *nowState = new uint64_t(0);
-
-
-        std::optional<BattleResult> result1;
-        result1 = BattleResult();
-        BattleEmulator::Main(position, turns + 100, genome.actions, players, result1, time1, nullptr, nullptr, -1,
-                             nowState);
-        std::cout << dumpTable(result1.value(), genome.actions, 0) << std::endl;
-    }
+    std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
 
 #ifdef DEBUG
     auto t3 = std::chrono::high_resolution_clock::now();

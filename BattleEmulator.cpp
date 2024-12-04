@@ -892,7 +892,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//不明 0x021e54fc
             baseDamage = 0;
             resetCombo(NowState);
-            return 350;
+            return 500;
         case DEFENDING_CHAMPION:
             (*position) += 2;
             (*position)++;//不明　0x021ec6f8
@@ -1315,7 +1315,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;//回避
 
             FUN_0207564c(position, players[attacker].atk, players[defender].def);
-            baseDamage = static_cast<int>(floor(players[1].defaultATK * lcg::floatRand(position, 0.8350, 0.9350)));
+            baseDamage = static_cast<int>(floor(players[1].defaultATK * lcg::floatRand(position, 0.8500, 0.9500)));
 
             if (kaihi) {
                 if (!players[0].paralysis && !players[0].sleeping && !players[0].specialCharge) {
@@ -1711,7 +1711,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++;
             //会心
             percent_tmp = lcg::getPercent(position, 0x2710);
-            if (((Id & 0xffff) == BattleEmulator::ATTACK_ALLY && percent_tmp < 350) ||
+            if (((Id & 0xffff) == BattleEmulator::ATTACK_ALLY && percent_tmp < 500) ||
                 ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST && percent_tmp < 250)) {
                 kaisinn = true;
             }
@@ -1904,7 +1904,7 @@ int BattleEmulator::FUN_0208aecc(int *position, uint64_t *NowState) {
 }
 
 int BattleEmulator::CalculateMoreHealBase(Player *players) {//ベホイミ
-    double tmp1 = (players[0].HealPower - 350) * 0.5194;
+    double tmp1 = (players[0].HealPower - 200) * 0.5194;
     auto tmp2 = static_cast<int>(floor(tmp1));
     return 185 + tmp2;
 }
