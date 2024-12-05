@@ -338,9 +338,19 @@ int main() {
     gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
     gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
     gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MORE_HEAL;
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::FULLHEAL;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
 
     //for (int i = 0; i < 10; ++i) {
         (*NowState) = BattleEmulator::TYPE_2A;
@@ -348,7 +358,7 @@ int main() {
         std::optional<BattleResult> dummy1;
         dummy1 = BattleResult();
         std::memcpy(players1, copiedPlayers, sizeof(players1));
-        BattleEmulator::Main(position1, 15, gene1, players1, dummy1, time1, dummy, dummy, -1, NowState);
+        BattleEmulator::Main(position1, 30, gene1, players1, dummy1, time1, dummy, dummy, -1, NowState);
 
         std::stringstream ss1;
         ss1 << time1 << " ";

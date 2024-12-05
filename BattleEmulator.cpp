@@ -188,7 +188,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[350], P
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 205) {
+        if ((*position) == 1132) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -1316,6 +1316,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             FUN_0207564c(position, players[attacker].atk, players[defender].def);
             baseDamage = static_cast<int>(floor(players[1].defaultATK * lcg::floatRand(position, 0.8500, 0.9500)));
+
+            if (baseDamage != 0) {
+                players[0].sleeping = false;
+                players[0].sleepingTurn = -1;
+            }
 
             if (kaihi) {
                 if (!players[0].paralysis && !players[0].sleeping && !players[0].specialCharge) {

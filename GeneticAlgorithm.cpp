@@ -296,7 +296,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
         currentGenome.Initialized = true;
         //if (!skip) {
-        if (AllyPlayer.mp >= 20) {
+        if (AllyPlayerPre.mp >= 20) {
             if (AllyPlayerPre.AtkBuffLevel == 0 && AllyPlayerPre.BuffLevel == 2 && !Bans.is_action_banned(
                     BattleEmulator::DOUBLE_UP, turns)) {
                 action = BattleEmulator::DOUBLE_UP;
@@ -327,7 +327,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
                 que.push(currentGenome);
             }
-            if (AllyPlayer.BuffLevel <= 1 && !Bans.is_action_banned(BattleEmulator::BUFF, turns)) {
+            if (AllyPlayerPre.BuffLevel <= 1 && !Bans.is_action_banned(BattleEmulator::BUFF, turns)) {
                 action = BattleEmulator::BUFF;
                 if (tmpgenomu.Visited >= 1) {
                     currentGenome.fitness = baseFitness; // 固定値に
@@ -357,7 +357,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
                 que.push(currentGenome);
             }
-            if (AllyPlayer.MagicMirrorTurn < 3 && !Bans.is_action_banned(BattleEmulator::MAGIC_MIRROR, turns)) {
+            if (AllyPlayerPre.MagicMirrorTurn < 3 && !Bans.is_action_banned(BattleEmulator::MAGIC_MIRROR, turns)) {
                 action = BattleEmulator::MAGIC_MIRROR;
                 if (tmpgenomu.Visited >= 1) {
                     currentGenome.fitness = baseFitness; // 固定値に
@@ -393,7 +393,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
                     currentGenome.fitness = baseFitness; // 固定値に
                     currentGenome.Visited = 0;
                 } else {
-                    if (AllyPlayer.AtkBuffLevel != 0 && AllyPlayer.hasMagicMirror) {
+                    if (AllyPlayerPre.AtkBuffLevel != 0 && AllyPlayerPre.hasMagicMirror) {
                         currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 6);
                     } else {
                         currentGenome.fitness = baseFitness + 6 + static_cast<int>(rng() % 6);
@@ -421,7 +421,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
                 que.push(currentGenome);
             }
-            if (!Bans.is_action_banned(BattleEmulator::MORE_HEAL, turns) && (AllyPlayer.hp / AllyPlayer.maxHp) <
+            if (!Bans.is_action_banned(BattleEmulator::MORE_HEAL, turns) && (AllyPlayerPre.hp / AllyPlayerPre.maxHp) <
                 0.7) {
                 action = BattleEmulator::MORE_HEAL;
                 if (tmpgenomu.Visited >= 1) {
@@ -453,8 +453,8 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
             }
         }
 
-        if (AllyPlayer.mp >= 25 && !Bans.is_action_banned(BattleEmulator::FULLHEAL, turns) && (
-                AllyPlayer.hp / AllyPlayer.maxHp) <
+        if (AllyPlayerPre.mp >= 25 && !Bans.is_action_banned(BattleEmulator::FULLHEAL, turns) && (
+                AllyPlayerPre.hp / AllyPlayerPre.maxHp) <
             0.5) {
             action = BattleEmulator::FULLHEAL;
             if (tmpgenomu.Visited >= 1) {
@@ -487,7 +487,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
 
         if (AllyPlayerPre.SageElixirCount > 0 && !Bans.is_action_banned(BattleEmulator::SAGE_ELIXIR, turns) && (
-                static_cast<double>(AllyPlayer.mp) / AllyPlayer.maxMp) <
+                static_cast<double>(AllyPlayerPre.mp) / AllyPlayerPre.maxMp) <
             0.3) {
             action = BattleEmulator::SAGE_ELIXIR;
             if (tmpgenomu.Visited >= 1) {
@@ -520,7 +520,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
 
         if (AllyPlayerPre.ElfinElixirCount > 0 && !Bans.is_action_banned(BattleEmulator::ELFIN_ELIXIR, turns) &&
-            AllyPlayer.mp <= 25) {
+            AllyPlayerPre.mp <= 25) {
             action = BattleEmulator::ELFIN_ELIXIR;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
