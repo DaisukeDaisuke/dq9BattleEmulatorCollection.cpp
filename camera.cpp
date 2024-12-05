@@ -14,7 +14,7 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
         int32_t after = actions[i];
         //一部の特異点の挙動について対策する
 
-        //守備力が高すぎる場合true、盾ガードは偽
+        //守備力が高すぎる場合(ダメージ0)true、盾ガードは偽
         if (bakuti && before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA) {
             onFreeCameraMove(position, after, 1, NowState);
         }

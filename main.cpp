@@ -29,10 +29,9 @@ std::string rtrim(const std::string &s);
 
 std::string trim(const std::string &s);
 
-void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
-                   int aActions[350], int damages[350]);
+void SearchRequest(const Player copiedPlayers[2], uint32_t seed, int turns, const int aActions[350]);
 
-void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
+uint32_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
                        int aActions[350], int damages[350]);
 
 
@@ -464,8 +463,7 @@ constexpr int32_t actions1[100] = {
     BattleEmulator::DEFENCE,
 };
 
-void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
-                   int aActions[350], int damages[350]) {
+void SearchRequest(const Player copiedPlayers[2], uint32_t seed, int turns, const int aActions[350]) {
     int32_t gene[350] = {0};
     for (int i = 0; i < 350; ++i) {
         gene[i] = aActions[i];
@@ -476,37 +474,51 @@ void SearchRequest(const Player copiedPlayers[2], int hours, int minutes, int se
         }
     }
 
-    /*
-    *NowStateの各ビットの使用状況は下記の通りである。
-    +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
-       |            Name            |     size      |
-    0  | Current Rotation Table     |     4bit      |
-    4  | Rotation Internal State    |     4bit      |
-    8  | Free Camera State          |     4bit      |
-    12 | Turn Count Processed       |     20bit     |
-    32 | Combo Previous Attack Id   |     2byte     |
-    40 | Combo Counter              |     1byte     |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                                 合計 6Byte
-    */
-    int *position = new int(1);
-    auto *nowState = new uint64_t(0);
-    uint32_t seed = FoundSeed;
+    lcg::init(seed);
 
-    Player players[2];
-    players[0] = copiedPlayers[0];
-    players[1] = copiedPlayers[1];
-    optional<BattleResult> result;
-    result = BattleResult();
-    int dummy[350] = {0};
-    BattleEmulator::Main(position, turns, gene, players,
-                         result, seed, dummy, dummy,
-                         -1,
-                         nowState);
+    BattleResult bestResult;
+    Genome bestGenome;
+    int maxTurns = INT_MAX-1;
+
+    priority_queue<Genome> que;
+
+    for (int i = 0; i < 250; ++i) {
+        auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, seed, turns, 10000, gene, i * 2);
+
+        Player players[2];
+        players[0] = copiedPlayers[0];
+        players[1] = copiedPlayers[1];
+
+        auto *position = new int(1);
+        auto *nowState = new uint64_t(0);
+
+
+        std::optional<BattleResult> result1;
+        result1 = BattleResult();
+        BattleEmulator::Main(position, turns + 100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
+                             nowState);
+
+        if (players[0].hp >= 0&& players[1].hp == 0 && players[0].mp >= 0) {
+            if (result1->turn < maxTurns) {
+                maxTurns = result1->turn;
+                bestResult = result1.value();
+                bestGenome = genome;
+            }
+        }
+    }
+
+    std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
+
+    for (auto i = 0; i < 100; ++i) {
+        if (bestGenome.actions[i] == 0 || bestGenome.actions[i] == -1) {
+            break;
+        }
+        std::cout << bestGenome.actions[i] << ", ";
+    }
 }
 
 // ブルートフォースリクエスト関数
-void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
+[[nodiscard]] uint32_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
                        int aActions[350], int damages[350]) {
     std::cout << "BruteForceRequest executed with time " << hours << ":" << minutes << ":" << seconds << std::endl;
     std::cout << "eActions: ";
@@ -591,13 +603,15 @@ void BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, in
     std::cout << std::endl << "found: " << foundSeeds << std::endl;
 
     if (foundSeeds == 1) {
-        return;
+        return FoundSeed;
     }
     if (foundSeeds == 0) {
         std::cout << "not found!!!" << std::endl;
+        return 0;
     }
     FoundSeed = 0;
     foundSeeds = 0;
+    return 0;
 }
 
 // 入力文字列を配列に分割するヘルパー関数
@@ -649,9 +663,9 @@ void mainLoop(const Player copiedPlayers[2]) {
 
         // コマンドに応じた処理
         if (command == 'b') {
-            BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
+            auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
             if (foundSeeds == 1) {
-                GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, FoundSeed, turns, 100, aActions, 0);
+                SearchRequest(copiedPlayers, seed, turns, aActions);
             }
         } else if (command == 'u') {
             std::cout << "Updating state..." << std::endl;
