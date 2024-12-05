@@ -31,6 +31,8 @@ add_executable(newDirectory main.cpp
         GeneticAlgorithm.h
         Genome.h
         ActionBanManager.h
+        FreecameraEmulator.cpp
+        FreecameraEmulator.h
 )
 
 if(MINGW)

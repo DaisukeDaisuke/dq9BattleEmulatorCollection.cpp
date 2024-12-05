@@ -14,11 +14,11 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
         int32_t after = actions[i];
         //一部の特異点の挙動について対策する
 
-        if (preemptive1 && bakuti && before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA) { //あくん後攻 スカイアタック→メラゾーマで不定消費
-            if (actions[0] != BattleEmulator::SLEEPING) {
-                onFreeCameraMove(position, after, 1, NowState);
-            }
-        }else
+        //守備力が高すぎる場合true、盾ガードは偽
+        if (bakuti && before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA) {
+            onFreeCameraMove(position, after, 1, NowState);
+        }
+        // }else
 /*        if (before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA){//寝てる必要ないの???? isSleeping
             //寝ていて、スカイアタックで起きず、メラゾーマされるとparam5がtrueになる。マジで謎
             onFreeCameraMove(position, after, 1, NowState);
