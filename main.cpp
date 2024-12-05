@@ -325,32 +325,33 @@ int main() {
     auto *NowState = new uint64_t(-1);//エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
+    //int32_t gene1[350] = {0};
+    int32_t gene1[350] = {30, 31, 30, 35, 35, 25, 38, 25, 31, 34, 34, 31, 30, 30, 31, 33, 30, 34, 34, 34, 34, 31, 33, 34, 34, 34, 34, };
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MORE_HEAL;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    // gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    // gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MORE_HEAL;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
 
     //for (int i = 0; i < 10; ++i) {
         (*NowState) = BattleEmulator::TYPE_2A;
@@ -416,6 +417,14 @@ int main() {
     }
 
     std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
+
+    for (auto i = 0; i < 100; ++i) {
+        if (bestGenome.actions[i] == 0 || bestGenome.actions[i] == -1) {
+            break;
+        }
+        std::cout << bestGenome.actions[i] << ", ";
+    }
+    std::cout << std::endl;
 
 #ifdef DEBUG
     auto t3 = std::chrono::high_resolution_clock::now();

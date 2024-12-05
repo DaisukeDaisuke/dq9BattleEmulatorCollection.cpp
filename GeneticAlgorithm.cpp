@@ -357,7 +357,7 @@ Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t s
 
                 que.push(currentGenome);
             }
-            if (AllyPlayerPre.MagicMirrorTurn < 3 && !Bans.is_action_banned(BattleEmulator::MAGIC_MIRROR, turns)) {
+            if (AllyPlayerPre.MagicMirrorTurn < 5 && !Bans.is_action_banned(BattleEmulator::MAGIC_MIRROR, turns)) {
                 action = BattleEmulator::MAGIC_MIRROR;
                 if (tmpgenomu.Visited >= 1) {
                     currentGenome.fitness = baseFitness; // 固定値に

@@ -188,7 +188,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[350], P
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 1132) {
+        if ((*position) == 874) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -665,7 +665,7 @@ bool BattleEmulator::Main(int *position, int RunCount,const int32_t Gene[350], P
         if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
             (*position) += 1;
         }
-        camera::Main(position, actions, NowState, player0_has_initiative);
+        camera::Main(position, actions, NowState, player0_has_initiative, counterJ % 3 == 2);
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
