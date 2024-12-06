@@ -31,7 +31,6 @@ add_executable(newDirectory main.cpp
         GeneticAlgorithm.h
         Genome.h
         ActionBanManager.h
-        FreecameraEmulator.h
 )
 
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
