@@ -267,7 +267,7 @@ std::string normalDump(AnalyzeData data) {
 
 //int main(int argc, char *argv[]) {
 int main() {
-    std::cout << "dq9 Corvus battle emulator v1.0.3" << std::endl << "Waiting for input[q/b]: " << std::endl;
+    std::cout << "dq9 Corvus battle emulator v1.0.4" << std::endl << "Waiting for input[q/b]: " << std::endl;
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
