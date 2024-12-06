@@ -34,6 +34,10 @@ add_executable(newDirectory main.cpp
         FreecameraEmulator.h
 )
 
+string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
+string(TIMESTAMP BUILD_TIME "%H:%M:%S")
+add_definitions(-DBUILD_DATE="${BUILD_DATE}" -DBUILD_TIME="${BUILD_TIME}")
+
 if(MINGW)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections -fno-inline-small-functions")
@@ -43,4 +47,24 @@ elseif(MSVC)
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
+endif()
+
+# MinGWの最適化フラグに応じたマクロ設定
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    if(CMAKE_CXX_FLAGS MATCHES "-O3")
+        add_definitions(-DOPTIMIZATION_O3_ENABLED)
+    elseif(CMAKE_CXX_FLAGS MATCHES "-O2")
+        add_definitions(-DOPTIMIZATION_O2_ENABLED)
+    else()
+        add_definitions(-DNO_OPTIMIZATION)
+    endif()
+endif()
+
+# MSVCの最適化フラグに応じたマクロ設定
+if(MSVC)
+    if(CMAKE_CXX_FLAGS_RELEASE MATCHES "/O2")
+        add_definitions(-DOPTIMIZATION_O2_ENABLED)
+    elseif(CMAKE_CXX_FLAGS_RELEASE MATCHES "/Od")
+        add_definitions(-DNO_OPTIMIZATION)
+    endif()
 endif()

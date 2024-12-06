@@ -31,8 +31,9 @@ std::string trim(const std::string &s);
 
 void SearchRequest(const Player copiedPlayers[2], uint64_t seed, int turns, const int aActions[350]);
 
-uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
-                       int aActions[350], int damages[350]);
+uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
+                           int eActions[350],
+                           int aActions[350], int damages[350]);
 
 
 void mainLoop(const Player copiedPlayers[2]);
@@ -265,9 +266,32 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
+const std::string version = "v1.0.6";
 //int main(int argc, char *argv[]) {
 int main() {
-    std::cout << "dq9 Corvus battle emulator v1.0.5" << std::endl << "Waiting for input[q/b]: " << std::endl;
+#ifdef BUILD_DATE
+    const std::string buildDate = BUILD_DATE;
+#else
+    const std::string buildDate = "Unknown";
+#endif
+
+#ifdef BUILD_TIME
+    const std::string buildTime = BUILD_TIME;
+#else
+    const std::string buildTime = "Unknown";
+#endif
+
+#if defined(OPTIMIZATION_O3_ENABLED)
+        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " << buildTime  << std::endl;
+#elif defined(OPTIMIZATION_O2_ENABLED)
+        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2),Build date: " << buildDate << ", " << buildTime  << std::endl;
+#elif defined(NO_OPTIMIZATION)
+        std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime  << std::endl;
+#else
+    std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate
+            << ", " << buildTime << std::endl;
+#endif
+    std::cout << "Waiting for input[q/b]: " << std::endl;
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
@@ -483,7 +507,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     BattleResult bestResult;
     Genome bestGenome;
-    int maxTurns = INT_MAX-1;
+    int maxTurns = INT_MAX - 1;
 
     priority_queue<Genome> que;
 
@@ -506,7 +530,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
         delete position;
         delete nowState;
 
-        if (players[0].hp >= 0&& players[1].hp == 0 && players[0].mp >= 0) {
+        if (players[0].hp >= 0 && players[1].hp == 0 && players[0].mp >= 0) {
             if (result1->turn < maxTurns) {
                 maxTurns = result1->turn;
                 bestResult = result1.value();
@@ -527,8 +551,9 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 }
 
 // ブルートフォースリクエスト関数
-[[nodiscard]] uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
-                       int aActions[350], int damages[350]) {
+[[nodiscard]] uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
+                                         int eActions[350],
+                                         int aActions[350], int damages[350]) {
     std::cout << "BruteForceRequest executed with time " << hours << ":" << minutes << ":" << seconds << std::endl;
     std::cout << "eActions: ";
     for (int i = 0; i < 350 && eActions[i] != -1; ++i) std::cout << eActions[i] << " ";
