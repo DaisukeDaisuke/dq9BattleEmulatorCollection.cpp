@@ -193,7 +193,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 874) {
+        if ((*position) == 141) {
             std::cout << "!!" << std::endl;
         }
 #endif
