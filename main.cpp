@@ -326,7 +326,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x36EB231C9;
+    uint64_t time1 = 14810968413;
 
     int dummy[100];
     lcg::init(time1);
@@ -349,7 +349,7 @@ int main() {
 
     Player players1[2];
     //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {30, 30, 31, 30, 33, 38, 31, 30, 34, 31, 33, 34, 34, 31, 34, 34, 30, 33, 31, 34, };
+    int32_t gene1[350] = {30, 31, 30, 35, 33, 34, 30, 30, 31, 33, 34, 30, 34, 31, 34, 31, 33, 31, 34, 34, 34, 31, 34,  };
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 

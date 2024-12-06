@@ -193,7 +193,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 141) {
+        if ((*position) == 357) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -1702,6 +1702,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
                 process7A8(position, baseDamage, players, defender);
             }
+
+            players[attacker].TensionLevel = 0;
 
             break;
         case BattleEmulator::INACTIVE_ALLY:
