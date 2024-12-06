@@ -29,9 +29,9 @@ std::string rtrim(const std::string &s);
 
 std::string trim(const std::string &s);
 
-void SearchRequest(const Player copiedPlayers[2], uint32_t seed, int turns, const int aActions[350]);
+void SearchRequest(const Player copiedPlayers[2], uint64_t seed, int turns, const int aActions[350]);
 
-uint32_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
+uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
                        int aActions[350], int damages[350]);
 
 
@@ -42,7 +42,7 @@ using namespace std;
 int foundSeeds = 0;
 std::vector<AnalyzeData> analyzeDataMap;
 
-uint32_t FoundSeed = 0;
+uint64_t FoundSeed = 0;
 
 void printHeader(std::stringstream &ss);
 
@@ -267,7 +267,7 @@ std::string normalDump(AnalyzeData data) {
 
 //int main(int argc, char *argv[]) {
 int main() {
-    std::cout << "dq9 Corvus battle emulator v1.0.0" << std::endl << "Waiting for input[q/u/b/s]: " << std::endl;
+    std::cout << "dq9 Corvus battle emulator v1.0.3" << std::endl << "Waiting for input[q/b]: " << std::endl;
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
@@ -406,6 +406,9 @@ int main() {
         BattleEmulator::Main(position, turns + 100, genome.actions, players, result1, time1, nullptr, nullptr, -1,
                              nowState);
 
+        delete position;
+        delete nowState;
+
         if (players[0].hp >= 0&& players[1].hp == 0 && players[0].mp >= 0) {
             if (result1->turn < maxTurns) {
                 maxTurns = result1->turn;
@@ -463,8 +466,9 @@ constexpr int32_t actions1[100] = {
     BattleEmulator::DEFENCE,
 };
 
-void SearchRequest(const Player copiedPlayers[2], uint32_t seed, int turns, const int aActions[350]) {
+void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]) {
     int32_t gene[350] = {0};
+    auto turns = 0;
     for (int i = 0; i < 350; ++i) {
         gene[i] = aActions[i];
         if (aActions[i] == -1) {
@@ -472,6 +476,7 @@ void SearchRequest(const Player copiedPlayers[2], uint32_t seed, int turns, cons
             gene[i + 1] = -1;
             break;
         }
+        turns++;
     }
 
     lcg::init(seed);
@@ -498,6 +503,9 @@ void SearchRequest(const Player copiedPlayers[2], uint32_t seed, int turns, cons
         BattleEmulator::Main(position, turns + 100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
                              nowState);
 
+        delete position;
+        delete nowState;
+
         if (players[0].hp >= 0&& players[1].hp == 0 && players[0].mp >= 0) {
             if (result1->turn < maxTurns) {
                 maxTurns = result1->turn;
@@ -515,10 +523,11 @@ void SearchRequest(const Player copiedPlayers[2], uint32_t seed, int turns, cons
         }
         std::cout << bestGenome.actions[i] << ", ";
     }
+    std::cout << std::endl;
 }
 
 // ブルートフォースリクエスト関数
-[[nodiscard]] uint32_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
+[[nodiscard]] uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns, int eActions[350],
                        int aActions[350], int damages[350]) {
     std::cout << "BruteForceRequest executed with time " << hours << ":" << minutes << ":" << seconds << std::endl;
     std::cout << "eActions: ";
@@ -665,7 +674,7 @@ void mainLoop(const Player copiedPlayers[2]) {
         if (command == 'b') {
             auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
             if (foundSeeds == 1) {
-                SearchRequest(copiedPlayers, seed, turns, aActions);
+                SearchRequest(copiedPlayers, seed, aActions);
             }
         } else if (command == 'u') {
             std::cout << "Updating state..." << std::endl;

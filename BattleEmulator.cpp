@@ -152,6 +152,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                           uint64_t *NowState) {
     resetCombo(NowState);
     player0_has_initiative = false;
+    TiggerSkyAttack = false;
     actionsPosition = 0;
     int genePosition = 0;
     int exCounter = 0;
@@ -183,6 +184,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         if (players[0].specialChargeTurn == -1) {
             players[0].specialCharge = false;
         }
+
+        TiggerSkyAttack = false;
 
         resetCombo(NowState);
 
@@ -386,11 +389,15 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         int32_t actionTable = -1;
 
         if (Gene[genePosition] == 0 || Gene[genePosition] == -1) {
+
             genePosition = -1;
             //throw std::invalid_argument("GenePosition is invalid");
         }
         if (genePosition != -1 && Gene[genePosition] != 0 && Gene[genePosition] != -1) {
             actionTable = Gene[genePosition];
+            if (actionTable == TURN_SKIPPED || actionTable == SLEEPING || actionTable == CURE_SLEEPING||actionTable == CURE_PARALYSIS || actionTable == PARALYSIS) {
+                actionTable = ATTACK_ALLY;
+            }
             //genePosition++;
             if (actionTable == HEAL && players[0].mp <= 0) {
                 if (players[0].SpecialMedicineCount >= 1) {
