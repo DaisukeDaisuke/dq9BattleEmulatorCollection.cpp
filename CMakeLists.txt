@@ -40,8 +40,8 @@ add_executable(newDirectory main.cpp
         ActionBanManager.h
 )
 
-string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
-string(TIMESTAMP BUILD_TIME "%H:%M:%S")
+string(TIMESTAMP BUILD_DATE "%Y-%m-%d" UTC)
+string(TIMESTAMP BUILD_TIME "%H:%M:%S" UTC)
 add_definitions(-DBUILD_DATE="${BUILD_DATE}" -DBUILD_TIME="${BUILD_TIME}")
 
 if(MINGW)
