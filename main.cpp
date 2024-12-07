@@ -266,7 +266,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v1.0.7";
+const std::string version = "v1.0.8";
 //int main(int argc, char *argv[]) {
 int main() {
 #ifdef BUILD_DATE
@@ -281,12 +281,20 @@ int main() {
     const std::string buildTime = "Unknown";
 #endif
 
+#if defined(MINGW_BUILD)
+    auto compiler = "mingw";
+#elif defined(MINGW_BUILD)
+    auto compiler = "msBuild";
+#endif
+
+
 #if defined(OPTIMIZATION_O3_ENABLED)
-        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " << buildTime  << std::endl;
+    std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " <<
+            buildTime << ", compiler: " << compiler << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2),Build date: " << buildDate << ", " << buildTime  << std::endl;
+        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2),Build date: " << buildDate << ", " << buildTime  << ", compiler: " << compiler << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime  << std::endl;
+        std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << ", compiler: " << compiler << std::endl;
 #else
     std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate
             << ", " << buildTime << std::endl;
