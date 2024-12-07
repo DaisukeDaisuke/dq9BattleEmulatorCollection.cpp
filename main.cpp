@@ -291,13 +291,13 @@ int main() {
 
 #if defined(OPTIMIZATION_O3_ENABLED)
     std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " <<
-            buildTime << " UTC, compiler: " << compiler << std::endl;
+            buildTime << " UTC, Compiler: " << compiler << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC, compiler: " << compiler << std::endl;
+        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC, Compiler: " << compiler << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC, compiler: " << compiler << std::endl;
+        std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
 #else
-    std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, compiler: " << compiler << std::endl;
+    std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
             << ", " << buildTime << std::endl;
 #endif
     std::cout << "Waiting for input[q/b]: " << std::endl;
@@ -358,7 +358,7 @@ int main() {
 
     Player players1[2];
     //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {30, 31, 30, 33, 34, 30, 34, 30, 31, 33, 34, 31, 34, 34, 31, 34, 30, 33, 34, 31, 34, 34, };
+    int32_t gene1[350] = {30, 31, 30, 33, 34, 31, 34, 30, 30, 33, 34, 31, 34, 34, 31, 34, 34, 30, 33, 31, 34, 34, };
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 

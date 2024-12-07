@@ -193,7 +193,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 1267) {
+        if ((*position) == 1082) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -615,34 +615,37 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         (*position) += 1;
                     }
 
+                    //TODO: 順序調べる
                     players[0].MagicMirrorTurn--;
                     if (players[0].hasMagicMirror && players[0].MagicMirrorTurn <= 0) {
                         const int probability[4] = {62, 75, 87, 100};
                         auto probability1 = probability[std::abs(players[0].MagicMirrorTurn)];
                         auto probability2 = lcg::getPercent(position, 100);
                         if (probability1 >= probability2) {
-                            // 0x0215a050
+                            // 0x0215a050 MMT
                             players[0].hasMagicMirror = false;
                         }
                     }
-                    players[0].BuffTurns--;
-                    if (players[0].BuffLevel != 0 && players[0].BuffTurns <= 0) {
-                        const int probability[4] = {62, 75, 87, 100};
-                        auto probability1 = probability[std::abs(players[0].BuffTurns)];
-                        auto probability2 = lcg::getPercent(position, 100);
-                        if (probability1 >= probability2) {
-                            players[0].BuffLevel = 0;
-                            RecalculateBuff(players);
-                        }
-                    }
+
                     players[0].AtkBuffTurn--;
                     if (players[0].AtkBuffLevel != 0 && players[0].AtkBuffTurn <= 0) {
-                        //0x0215a804
+                        //0x0215a804 ATK
                         const int probability[4] = {62, 75, 87, 100};
                         auto probability1 = probability[std::abs(players[0].AtkBuffTurn)];
                         auto probability2 = lcg::getPercent(position, 100);
                         if (probability1 >= probability2) {
                             players[0].AtkBuffLevel = 0;
+                            RecalculateBuff(players);
+                        }
+                    }
+                    players[0].BuffTurns--;
+                    if (players[0].BuffLevel != 0 && players[0].BuffTurns <= 0) {
+                        //0x0215a8a8 DEF
+                        const int probability[4] = {62, 75, 87, 100};
+                        auto probability1 = probability[std::abs(players[0].BuffTurns)];
+                        auto probability2 = lcg::getPercent(position, 100);
+                        if (probability1 >= probability2) {
+                            players[0].BuffLevel = 0;
                             RecalculateBuff(players);
                         }
                     }
@@ -1146,6 +1149,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
                 (*position)++; //ニセ回避 0x02157f58 100%
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+
                 tmp = floor(baseDamage * 0.5);
                 if (kaisinn) {
                     //0x020759ec
