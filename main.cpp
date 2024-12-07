@@ -281,10 +281,11 @@ int main() {
     const std::string buildTime = "Unknown";
 #endif
 
+    auto compiler = "Unknown";
 #if defined(MINGW_BUILD)
-    auto compiler = "mingw";
-#elif defined(MINGW_BUILD)
-    auto compiler = "msBuild";
+    compiler = "mingw";
+#elif defined(MSVC_BUILD)
+    compiler = "msBuild";
 #endif
 
 
