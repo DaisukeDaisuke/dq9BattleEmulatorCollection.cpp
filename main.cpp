@@ -293,7 +293,7 @@ int main() {
     std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " <<
             buildTime << " UTC, compiler: " << compiler << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2),Build date: " << buildDate << ", " << buildTime  << " UTC, compiler: " << compiler << std::endl;
+        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC, compiler: " << compiler << std::endl;
 #elif defined(NO_OPTIMIZATION)
         std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC, compiler: " << compiler << std::endl;
 #else
