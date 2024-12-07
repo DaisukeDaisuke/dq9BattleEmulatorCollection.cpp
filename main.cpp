@@ -423,7 +423,7 @@ int main() {
 
     priority_queue<Genome> que;
 
-    for (int i = 0; i < 250; ++i) {
+    for (int i = 0; i < 300; ++i) {
         auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 10000, actions, i * 2);
 
         Player players[2];
@@ -520,7 +520,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     priority_queue<Genome> que;
 
-    for (int i = 0; i < 250; ++i) {
+    for (int i = 0; i < 300; ++i) {
         auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, seed, turns, 10000, gene, i * 2);
 
         Player players[2];
