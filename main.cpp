@@ -354,7 +354,7 @@ int main() {
                                  合計 6Byte
 */
 
-    auto *NowState = new uint64_t(-1);//エミュレーターの内部ステートを表すint
+    auto *NowState = new uint64_t(0);//エミュレーターの内部ステートを表すint
 
     Player players1[2];
     //int32_t gene1[350] = {0};
