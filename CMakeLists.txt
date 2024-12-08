@@ -34,8 +34,8 @@ add_executable(newDirectory main.cpp
         BattleResult.h
         AnalyzeData.h
         Equipment.h
-        GeneticAlgorithm.cpp
-        GeneticAlgorithm.h
+        ActionOptimizer.cpp
+        ActionOptimizer.h
         Genome.h
         ActionBanManager.h
 )

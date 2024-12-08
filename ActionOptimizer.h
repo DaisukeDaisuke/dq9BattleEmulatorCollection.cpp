@@ -10,9 +10,9 @@
 #include "Player.h"
 #include "Genome.h"
 
-class GeneticAlgorithm {
+class ActionOptimizer {
 public:
-    static Genome RunGeneticAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[350], int seedOffset);
+    static Genome RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[350], int seedOffset);
 };
 
 

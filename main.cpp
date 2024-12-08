@@ -11,7 +11,7 @@
 #include "BattleEmulator.h"
 #include "AnalyzeData.h"
 #include "debug.h"
-#include "GeneticAlgorithm.h"
+#include "ActionOptimizer.h"
 
 #ifdef DEBUG
 
@@ -424,7 +424,7 @@ int main() {
     priority_queue<Genome> que;
 
     for (int i = 0; i < 300; ++i) {
-        auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, time1, turns, 10000, actions, i * 2);
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, time1, turns, 10000, actions, i * 2);
 
         Player players[2];
         players[0] = copiedPlayers[0];
@@ -521,7 +521,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     priority_queue<Genome> que;
 
     for (int i = 0; i < 300; ++i) {
-        auto genome = GeneticAlgorithm::RunGeneticAlgorithm(copiedPlayers, seed, turns, 10000, gene, i * 2);
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 10000, gene, i * 2);
 
         Player players[2];
         players[0] = copiedPlayers[0];

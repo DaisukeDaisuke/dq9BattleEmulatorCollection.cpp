@@ -2,7 +2,7 @@
 // Created by Owner on 2024/11/21.
 //
 
-#include "GeneticAlgorithm.h"
+#include "ActionOptimizer.h"
 #include <vector>
 #include <random>
 #include <functional>
@@ -55,8 +55,8 @@ void updateCompromiseScore(Genome &genome) {
     }
 }
 
-// 遺伝的アルゴリズム実行
-Genome GeneticAlgorithm::RunGeneticAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
+// オレオレアルゴリズム実行
+Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
                                              int actions[350], int seedOffset) {
     std::mt19937 rng(seed+seedOffset);
     auto *position = new int(1);
