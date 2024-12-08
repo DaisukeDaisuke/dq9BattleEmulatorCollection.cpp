@@ -193,7 +193,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 1082) {
+        if ((*position) == 975) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -389,13 +389,13 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         int32_t actionTable = -1;
 
         if (Gene[genePosition] == 0 || Gene[genePosition] == -1) {
-
             genePosition = -1;
             //throw std::invalid_argument("GenePosition is invalid");
         }
         if (genePosition != -1 && Gene[genePosition] != 0 && Gene[genePosition] != -1) {
             actionTable = Gene[genePosition];
-            if (actionTable == TURN_SKIPPED || actionTable == SLEEPING || actionTable == CURE_SLEEPING||actionTable == CURE_PARALYSIS || actionTable == PARALYSIS) {
+            if (actionTable == TURN_SKIPPED || actionTable == SLEEPING || actionTable == CURE_SLEEPING || actionTable ==
+                CURE_PARALYSIS || actionTable == PARALYSIS) {
                 actionTable = ATTACK_ALLY;
             }
             //genePosition++;
@@ -613,40 +613,39 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     //--------start_FUN_021594bc-------
                     if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
                         (*position) += 1;
-                    }
-
-                    //TODO: 順序調べる
-                    players[0].MagicMirrorTurn--;
-                    if (players[0].hasMagicMirror && players[0].MagicMirrorTurn <= 0) {
-                        const int probability[4] = {62, 75, 87, 100};
-                        auto probability1 = probability[std::abs(players[0].MagicMirrorTurn)];
-                        auto probability2 = lcg::getPercent(position, 100);
-                        if (probability1 >= probability2) {
-                            // 0x0215a050 MMT
-                            players[0].hasMagicMirror = false;
+                        //TODO: 順序調べる
+                        players[0].MagicMirrorTurn--;
+                        if (players[0].hasMagicMirror && players[0].MagicMirrorTurn <= 0) {
+                            const int probability[4] = {62, 75, 87, 100};
+                            auto probability1 = probability[std::abs(players[0].MagicMirrorTurn)];
+                            auto probability2 = lcg::getPercent(position, 100);
+                            if (probability1 >= probability2) {
+                                // 0x0215a050 MMT
+                                players[0].hasMagicMirror = false;
+                            }
                         }
-                    }
 
-                    players[0].AtkBuffTurn--;
-                    if (players[0].AtkBuffLevel != 0 && players[0].AtkBuffTurn <= 0) {
-                        //0x0215a804 ATK
-                        const int probability[4] = {62, 75, 87, 100};
-                        auto probability1 = probability[std::abs(players[0].AtkBuffTurn)];
-                        auto probability2 = lcg::getPercent(position, 100);
-                        if (probability1 >= probability2) {
-                            players[0].AtkBuffLevel = 0;
-                            RecalculateBuff(players);
+                        players[0].AtkBuffTurn--;
+                        if (players[0].AtkBuffLevel != 0 && players[0].AtkBuffTurn <= 0) {
+                            //0x0215a804 ATK
+                            const int probability[4] = {62, 75, 87, 100};
+                            auto probability1 = probability[std::abs(players[0].AtkBuffTurn)];
+                            auto probability2 = lcg::getPercent(position, 100);
+                            if (probability1 >= probability2) {
+                                players[0].AtkBuffLevel = 0;
+                                RecalculateBuff(players);
+                            }
                         }
-                    }
-                    players[0].BuffTurns--;
-                    if (players[0].BuffLevel != 0 && players[0].BuffTurns <= 0) {
-                        //0x0215a8a8 DEF
-                        const int probability[4] = {62, 75, 87, 100};
-                        auto probability1 = probability[std::abs(players[0].BuffTurns)];
-                        auto probability2 = lcg::getPercent(position, 100);
-                        if (probability1 >= probability2) {
-                            players[0].BuffLevel = 0;
-                            RecalculateBuff(players);
+                        players[0].BuffTurns--;
+                        if (players[0].BuffLevel != 0 && players[0].BuffTurns <= 0) {
+                            //0x0215a8a8 DEF
+                            const int probability[4] = {62, 75, 87, 100};
+                            auto probability1 = probability[std::abs(players[0].BuffTurns)];
+                            auto probability2 = lcg::getPercent(position, 100);
+                            if (probability1 >= probability2) {
+                                players[0].BuffLevel = 0;
+                                RecalculateBuff(players);
+                            }
                         }
                     }
                 } else {
@@ -1136,7 +1135,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                         kaisinn = true;
                         hasKaisinn = true;
                     }
-                }else{
+                } else {
                     if (lcg::getPercent(position, 0x2710) < 83) {
                         kaisinn = true;
                         hasKaisinn = true;
@@ -1176,12 +1175,14 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (hasKaisinn) {
                 (*position) += 2;
             }
-            if (players[defender].hp - baseDamage >= 0) {
+            if (preHP[1] > 0) {
                 if (!players[attacker].specialCharge && lcg::getPercent(position, 100) < 1) {
                     players[attacker].specialCharge = true;
                     players[attacker].specialChargeTurn = 8;
                 }
             }
+        //0x021ec6f8が多分の残りの攻撃回数だけ発生する
+
             resetCombo(NowState);
             return totalDamage;
         case MERA_ZOMA:
@@ -1200,6 +1201,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     tmp *= lcg::floatRand(position, 1.5, 2.0);
                 }
                 tmp *= 1.25;
+                tmp = processCombo(Id & 0xffff, tmp, NowState);
                 baseDamage = static_cast<int>(floor(tmp));
                 (*position)++; //不明 0x021e54fc
                 ProcessRage(position, baseDamage, players);
@@ -1216,6 +1218,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 if (!players[0].paralysis && !players[0].sleeping) {
                     tmp *= players[defender].defence;
                 }
+                tmp = processCombo(Id & 0xffff, tmp, NowState);
                 baseDamage = static_cast<int>(floor(tmp));
                 if (!tate) {
                     (*position)++; //0x021e54fc 不明
@@ -1224,7 +1227,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
                 process7A8(position, baseDamage, players, defender); //必殺チャージ(敵)　0x021ed7a8
             }
-            resetCombo(NowState);
             break;
         case BattleEmulator::FREEZING_BLIZZARD:
             (*position) += 2;
