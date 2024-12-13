@@ -312,8 +312,8 @@ int main() {
     const Player copiedPlayers[2] = {
         // プレイヤー1
         {
-            309, 309.0, 312, 312, 298, 298, 193, 234, 165, // 最初のメンバー
-            165, false, false, 0, false, 0, -1,
+            319, 319.0, 302, 302, 293, 293, 178, 218, 152, // 最初のメンバー
+            152, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 1, 1, 1
@@ -335,7 +335,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 15498409079;
+    uint64_t time1 = 0x302e7e5b;
 
     int dummy[100];
     lcg::init(time1);
@@ -357,14 +357,14 @@ int main() {
     auto *NowState = new uint64_t(0);//エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {30, 31, 30, 33, 35, 31, 34, 30, 34, 33, 31, 34, 34, 34, 34, 34,};
+    int32_t gene1[350] = {0};
+    //int32_t gene1[350] = {30, 31, 30, 33, 35, 31, 34, 30, 34, 33, 31, 34, 34, 34, 34, 34,};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    // gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::BUFF;
     // gene1[counter++] = BattleEmulator::DOUBLE_UP;
     // gene1[counter++] = BattleEmulator::DOUBLE_UP;
     // gene1[counter++] = BattleEmulator::DOUBLE_UP;

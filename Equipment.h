@@ -53,12 +53,17 @@ const Equipment EtherealArmour("げんまのよろい", {
         {Attribute::Darkness, 15},
 });
 
-const Equipment EnchantedGloves("せいれいのこて", {
+const Equipment EtherealGloves("げんまのこて", {
+        {Attribute::Fire, 10},
+        {Attribute::Ice, 10},
+        {Attribute::Wind, 10},
+        {Attribute::ThunderExplosion, 10},
+        {Attribute::Darkness, 10},
+});
+
+const Equipment redTights("レッドタイツ", {
         {Attribute::Fire, 7},
-        {Attribute::Ice, 7},
-        {Attribute::Wind, 7},
         {Attribute::ThunderExplosion, 7},
-        {Attribute::Darkness, 7},
 });
 
 const Equipment DragonWarriorBoots("竜戦士のブーツ", {
@@ -66,8 +71,8 @@ const Equipment DragonWarriorBoots("竜戦士のブーツ", {
         {Attribute::Darkness, 5}
 });
 
-const std::array<Equipment, 4> allEquipments = {
-        DarkShield, EtherealArmour, EnchantedGloves, DragonWarriorBoots
+const std::array<Equipment, 5> allEquipments = {
+        DarkShield, EtherealArmour, EtherealGloves, DragonWarriorBoots, redTights
 };
 
 class Equipments {
