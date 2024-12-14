@@ -365,13 +365,35 @@ int main() {
     gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
     gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
     // gene1[counter++] = BattleEmulator::DOUBLE_UP;
     // gene1[counter++] = BattleEmulator::DOUBLE_UP;
     // gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
     // gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
     // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
     // gene1[counter++] = BattleEmulator::BUFF;
     // gene1[counter++] = BattleEmulator::MULTITHRUST;
     // gene1[counter++] = BattleEmulator::MULTITHRUST;
@@ -407,13 +429,17 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    uint64_t time1 = 0x3611D5E47;
+    uint64_t time1 = 0x302e7e5b;
 
-    int actions[350] = {
-        30, 31, 30, 35, 35
-    };
+    auto counter = 0;
+    int actions[350] = {};
+    actions[counter++] = BattleEmulator::BUFF;
+    actions[counter++] = BattleEmulator::MAGIC_MIRROR;
+    actions[counter++] = BattleEmulator::BUFF;
+    actions[counter++] = BattleEmulator::DOUBLE_UP;
 
-    int turns = 5;
+
+    int turns = 4;
 
     lcg::init(time1);
 
