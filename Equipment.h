@@ -62,8 +62,8 @@ const Equipment EtherealGloves("げんまのこて", {
 });
 
 const Equipment redTights("レッドタイツ", {
-        {Attribute::Fire, 7},
-        {Attribute::ThunderExplosion, 7},
+        {Attribute::Fire, 5},
+        {Attribute::Darkness, 5},
 });
 
 const Equipment DragonWarriorBoots("竜戦士のブーツ", {

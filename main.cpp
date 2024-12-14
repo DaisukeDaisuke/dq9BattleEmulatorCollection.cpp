@@ -266,7 +266,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v1.1.0_zeppkei, valiant: redTights";
+const std::string version = "v1.3.0_zeppkei, valiant: Dragon warrior trousers";
 //int main(int argc, char *argv[]) {
 int main() {
 #ifdef BUILD_DATE
@@ -312,7 +312,7 @@ int main() {
     const Player copiedPlayers[2] = {
         // プレイヤー1
         {
-            319, 319.0, 302, 302, 293, 293, 178, 218, 152, // 最初のメンバー
+            319, 319.0, 302, 302, 294, 294, 178, 218, 152, // 最初のメンバー
             152, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
@@ -335,7 +335,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x302e7e5b;
+    uint64_t time1 = 0x33956fbb;
 
     int dummy[100];
     lcg::init(time1);
@@ -429,17 +429,17 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    uint64_t time1 = 0x302e7e5b;
+    uint64_t time1 = 0x33956fbb;
 
     auto counter = 0;
     int actions[350] = {};
     actions[counter++] = BattleEmulator::BUFF;
     actions[counter++] = BattleEmulator::MAGIC_MIRROR;
-    actions[counter++] = BattleEmulator::BUFF;
-    actions[counter++] = BattleEmulator::DOUBLE_UP;
+    // actions[counter++] = BattleEmulator::BUFF;
+    // actions[counter++] = BattleEmulator::DOUBLE_UP;
 
 
-    int turns = 4;
+    int turns = 2;
 
     lcg::init(time1);
 
