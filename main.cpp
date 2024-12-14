@@ -713,25 +713,23 @@ void mainLoop(const Player copiedPlayers[2]) {
             std::cout << "Exiting loop." << std::endl;
             break;
         }
-
-        std::istringstream ss(input.substr(2)); // コマンド文字を除外してパース
-
-        int hours, minutes, seconds, turns;
-        ss >> hours >> minutes >> seconds >> turns;
-
-        // '/'区切りでeActions, aActions, damagesに分割
-        std::string eActionsStr, aActionsStr, damagesStr;
-        std::getline(ss, eActionsStr, '-');
-        std::getline(ss, aActionsStr, '-');
-        std::getline(ss, damagesStr, '-');
-
-        // 各アクション配列に値を代入
-        parseActions(eActionsStr, eActions);
-        parseActions(aActionsStr, aActions);
-        parseActions(damagesStr, damages);
-
         // コマンドに応じた処理
         if (command == 'b') {
+            std::istringstream ss(input.substr(2)); // コマンド文字を除外してパース
+
+            int hours, minutes, seconds, turns;
+            ss >> hours >> minutes >> seconds >> turns;
+
+            // '/'区切りでeActions, aActions, damagesに分割
+            std::string eActionsStr, aActionsStr, damagesStr;
+
+            std::getline(ss, eActionsStr, '-');
+            std::getline(ss, aActionsStr, '-');
+            std::getline(ss, damagesStr, '-');
+            // 各アクション配列に値を代入
+            parseActions(eActionsStr, eActions);
+            parseActions(aActionsStr, aActions);
+            parseActions(damagesStr, damages);
             auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
             if (foundSeeds == 1) {
                 SearchRequest(copiedPlayers, seed, aActions);
