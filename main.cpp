@@ -266,7 +266,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v1.1.0_zeppkei, valiant: redTights";
+const std::string version = "v1.1.1_zeppkei, valiant: redTights";
 //int main(int argc, char *argv[]) {
 int main() {
 #ifdef BUILD_DATE
