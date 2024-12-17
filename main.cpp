@@ -67,7 +67,6 @@ void printHeader(std::stringstream &ss) {
             << std::setw(6) << "ATT"
             << std::setw(6) << "DET"
             << std::setw(6) << "MMT"
-            << std::setw(6) << "Tab"
             << std::setw(6) << "Sct" << "\n";
     ss << std::string(140, '-') << "\n"; // 区切り線を出力
 }
@@ -80,7 +79,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
     int currentTurn = -1;
     int eDamage[2] = {-1, -1}, aDamage = -1;
     bool initiative_tmp = false;
-    std::string eAction[2], aAction, sp, tmpState, ATKTurn1, DEFTurn1, magicMirrorTurn1, specialChargeTurn1, amp1, ahp2,
+    std::string eAction[2], aAction, sp, ATKTurn1, DEFTurn1, magicMirrorTurn1, specialChargeTurn1, amp1, ahp2,
             ehp2, amp2;
     auto counter = 0;
     // データのループ
@@ -95,27 +94,11 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
         auto ehp1 = result.ehp[i];
         auto ahp1 = result.ahp[i];
         auto isEnemy = result.isEnemy[i];
-        auto state = result.state[i] & 0xf;
         auto specialChargeTurn = result.scTurn[i];
         int amp = -1;
         if (i >= 1) {
             amp = result.amp[i - 1];
         }
-
-
-        if (state == BattleEmulator::TYPE_2A) {
-            tmpState = "A";
-        } else if (state == BattleEmulator::TYPE_2B) {
-            tmpState = "B";
-        } else if (state == BattleEmulator::TYPE_2C) {
-            tmpState = "C";
-        } else if (state == BattleEmulator::TYPE_2D) {
-            tmpState = "D";
-        }
-        if (state == BattleEmulator::TYPE_2E) {
-            tmpState = "E";
-        }
-
         auto special = gene[turn];
 
         std::string specialAction;
@@ -146,7 +129,6 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
                             << std::setw(6) << ATKTurn1
                             << std::setw(6) << DEFTurn1
                             << std::setw(6) << magicMirrorTurn1
-                            << std::setw(6) << tmpState
                             << std::setw(6) << specialChargeTurn1
                             << std::setw(11) << "" << "\n";
                 }
@@ -229,7 +211,6 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
                 << std::setw(6) << ATKTurn1
                 << std::setw(6) << DEFTurn1
                 << std::setw(6) << magicMirrorTurn1
-                << std::setw(6) << tmpState
                 << std::setw(6) << specialChargeTurn1
                 << std::setw(11) << "" << "\n";
     }
@@ -266,7 +247,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v1.1.1_zeppkei, valiant: redTights";
+const std::string version = "v1.0.0";
 //int main(int argc, char *argv[]) {
 int main() {
 #ifdef BUILD_DATE
@@ -290,14 +271,14 @@ int main() {
 
 
 #if defined(OPTIMIZATION_O3_ENABLED)
-    std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " <<
+    std::cout << "dq9 Goresby-Purrvis battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " <<
             buildTime << " UTC, Compiler: " << compiler << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC, Compiler: " << compiler << std::endl;
+        std::cout << "dq9 Goresby-Purrvis battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC, Compiler: " << compiler << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
+        std::cout << "dq9 Goresby-Purrvis battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
 #else
-    std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
+    std::cout << "dq9 Goresby-Purrvis battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
             << ", " << buildTime << std::endl;
 #endif
     std::cout << "Waiting for input[q/b]: " << std::endl;
@@ -312,20 +293,20 @@ int main() {
     const Player copiedPlayers[2] = {
         // プレイヤー1
         {
-            319, 319.0, 302, 302, 293, 293, 178, 218, 152, // 最初のメンバー
+            323, 323.0, 304, 304, 295, 295, 181, 230, 135, // 最初のメンバー
             152, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1
+            false, -1, 0, -1, 0, false, 1, 1, 1 , false
         }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
         // プレイヤー2
         {
-            4800, 4800.0, 248, 248, 278, 278, 157, 0, 255, // 最初のメンバー
+            1653, 1653.0, 234, 234, 256, 256, 172, 25, 25, // 最初のメンバー
             255, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0
+            false, -1, 0, -1, 0, false, 0, 0, 0 ,false
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
@@ -335,7 +316,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x302e7e5b;
+    uint64_t time1 = 0x1b11dea0;
 
     int dummy[100];
     lcg::init(time1);
@@ -363,49 +344,22 @@ int main() {
     int counter = 0;
 
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::MIDHEAL;
     gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    // gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    // gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MORE_HEAL;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+
 
     //for (int i = 0; i < 10; ++i) {
         (*NowState) = BattleEmulator::TYPE_2A;
@@ -413,7 +367,7 @@ int main() {
         std::optional<BattleResult> dummy1;
         dummy1 = BattleResult();
         std::memcpy(players1, copiedPlayers, sizeof(players1));
-        BattleEmulator::Main(position1, 30, gene1, players1, dummy1, time1, dummy, dummy, -1, NowState);
+        BattleEmulator::Main(position1, 29, gene1, players1, dummy1, time1, dummy, dummy, -1, NowState);
 
         std::stringstream ss1;
         ss1 << time1 << " ";

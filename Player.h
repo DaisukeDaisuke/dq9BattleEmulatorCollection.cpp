@@ -42,6 +42,7 @@ struct Player {
     int SageElixirCount = 2;
     int ElfinElixirCount = 1;
     int MagicWaterCount = 1;
+    bool inactive = false;
 
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 

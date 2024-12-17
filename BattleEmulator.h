@@ -87,6 +87,11 @@ public:
     static const int DEAD1 = 51;//ゴスペルソング
     static const int GOSPEL_SONG = 52;//ゴスペルソング
 
+    static const int FLAME_SLASH = 55; //火炎斬り
+    static const int KACRACKLE_SLASH = 56;// マヒャド斬り
+    static const int HATCHET_MAN = 57;// 魔人切り
+    static const int UPWARD_SLICE = 58;// 切り上げ
+    static const int MULTISLASH = 59;// さみだれ斬り
 
     static bool
     Main(int *position, int RunCount, const int32_t Gene[350], Player *players,

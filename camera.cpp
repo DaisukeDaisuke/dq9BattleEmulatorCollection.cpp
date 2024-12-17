@@ -32,7 +32,7 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
             onFreeCameraMove(position, after, 1, NowState);
         }else*/ if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
             onFreeCameraMove(position, after, preemptive ? 1 : 0, NowState);
-        }else if(after == BattleEmulator::MERCURIAL_THRUST){
+        }else if(after == BattleEmulator::MERCURIAL_THRUST||after == BattleEmulator::ATTACK_ENEMY||after == BattleEmulator::FLAME_SLASH||after == BattleEmulator::KACRACKLE_SLASH || after == BattleEmulator::HATCHET_MAN || after == BattleEmulator::UPWARD_SLICE) {
             (*position)++;//追尾カメラ
         }
         if (after != BattleEmulator::ATTACK_ALLY) {//味方の攻撃→上空だとフリーカメラが特異点の挙動する
