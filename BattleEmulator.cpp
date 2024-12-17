@@ -205,7 +205,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 388) {
+        if ((*position) == 1123) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -301,26 +301,35 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         ATTACK_ENEMY, UPWARD_SLICE, HATCHET_MAN, MULTISLASH, FLAME_SLASH,
                         KACRACKLE_SLASH
                     };
+                    auto flag = false;
                     enemyAction[counter] = table[ProcessEnemyRandomAction44(position)];
                     do {
-                        auto flag = false;
                         if (preAction != 0 && enemyAction[0] == enemyAction[1]) {
                             if (enemyAction[counter] == UPWARD_SLICE) {
-                                enemyAction[counter] = ATTACK_ENEMY;
-                                flag = true;
+                                if (flag) {
+                                    enemyAction[counter] = MULTISLASH;
+                                }else{
+                                    enemyAction[counter] = ATTACK_ENEMY;
+                                }
                             } else if (enemyAction[counter] == KACRACKLE_SLASH) {
                                 enemyAction[counter] = FLAME_SLASH;
                             } else if (enemyAction[counter] == MULTISLASH) {
                                 enemyAction[counter] = HATCHET_MAN;
+                            } else if (enemyAction[counter] == FLAME_SLASH) {
+                                enemyAction[counter] = MULTISLASH;
+                            }else if (enemyAction[counter] == KACRACKLE_SLASH) {
+                                enemyAction[counter] = FLAME_SLASH;
                             }
                         }
                         if (enemyAction[counter] == HATCHET_MAN && players[1].mp <= 4) {
                             enemyAction[counter] = UPWARD_SLICE;
                             continue;
                         }
-                        if (!flag && enemyAction[counter] == ATTACK_ENEMY && (players[1].defaultATK * 2) <= players[0].
+                        if (enemyAction[counter] == ATTACK_ENEMY && (players[1].defaultATK * 2) <= players[0].
                             def) {
                             enemyAction[counter] = UPWARD_SLICE;
+                            flag = true;
+                            continue;
                         }
                         break;
                     } while (true);
@@ -1655,7 +1664,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     }
                 }
 
-                if ((Id & 0xffff) == UPWARD_SLICE) {
+                if (baseDamage != 0 && (Id & 0xffff) == UPWARD_SLICE) {
                     (*position)++; // 0x021e34e8??
                 }
 

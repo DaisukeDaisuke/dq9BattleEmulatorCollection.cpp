@@ -359,6 +359,10 @@ int main() {
     gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
     gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::THUNDER_THRUST;
 
 
     //for (int i = 0; i < 10; ++i) {
