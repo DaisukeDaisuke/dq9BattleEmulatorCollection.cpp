@@ -18,6 +18,7 @@ struct Genome {
     int fitness;
     int Visited;
     int EActions[2];
+    int Edamage[2];
     int Aactions;
     int compromiseScore;      // 状態異常などの妥協可能度（小さい方が良い）
     bool isEliminated;        // 閾値超えで切り捨てるフラグ

@@ -316,7 +316,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x1b11dea0;
+    uint64_t time1 = 0x11165697;
 
     int dummy[100];
     lcg::init(time1);
@@ -344,25 +344,28 @@ int main() {
     int counter = 0;
 
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MIDHEAL;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::MULTITHRUST;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::THUNDER_THRUST;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+    gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
+//    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::THUNDER_THRUST;
 
 
     //for (int i = 0; i < 10; ++i) {
@@ -387,17 +390,14 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    uint64_t time1 = 0x302e7e5b;
+    uint64_t time1 = 0x11165697;
 
     auto counter = 0;
     int actions[350] = {};
     actions[counter++] = BattleEmulator::BUFF;
-    actions[counter++] = BattleEmulator::MAGIC_MIRROR;
-    actions[counter++] = BattleEmulator::BUFF;
-    actions[counter++] = BattleEmulator::DOUBLE_UP;
 
 
-    int turns = 4;
+    int turns = counter;
 
     lcg::init(time1);
 
@@ -407,8 +407,8 @@ int main() {
 
     priority_queue<Genome> que;
 
-    for (int i = 0; i < 300; ++i) {
-        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, time1, turns, 10000, actions, i * 2);
+    for (int i = 0; i < 200; ++i) {
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, time1, turns, 1000, actions, i * 2);
 
         Player players[2];
         players[0] = copiedPlayers[0];
