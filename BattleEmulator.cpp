@@ -193,7 +193,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 975) {
+        if ((*position) == 978) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -1129,6 +1129,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             hasKaisinn = false;
             for (int i = 0; i < attackCount; ++i) {
                 kaihi = false;
+                kaisinn = false;
                 (*position)++; //0x021ec6f8 不明
                 if (attackCount == 4) {
                     if (lcg::getPercent(position, 0x2710) < 62) {

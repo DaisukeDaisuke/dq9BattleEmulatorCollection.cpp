@@ -266,7 +266,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v1.0.9";
+const std::string version = "v1.0.12";
 //int main(int argc, char *argv[]) {
 int main() {
 #ifdef BUILD_DATE
@@ -335,7 +335,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 15498409079;
+    uint64_t time1 = 14532282653;
 
     int dummy[100];
     lcg::init(time1);
@@ -358,7 +358,7 @@ int main() {
 
     Player players1[2];
     //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {30, 31, 30, 33, 35, 31, 34, 30, 34, 33, 31, 34, 34, 34, 34, 34,};
+    int32_t gene1[350] = {30, 31, 30, 38, 46, 30, 31, 33, 33, 34, 31, 34, 31, 30, 33, 34, 31, 34, 34, 34};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
