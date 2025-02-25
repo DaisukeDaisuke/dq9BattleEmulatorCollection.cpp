@@ -394,7 +394,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                     currentGenome.Visited = 0;
                 } else {
                     if (AllyPlayerPre.AtkBuffLevel != 0 && AllyPlayerPre.hasMagicMirror) {
-                        currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 6);
+                        currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 30);
                     } else {
                         currentGenome.fitness = baseFitness + 6 + static_cast<int>(rng() % 6);
                     }

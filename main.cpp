@@ -520,7 +520,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     priority_queue<Genome> que;
 
-    for (int i = 0; i < 300; ++i) {
+    for (int i = 0; i < 1500; ++i) {
         auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 10000, gene, i * 2);
 
         Player players[2];
@@ -571,6 +571,9 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     std::cout << "\ndamages: ";
     for (int i = 0; i < 350 && damages[i] != -1; ++i) std::cout << damages[i] << " ";
     std::cout << std::endl;
+
+    foundSeeds = 0;
+    FoundSeed = 0;
 
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 17;
