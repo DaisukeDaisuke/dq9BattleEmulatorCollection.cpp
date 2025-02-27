@@ -444,7 +444,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
         if (AllyPlayerPre.mp >= 25 && !Bans.is_action_banned(BattleEmulator::FULLHEAL, turns) && (
                 AllyPlayerPre.hp / AllyPlayerPre.maxHp) <
-            0.5) {
+            0.8) {
             action = BattleEmulator::FULLHEAL;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
