@@ -291,11 +291,11 @@ int main() {
 
 #if defined(OPTIMIZATION_O3_ENABLED)
     std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " <<
-            buildTime << " UTC, Compiler: " << compiler << std::endl;
+            buildTime << " UTC/GMT, Compiler: " << compiler << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC, Compiler: " << compiler << std::endl;
+        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
+        std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << std::endl;
 #else
     std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
             << ", " << buildTime << std::endl;
@@ -520,8 +520,8 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     priority_queue<Genome> que;
 
-    for (int i = 0; i < 1500; ++i) {
-        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 10000, gene, i * 2);
+    for (int i = 0; i < 1000; ++i) {
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 15000, gene, i * 2);
 
         Player players[2];
         players[0] = copiedPlayers[0];

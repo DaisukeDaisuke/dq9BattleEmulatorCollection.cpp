@@ -216,25 +216,14 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
         bool skip = false;
 
-        if (currentGenome.canMove || Eactions[0] == BattleEmulator::MAGIC_BURST || Eactions[1] ==
-            BattleEmulator::MAGIC_BURST) {
-            skip = false;
-            currentGenome.canMove = false;
-        } else {
-            if (Aactions == BattleEmulator::SLEEPING || Aactions == BattleEmulator::PARALYSIS || Aactions ==
-                BattleEmulator::TURN_SKIPPED) {
-                currentGenome.canMove = false;
-                skip = true;
-            } else if (Aactions == BattleEmulator::CURE_SLEEPING || Aactions == BattleEmulator::CURE_PARALYSIS) {
-                currentGenome.canMove = true;
-                skip = true;
-            } else {
-                currentGenome.canMove = true;
-            }
+        if (Aactions == BattleEmulator::SLEEPING || Aactions == BattleEmulator::PARALYSIS || Aactions ==
+            BattleEmulator::TURN_SKIPPED) {
+            //canmove1 = false;
+            skip = true;
+        } else if (Aactions == BattleEmulator::CURE_SLEEPING || Aactions == BattleEmulator::CURE_PARALYSIS) {
+            //canmove1 = true;
+            //skip = true;
         }
-
-
-        currentGenome.canMove = !CopedPlayers[0].sleeping;
 
         auto baseFitness = tmpgenomu.fitness;
 
