@@ -335,7 +335,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 15512133729;
+    uint64_t time1 = 0x34DB9E390;
 
     int dummy[100];
     lcg::init(time1);
@@ -362,7 +362,15 @@ int main() {
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
-    // gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
     // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
     // gene1[counter++] = BattleEmulator::BUFF;
     // gene1[counter++] = BattleEmulator::DOUBLE_UP;
