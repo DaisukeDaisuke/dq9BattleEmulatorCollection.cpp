@@ -141,6 +141,8 @@ std::string BattleEmulator::getActionName(int actionId) {
             return "Magic Water";
         case BattleEmulator::GOSPEL_SONG:
             return "gospel song";
+        case BattleEmulator::FLEE_ALLY:
+            return "Flee";
         default:
             return "Unknown Action";
     }
@@ -193,7 +195,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 978) {
+        if ((*position) == 743) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -526,6 +528,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 if (action == SLEEPING && !player0_has_initiative && !players[0].sleeping) {
                     skipTurn = true;
                 }
+                if (action == BattleEmulator::FLEE_ALLY) {
+                    skipTurn = true;
+                }
                 if (!skipTurn) {
                     //--------start_FUN_02158dfc-------
                     if (!players[0].paralysis && !players[0].sleeping) {
@@ -668,7 +673,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         } else if (players[0].hasMagicMirror) {
                             mmt1 = 0;
                         }
-                        BattleResult::add(result, TURN_SKIPPED, 0, false, atk1,
+                        BattleResult::add(result, action, 0, false, atk1,
                                           def1, mmt1, counterJ - 1,
                                           player0_has_initiative, ehp, ahp,
                                           tmpState, players[0].specialChargeTurn, players[0].mp);
@@ -1261,7 +1266,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //関係ない
             (*position)++; //会心
             (*position)++; //回避
-            FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
+            baseDamage = FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
+            if (baseDamage == 0) {//0x021e81a0 おそらくbuffにもあるけど...
+                baseDamage = lcg::getPercent(position, 2);
+            }
             (*position)++; //かぶとわりの判定　0x021e3e7c
             (*position)++; //なんか　0x021e54fc
             if (!players[attacker].specialCharge) {
@@ -1287,6 +1295,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             RecalculateBuff(players);
             resetCombo(NowState);
+            baseDamage = 0;
             break;
         case BattleEmulator::MORE_HEAL:
             players[attacker].mp -= 8;

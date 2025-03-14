@@ -57,8 +57,8 @@ void updateCompromiseScore(Genome &genome) {
 
 // オレオレアルゴリズム実行
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
-                                             int actions[350], int seedOffset) {
-    std::mt19937 rng(seed+seedOffset);
+                                     int actions[350], int seedOffset) {
+    std::mt19937 rng(seed + seedOffset);
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
     auto counter = 0;
@@ -516,6 +516,37 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.Visited = 0;
             } else {
                 currentGenome.fitness = baseFitness + 15 + static_cast<int>(rng() % 6);
+            }
+            currentGenome.actions[turns - 1] = action;
+
+            CopedPlayers[0] = tmpgenomu.AllyPlayer;
+            CopedPlayers[1] = tmpgenomu.EnemyPlayer;
+
+            (*position) = tmpgenomu.position;
+            (*nowState) = tmpgenomu.state;
+
+            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+                                 CopedPlayers,
+                                 (std::optional<BattleResult> &) std::nullopt, seed,
+                                 nullptr, nullptr, -2, nowState);
+            currentGenome.position = (*position);
+            currentGenome.state = (*nowState);
+            currentGenome.turn = turns + 1;
+            currentGenome.processed = turns;
+            currentGenome.AllyPlayer = CopedPlayers[0];
+            currentGenome.EnemyPlayer = CopedPlayers[1];
+
+            que.push(currentGenome);
+        }
+
+
+        if (!Bans.is_action_banned(BattleEmulator::FLEE_ALLY, turns)) {
+            action = BattleEmulator::FLEE_ALLY;
+            if (tmpgenomu.Visited >= 1) {
+                currentGenome.fitness = baseFitness; // 固定値に
+                currentGenome.Visited = 0;
+            } else {
+                currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 13);
             }
             currentGenome.actions[turns - 1] = action;
 

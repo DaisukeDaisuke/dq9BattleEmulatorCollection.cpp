@@ -87,6 +87,8 @@ public:
     static const int DEAD1 = 51;//ゴスペルソング
     static const int GOSPEL_SONG = 52;//ゴスペルソング
 
+    static const int FLEE_ALLY = 53;//逃げる
+
 
     static bool
     Main(int *position, int RunCount, const int32_t Gene[350], Player *players,

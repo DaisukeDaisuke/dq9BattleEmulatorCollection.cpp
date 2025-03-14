@@ -335,7 +335,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 14532282653;
+    uint64_t time1 = 15512133729;
 
     int dummy[100];
     lcg::init(time1);
@@ -358,7 +358,7 @@ int main() {
 
     Player players1[2];
     //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {30, 31, 30, 38, 46, 30, 31, 33, 33, 34, 31, 34, 31, 30, 33, 34, 31, 34, 34, 34};
+    int32_t gene1[350] = {30, 31, 30, 33, 34, 31, 53, 53, 38, 34, 31, 34, 30, 31, 33, 31, 34, 34, 34, 34, 53, 30, 33, 34};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
@@ -520,7 +520,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     priority_queue<Genome> que;
 
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 1200; ++i) {
         auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 15000, gene, i * 2);
 
         Player players[2];
