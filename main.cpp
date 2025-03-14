@@ -335,7 +335,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x34DB9E390;
+    uint64_t time1 = 15512133729;
 
     int dummy[100];
     lcg::init(time1);
@@ -358,19 +358,19 @@ int main() {
 
     Player players1[2];
     //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {30, 31, 30, 33, 34, 31, 53, 53, 38, 34, 31, 34, 30, 31, 33, 31, 34, 34, 34, 34, 53, 30, 33, 34};
+    int32_t gene1[350] = {30, 31, 30, 33, 34, 31, 30, 31, 38, 31, 30, 30, 31, 30, 31, 34, 33, 34, 31, 34, 31, 30, 31, 33, 34, 34,};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::BUFF;
     // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
     // gene1[counter++] = BattleEmulator::BUFF;
     // gene1[counter++] = BattleEmulator::DOUBLE_UP;

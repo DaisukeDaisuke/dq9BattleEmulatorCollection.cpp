@@ -1361,7 +1361,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (baseDamage != 0) {
                 (*position)++; //不明 0x021e54fc
             }
-            (*position)++; //不明
             if (!players[0].specialCharge) {
                 (*position)++; //0x021ed7a8
                 if (lcg::getPercent(position, 100) < 1) {
@@ -1565,13 +1564,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //関係ない
             (*position)++; //会心
             (*position)++; //回避
-            baseDamage = FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
-            if (baseDamage == 0) {
-                baseDamage = lcg::getPercent(position, 2); //0x021e81a0
-            }
-            if (baseDamage != 0) {
-                (*position)++; //不明 0x021e54fc
-            }
+            FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
             (*position)++; //不明
             if (!players[attacker].specialCharge && !players[attacker].sleeping && !players[attacker].paralysis) {
                 (*position)++; //必殺チャージ(敵)
