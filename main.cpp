@@ -266,9 +266,8 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v1.0.13";
-//int main(int argc, char *argv[]) {
-int main() {
+const std::string version = "v1.0.14";
+void showHeader() {
 #ifdef BUILD_DATE
     const std::string buildDate = BUILD_DATE;
 #else
@@ -293,14 +292,20 @@ int main() {
     std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " <<
             buildTime << " UTC/GMT, Compiler: " << compiler << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << std::endl;
+    std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << std::endl;
+    std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << std::endl;
 #else
     std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
-            << ", " << buildTime << std::endl;
+    << ", " << buildTime << std::endl;
 #endif
     std::cout << "Waiting for input[q/b]: " << std::endl;
+}
+
+
+//int main(int argc, char *argv[]) {
+int main() {
+    showHeader();
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
@@ -744,6 +749,10 @@ void mainLoop(const Player copiedPlayers[2]) {
             if (foundSeeds == 1) {
                 SearchRequest(copiedPlayers, seed, aActions);
             }
+            continue;
+        }
+        if (command == 'h') {
+            showHeader();
             continue;
         }
         std::cerr << "Unknown command." << std::endl;
