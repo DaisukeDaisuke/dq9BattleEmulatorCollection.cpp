@@ -558,6 +558,8 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
 
+    std::cout << "0x" << std::hex << seed << std::dec << ": ";
+
     for (auto i = 0; i < 100; ++i) {
         if (bestGenome.actions[i] == 0 || bestGenome.actions[i] == -1) {
             break;
