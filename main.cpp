@@ -687,46 +687,69 @@ void mainLoop(const Player copiedPlayers[2]) {
     int aActions[350] = {0};
     int damages[350] = {0};
 
-    while (true) {
-        std::string input;
-        std::getline(std::cin, input);
-
+    std::string input;
+    while (std::getline(std::cin, input)) {//意図せずcinが閉じられると無限ループするので対策
         if (input.empty()) continue;
 
         char command = input[0];
         if (command == 'q') {
             std::cout << "Exiting loop." << std::endl;
-            break;
+            return;
         }
-
-        std::istringstream ss(input.substr(2)); // コマンド文字を除外してパース
-
-        int hours, minutes, seconds, turns;
-        ss >> hours >> minutes >> seconds >> turns;
-
-        // '/'区切りでeActions, aActions, damagesに分割
-        std::string eActionsStr, aActionsStr, damagesStr;
-        std::getline(ss, eActionsStr, '-');
-        std::getline(ss, aActionsStr, '-');
-        std::getline(ss, damagesStr, '-');
-
-        // 各アクション配列に値を代入
-        parseActions(eActionsStr, eActions);
-        parseActions(aActionsStr, aActions);
-        parseActions(damagesStr, damages);
-
-        // コマンドに応じた処理
         if (command == 'b') {
+            // Check if there is enough input (e.g., at least "b " and some parameters)
+            if (input.size() < 3) {
+                std::cerr << "Error: insufficient input for command 'b'." << std::endl;
+                continue;
+            }
+
+            // Extract the substring after the command character and a space
+            std::string params = input.substr(2);
+            if (params.empty()) {
+                std::cerr << "Error: no parameters provided for command 'b'." << std::endl;
+                continue;
+            }
+
+            std::istringstream ss(params);
+
+            int hours, minutes, seconds, turns;
+            if (!(ss >> hours >> minutes >> seconds >> turns)) {
+                std::cerr << "Error: failed to parse time parameters." << std::endl;
+                continue;
+            }
+
+            // Read the three action strings separated by '-' delimiters
+            std::string eActionsStr, aActionsStr, damagesStr;
+            if (!std::getline(ss, eActionsStr, '-')) {
+                std::cerr << "Error: failed to read eActions." << std::endl;
+                continue;
+            }
+            if (!std::getline(ss, aActionsStr, '-')) {
+                std::cerr << "Error: failed to read aActions." << std::endl;
+                continue;
+            }
+            if (!std::getline(ss, damagesStr, '-')) {
+                std::cerr << "Error: failed to read damages." << std::endl;
+                continue;
+            }
+
+            // 各アクション配列に値を代入
+            parseActions(eActionsStr, eActions);
+            parseActions(aActionsStr, aActions);
+            parseActions(damagesStr, damages);
+
             auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
             if (foundSeeds == 1) {
                 SearchRequest(copiedPlayers, seed, aActions);
             }
-        } else if (command == 'u') {
-            std::cout << "Updating state..." << std::endl;
-            // 状態更新の処理を実装
-        } else {
-            std::cerr << "Unknown command." << std::endl;
+            continue;
         }
+        std::cerr << "Unknown command." << std::endl;
+    }
+    if (std::cerr.good()) {
+        std::cerr <<
+                "Unrecoverable Error: An anomaly occurred in the main loop of the C++ process, forcing the battle emulator process to terminate. To recover, please restart the integrated system"
+                << std::endl;
     }
 }
 
