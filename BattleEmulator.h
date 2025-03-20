@@ -88,6 +88,13 @@ public:
     static const int GOSPEL_SONG = 52;//ゴスペルソング
 
     static const int FLEE_ALLY = 53;//逃げる
+    static const int MIRACLE_SLASH = 54;//逃げる
+
+    //病魔
+    static const int POISON_ATTACK = 65; // 毒攻撃
+    static const int DECELERATLE = 66; //ボミオス
+    static const int KASAP = 67; //ルカナン
+    static const int SWEET_BREATH = 68; //ルカナン
 
 
     static bool

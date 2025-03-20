@@ -17,6 +17,7 @@ struct Player {
     int def;
     int defaultDEF;
     int speed;
+    int defaultSpeed;
     int HealPower;
     int mp = 0;
     int maxMp = 0;
@@ -42,6 +43,10 @@ struct Player {
     int SageElixirCount = 2;
     int ElfinElixirCount = 1;
     int MagicWaterCount = 1;
+    int speedTurn = -1;
+    bool speedEnable = false;
+    int PoisonTurn = -1;
+    bool PoisonEnable = false;
 
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 

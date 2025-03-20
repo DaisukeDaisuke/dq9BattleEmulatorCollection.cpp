@@ -16,13 +16,13 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
         //一部の特異点の挙動について対策する
 
         //守備力が高すぎる場合(ダメージ0)true、盾ガードは偽
-        if (bakuti && after == BattleEmulator::SKY_ATTACK) {
-            moture = true;
-        }
-        if (moture && after == BattleEmulator::MERA_ZOMA) {
-            onFreeCameraMove(position, after, 1, NowState);
-            continue;
-        }
+        // if (bakuti && after == BattleEmulator::SKY_ATTACK) {
+        //     moture = true;
+        // }
+        // if (moture && after == BattleEmulator::MERA_ZOMA) {
+        //     onFreeCameraMove(position, after, 1, NowState);
+        //     continue;
+        // }
         // }else
 /*        if (before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA){//寝てる必要ないの???? isSleeping
             //寝ていて、スカイアタックで起きず、メラゾーマされるとparam5がtrueになる。マジで謎
@@ -30,9 +30,9 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
         }else *//*if (!preemptive1&&before == BattleEmulator::MERA_ZOMA&&after == BattleEmulator::SKY_ATTACK){//寝てる必要ないの???? isSleeping
             //暫定
             onFreeCameraMove(position, after, 1, NowState);
-        }else*/ if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
+        }else*/ if (after == BattleEmulator::ATTACK_ALLY) {
             onFreeCameraMove(position, after, preemptive ? 1 : 0, NowState);
-        }else if(after == BattleEmulator::MERCURIAL_THRUST){
+        }else if(after == BattleEmulator::POISON_ATTACK){
             (*position)++;//追尾カメラ
         }
         if (after != BattleEmulator::ATTACK_ALLY) {//味方の攻撃→上空だとフリーカメラが特異点の挙動する
