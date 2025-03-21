@@ -322,7 +322,7 @@ int main() {
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 1, 1, 1
-            ,-1, false, -1, false,
+            ,-1, 0, -1, false,
         }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
         // プレイヤー2
@@ -332,7 +332,7 @@ int main() {
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 0, 0, 0
-            ,-1, false, -1, false,
+            ,-1, 0, -1, false,
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
@@ -342,7 +342,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x1ed58118;
+    uint64_t time1 = 0x26876045;
 
     int dummy[100];
     lcg::init(time1);
@@ -371,41 +371,23 @@ int main() {
 
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::FLEE_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    // gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    // gene1[counter++] = BattleEmulator::DEFENDING_CHAMPION;
-    // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MORE_HEAL;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::MAGIC_MIRROR;
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::DOUBLE_UP;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
-    // gene1[counter++] = BattleEmulator::MULTITHRUST;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
 
     //for (int i = 0; i < 10; ++i) {
         (*NowState) = 0;

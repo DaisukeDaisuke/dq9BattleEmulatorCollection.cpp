@@ -44,7 +44,7 @@ struct Player {
     int ElfinElixirCount = 1;
     int MagicWaterCount = 1;
     int speedTurn = -1;
-    bool speedEnable = false;
+    int speedLevel = 0;
     int PoisonTurn = -1;
     bool PoisonEnable = false;
 
