@@ -204,7 +204,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 147) {
+        if ((*position) == 216) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -628,6 +628,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     auto attackCount = 0;
     bool defenseFlag = false; //防御した場合0x021e81a0のほうが優先度高いらしい。なんで
     switch (Id & 0xffff) {
+        case SWEET_BREATH:
+            (*position) += 2;
+            (*position)++; //0x02158584 会心
+            (*position)++; //0x021ec6f8 不明
+            break;
         case KASAP:
             (*position) += 2;
             (*position)++; //0x02158584 会心
