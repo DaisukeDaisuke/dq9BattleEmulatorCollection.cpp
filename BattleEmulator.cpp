@@ -12,7 +12,6 @@
 #include "camera.h"
 #include "debug.h"
 #include "BattleResult.h"
-#include "Equipment.h"
 
 
 int32_t actions[3];

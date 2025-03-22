@@ -51,6 +51,47 @@ void updateCompromiseScore(Genome &genome) {
     }
 }
 
+class HeapQueue {
+private:
+    std::vector<Genome> heap;
+    size_t maxSize;
+
+public:
+    explicit HeapQueue(size_t maxSize) : maxSize(maxSize) {}
+
+    void push(const Genome& genome) {
+        if (heap.size() < maxSize) {
+            heap.push_back(genome);
+            std::push_heap(heap.begin(), heap.end());
+        }
+        else {
+            // 200 を超えたら、最小要素を削除（最小ヒープのように管理）
+            if (genome.fitness > heap.front().fitness) {
+                std::pop_heap(heap.begin(), heap.end());
+                heap.back() = genome;
+                std::push_heap(heap.begin(), heap.end());
+            }
+        }
+    }
+
+    void pop() {
+        std::pop_heap(heap.begin(), heap.end());
+        heap.pop_back();
+    }
+
+    Genome top() const {
+        return heap.front();
+    }
+
+    bool empty() const {
+        return heap.empty();
+    }
+
+    size_t size() const {
+        return heap.size();
+    }
+};
+
 // オレオレアルゴリズム実行
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
                                      int actions[350], int seedOffset) {
@@ -74,7 +115,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     // int Edamage[2] = {-1, -1};
     auto counter1 = 0;
     //std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
-    std::priority_queue<Genome> que;
+    //std::priority_queue<Genome> que;
+    HeapQueue que(200);
 
     genome = {};
 

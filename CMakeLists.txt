@@ -33,12 +33,11 @@ add_executable(newDirectory main.cpp
         debug.h
         BattleResult.h
         AnalyzeData.h
-        Equipment.h
         ActionOptimizer.cpp
         ActionOptimizer.h
         Genome.h
         ActionBanManager.h
-)
+  )
 
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d" UTC)
 string(TIMESTAMP BUILD_TIME "%H:%M:%S" UTC)
