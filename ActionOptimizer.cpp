@@ -134,8 +134,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         (*position) = currentGenome.position;
         (*nowState) = currentGenome.state;
 
-        auto tmpgenomu = currentGenome;
-        result->clear();
+        const auto tmpgenomu = currentGenome;
+        result->clear(); //メモリ新規確保よりこっちのほうが早い
 
         BattleEmulator::Main(position, currentGenome.turn - currentGenome.processed, currentGenome.actions,
                              CopedPlayers,

@@ -156,7 +156,7 @@ std::string BattleEmulator::getActionName(int actionId) {
         case BattleEmulator::DECELERATLE:
             return "Deceleratle(bomi)";
         case BattleEmulator::SPECIAL_ANTIDOTE:
-            return "Special Antidote";
+            return "!Special Antidote";
         default:
             return "Unknown Action";
     }
@@ -187,7 +187,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         if (genePosition != -1) {
             genePosition = counterJ - 1;
         }
-        TiggerSkyAttack = false;
         //現在ターンを保存
         (*NowState) &= ~0xFFFFF000;
         (*NowState) |= (counterJ << 12);
@@ -200,8 +199,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         if (players[0].specialChargeTurn == -1) {
             players[0].specialCharge = false;
         }
-
-        TiggerSkyAttack = false;
 
         resetCombo(NowState);
 
@@ -254,6 +251,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 }
             }
 
+            if (enemyAction[counter] == SWEET_BREATH && players[0].sleeping == true) {
+                enemyAction[counter] = KASAP;
+            }
 
             if (enemyAction[counter] == KASAP && players[0].BuffLevel == -2) {
                 enemyAction[counter] = DECELERATLE;
@@ -299,14 +299,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 CURE_PARALYSIS || actionTable == PARALYSIS) {
                 actionTable = ATTACK_ALLY;
             }
-            //genePosition++;
-            if (actionTable == HEAL && players[0].mp <= 0) {
-                if (players[0].SpecialMedicineCount >= 1) {
-                    actionTable = MEDICINAL_HERBS;
-                } else {
-                    actionTable = ATTACK_ALLY;
-                }
-            }
         } else {
             if (players[0].hp >= 35) {
                 actionTable = ATTACK_ALLY;
@@ -314,7 +306,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 if (players[0].mp >= 2) {
                     actionTable = HEAL;
                 } else if (players[0].SpecialMedicineCount >= 1) {
-                    actionTable = MEDICINAL_HERBS;
+                    actionTable = SPECIAL_MEDICINE;
                 } else {
                     actionTable = ATTACK_ALLY;
                 }
@@ -325,17 +317,10 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         //途中で解除してもいいように2回チェックする
         if (players[0].sleeping) {
             actionTable = SLEEPING;
-        } else if (!players[0].paralysis && actionTable == BattleEmulator::MERCURIAL_THRUST) {
-            player0_has_initiative = true;
         }
 
         if (actionTable == DEFENCE) {
             players[0].defence = 0.5;
-        }
-        if (actionTable == DEFENDING_CHAMPION) {
-            //例え寝てる場合でもmpが減る
-            players[0].defence = 0.1;
-            players[0].mp -= 3; //後攻睡眠などにより大防御の行動ができない場合は事前に減る
         }
 
         // ソートされた結果を出力
@@ -413,13 +398,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             }
                         }
                     }
-                    if (c == BattleEmulator::MEDITATION) {
-                        Player::heal(players[1], basedamage);
-                    } else if (c == BattleEmulator::MERA_ZOMA && players[0].hasMagicMirror) {
-                        Player::reduceHp(players[1], basedamage);
-                    } else {
-                        Player::reduceHp(players[0], basedamage);
-                    }
+
+                    Player::reduceHp(players[0], basedamage);
+
                     //--------start_FUN_021594bc-------
                     if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
                         (*position) += 1;
@@ -441,24 +422,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     //--------start_FUN_02158dfc-------
                     if (!players[0].paralysis && !players[0].sleeping) {
                         (*position) += 1;
-                    } else if (players[0].paralysis) {
-                        action = PARALYSIS;
-                        //if (players[0].paralysisTurns != 0) {
-                        players[0].paralysisTurns--;
-                        //}
-                        if (players[0].paralysisTurns <= 0) {
-                            int paralysisTable[4] = {62, 75, 87, 100};
-                            auto probability1 = paralysisTable[std::abs(players[0].paralysisTurns)];
-                            auto probability2 = lcg::getPercent(position, 100);
-                            if (probability1 >= probability2) {
-                                // 0.5 < 0.65
-                                players[0].paralysis = false;
-                                players[0].paralysisLevel = 0;
-                                action = CURE_PARALYSIS;
-                            }
-                        } else {
-                            (*position) += 1;
-                        }
                     } else if (players[0].sleeping) {
                         action = SLEEPING;
 
@@ -1035,11 +998,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
 
-            if ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST) {
-                tmp = floor(baseDamage * 0.75);
-            } else {
-                tmp = static_cast<double>(baseDamage);
-            }
+            // if ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST) {
+            //     tmp = floor(baseDamage * 0.75);
+            // } else {
+            //     tmp = static_cast<double>(baseDamage);
+            // }
+
+            tmp = static_cast<double>(baseDamage);
 
             if (kaisinn) {
                 //0x020759ec
@@ -1059,13 +1024,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = static_cast<int>(floor(tmp));
 
-            if (!kaihi) {
-                ProcessRage(position, baseDamage, players);
-                (*position)++; //目を覚ました
-                (*position)++; //不明
-            } else {
-                baseDamage = 0;
-            }
+            ProcessRage(position, baseDamage, players);
+            (*position)++; //目を覚ました
+            (*position)++; //不明
             if (kaisinn) {
                 if (!players[1].rage) {
                     (*position)++; //会心時特殊処理　0x021e54fc

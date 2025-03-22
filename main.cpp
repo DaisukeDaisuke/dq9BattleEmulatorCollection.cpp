@@ -417,6 +417,13 @@ int main() {
 
     priority_queue<Genome> que;
 
+    auto *position = new int(1);
+    auto *nowState = new uint64_t(0);
+
+
+    std::optional<BattleResult> result1;
+    result1 = BattleResult();
+
     for (int i = 0; i < 400; ++i) {
         auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, time1, turns, 1000, actions, i * 2);
 
@@ -424,17 +431,13 @@ int main() {
         players[0] = copiedPlayers[0];
         players[1] = copiedPlayers[1];
 
-        auto *position = new int(1);
-        auto *nowState = new uint64_t(0);
+        (*position) = 1;
+        (*nowState) = 0;
 
+        result1->clear();
 
-        std::optional<BattleResult> result1;
-        result1 = BattleResult();
         BattleEmulator::Main(position, turns + 100, genome.actions, players, result1, time1, nullptr, nullptr, -1,
                              nowState);
-
-        delete position;
-        delete nowState;
 
         if (players[0].hp >= 0&& players[1].hp == 0) {
             if (result1->turn < maxTurns) {
@@ -444,6 +447,9 @@ int main() {
             }
         }
     }
+
+    delete position;
+    delete nowState;
 
     std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
 

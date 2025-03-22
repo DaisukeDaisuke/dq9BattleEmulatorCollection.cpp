@@ -12,19 +12,6 @@ class BattleResult {
 public:
     // 各メンバの内容を 0 にリセットする clear 関数
     void clear() {
-        // std::memset(actions, 0, sizeof(actions));
-        // std::memset(damages, 0, sizeof(damages));
-        // std::memset(isEnemy, 0, sizeof(isEnemy));
-        // std::memset(BuffTurnss, 0, sizeof(BuffTurnss));
-        // std::memset(PoisonTurns, 0, sizeof(PoisonTurns));
-        // std::memset(SpeedTurn, 0, sizeof(SpeedTurn));
-        // std::memset(turns, 0, sizeof(turns));
-        // std::memset(initiative, 0, sizeof(initiative));
-        // std::memset(ehp, 0, sizeof(ehp));
-        // std::memset(ahp, 0, sizeof(ahp));
-        // std::memset(scTurn, 0, sizeof(scTurn));
-        // std::memset(amp, 0, sizeof(amp));
-        // std::memset(state, 0, sizeof(state));
         position = 0;
         turn = 0;
     }
