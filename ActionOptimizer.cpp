@@ -135,8 +135,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         (*nowState) = currentGenome.state;
 
         auto tmpgenomu = currentGenome;
-
-
+        result->clear();
 
         BattleEmulator::Main(position, currentGenome.turn - currentGenome.processed, currentGenome.actions,
                              CopedPlayers,
