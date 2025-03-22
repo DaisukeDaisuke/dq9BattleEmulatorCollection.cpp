@@ -28,7 +28,7 @@ struct Player {
     int paralysisLevel = 0;
     int paralysisTurns = -1;
 
-    int SpecialMedicineCount = 3;
+    int SpecialMedicineCount = 6;
     double defence = 1.0;
     bool sleeping = false;
     int sleepingTurn = -1;
@@ -47,6 +47,7 @@ struct Player {
     int speedLevel = 0;
     int PoisonTurn = -1;
     bool PoisonEnable = false;
+    int SpecialAntidoteCount = 2;
 
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 

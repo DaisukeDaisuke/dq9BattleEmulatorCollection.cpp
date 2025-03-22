@@ -317,12 +317,12 @@ int main() {
     const Player copiedPlayers[2] = {
         // プレイヤー1
         {
-            112, 112.0, 94, 94, 102, 102, 76, 76,48, 40, // 最初のメンバー
-            40, false, false, 0, false, 0, -1,
+            103, 103.0, 89, 89, 97, 97, 69, 69,44, 36, // 最初のメンバー
+            36, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 1, 1, 1
-            ,-1, 0, -1, false,
+            ,-1, 0, -1, false, 2,
         }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
         // プレイヤー2
@@ -330,9 +330,9 @@ int main() {
             696, 696.0, 68, 68, 68, 68, 50, 50, 0, 255, // 最初のメンバー
             255, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 0, 0, 0
-            ,-1, 0, -1, false,
+            ,-1, 0, -1, false, 2,
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
@@ -342,7 +342,7 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x26876045;
+    uint64_t time1 = 0x13409baa;
 
     int dummy[100];
     lcg::init(time1);
@@ -370,24 +370,14 @@ int main() {
     int counter = 0;
 
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::FLEE_ALLY;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
 
     //for (int i = 0; i < 10; ++i) {
         (*NowState) = 0;
@@ -411,13 +401,13 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    uint64_t time1 = 0x3611D5E47;
+    uint64_t time1 = 0x22ccafef;
 
     int actions[350] = {
-        30, 31, 30, 35, 35
+        BattleEmulator::ATTACK_ALLY,
     };
 
-    int turns = 5;
+    int turns = 1;
 
     lcg::init(time1);
 
@@ -446,7 +436,7 @@ int main() {
         delete position;
         delete nowState;
 
-        if (players[0].hp >= 0&& players[1].hp == 0 && players[0].mp >= 0) {
+        if (players[0].hp >= 0&& players[1].hp == 0) {
             if (result1->turn < maxTurns) {
                 maxTurns = result1->turn;
                 bestResult = result1.value();
@@ -524,8 +514,8 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     priority_queue<Genome> que;
 
-    for (int i = 0; i < 1200; ++i) {
-        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 15000, gene, i * 2);
+    for (int i = 0; i < 200; ++i) {
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 10000, gene, i * 2);
 
         Player players[2];
         players[0] = copiedPlayers[0];

@@ -155,7 +155,8 @@ std::string BattleEmulator::getActionName(int actionId) {
             return "Sweet Breath";
         case BattleEmulator::DECELERATLE:
             return "Deceleratle(bomi)";
-
+        case BattleEmulator::SPECIAL_ANTIDOTE:
+            return "Special Antidote";
         default:
             return "Unknown Action";
     }
@@ -207,8 +208,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         tmpState = (*NowState);
 
 #ifdef DEBUG2
-        DEBUG_COUT2((*position));
-        if ((*position) == 889) {
+        std::cout << "c: "<< counterJ << ", " << (*position) << std::endl;
+        if ((*position) == 526) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -244,17 +245,15 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
             if (counter == 1 && enemyAction[0] == enemyAction[1]) {
                 if (enemyAction[1] == POISON_ATTACK) {
                     enemyAction[1] = ATTACK_ENEMY;
-                }
-                if (enemyAction[1] == KASAP) {
+                } else if (enemyAction[1] == KASAP) {
                     enemyAction[1] = DECELERATLE;
-                }
-                if (enemyAction[1] == DECELERATLE) {
+                } else if (enemyAction[1] == DECELERATLE) {
                     enemyAction[1] = ATTACK_ENEMY;
-                }
-                if (enemyAction[1] == SWEET_BREATH) {
+                } else if (enemyAction[1] == SWEET_BREATH) {
                     enemyAction[1] = KASAP;
                 }
             }
+
 
             if (enemyAction[counter] == KASAP && players[0].BuffLevel == -2) {
                 enemyAction[counter] = DECELERATLE;
@@ -262,7 +261,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
             if (enemyAction[counter] == DECELERATLE && players[0].speedLevel == -2) {
                 enemyAction[counter] = ATTACK_ENEMY;
             }
-
 
 
             preAction = enemyAction[counter];
@@ -513,7 +511,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                           tmpState, players[0].specialChargeTurn, players[0].mp);
                     }
                     if (action == HEAL || action == MEDICINAL_HERBS || action == MORE_HEAL || action == MIDHEAL ||
-                        action == FULLHEAL || action == SPECIAL_MEDICINE || action == GOSPEL_SONG) {
+                        action == FULLHEAL || action == SPECIAL_MEDICINE || action == GOSPEL_SONG || action == SPECIAL_ANTIDOTE) {
                         Player::heal(players[0], basedamage);
                     } else {
                         Player::reduceHp(players[1], basedamage);
@@ -534,7 +532,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
                         (*position) += 1;
                         //TODO: 順序調べる
-
 
 
                         players[0].BuffTurns--;
@@ -599,9 +596,11 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         }
 
         // 0x0215bd64 毒のダメージ処理
-        players[0].PoisonTurn--;
+        if (players[0].PoisonTurn != -1) {
+            players[0].PoisonTurn++;
+        }
         if (players[0].PoisonEnable == true) {
-            Player::reduceHp(players[0], static_cast<int>(players[0].maxHp) >> 4);// 16分の1
+            Player::reduceHp(players[0], static_cast<int>(players[0].maxHp) >> 4); // 16分の1
         }
 
         if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
@@ -610,9 +609,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         camera::Main(position, actions, NowState, player0_has_initiative, TiggerSkyAttack);
 
 #ifdef DEBUG2
-        DEBUG_COUT2((*position));
+        //DEBUG_COUT2((*position));
         if ((*position) == 176) {
-            std::cout << "!!" << std::endl;
+            //std::cout << "!!" << std::endl;
         }
 #endif
 
@@ -640,9 +639,24 @@ double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
 
 //コンパイラが毎回コピーするコードを生成するからグローバルスコープに追い出しとく
 const int proportionTable2[9] = {90, 90, 64, 32, 16, 8, 4, 2, 1}; //最後の項目を調べるのは手動　P:\lua\isilyudaru\hissatuteki.lua
-const int proportionTable3[9] = {109, 90, 79, 69, 57, 45, 34, 23, 12}; //6ダメージ以下で0% 309 new: 112
+const int proportionTable3[9] = {93, 83, 73, 62, 52, 42, 31, 21, 11}; //6ダメージ以下で0% 309 new: 112 103
 // double proportionTable1[9] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2, 0.1};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
 const double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5}; //一部の敵は特殊テンションテーブルを倍率として使う
+
+/*
+<?php
+$base = 103;
+$results = [];
+
+for ($i = 9; $i >= 1; $i--) {
+    $multiplier = $i / 10;
+    $result = floor($base * $multiplier) + 1;
+    $results[] = $result;
+}
+
+echo implode(", ", $results);
+?>
+*/
 
 
 int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender,
@@ -683,7 +697,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 players[defender].speedTurn = 7;
                 RecalculateBuff(players);
             } else {
-                //TODO
+                (*position)++; //0x021ed7a8
             }
             baseDamage = 0;
             resetCombo(NowState);
@@ -738,13 +752,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 players[defender].BuffTurns = 7;
                 RecalculateBuff(players);
             } else {
-                //TODO
+                (*position)++; //0x021ed7a8
             }
             baseDamage = 0;
             resetCombo(NowState);
             break;
         case SPECIAL_MEDICINE:
-            players[attacker].SpecialMedicineCount--;
+        case SPECIAL_ANTIDOTE:
             (*position) += 2;
             (*position)++; //0x021ec6f8 不明
             (*position)++; //0x02158584 会心
@@ -758,6 +772,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[attacker].specialCharge = true;
                     players[attacker].specialChargeTurn = 6;
                 }
+            }
+            if ((Id & 0xffff) == SPECIAL_ANTIDOTE) {
+                players[attacker].PoisonEnable = false;
+                players[attacker].PoisonTurn = -1;
+                players[attacker].SpecialAntidoteCount--;
+            } else {
+                players[attacker].SpecialMedicineCount--;
             }
             resetCombo(NowState);
             break;
@@ -884,7 +905,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     if (lcg::getPercent(position, 100) < 12) {
                         //0x021e3978 毒
                         players[defender].PoisonEnable = true;
-                        players[defender].PoisonTurn = 7;
+                        players[defender].PoisonTurn = 0;
                     }
                 }
 

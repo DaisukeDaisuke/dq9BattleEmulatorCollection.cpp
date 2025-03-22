@@ -88,7 +88,8 @@ public:
     static const int GOSPEL_SONG = 52;//ゴスペルソング
 
     static const int FLEE_ALLY = 53;//逃げる
-    static const int MIRACLE_SLASH = 54;//逃げる
+    static const int MIRACLE_SLASH = 54;//ミラクルソード
+    static const int SPECIAL_ANTIDOTE = 55;//特毒消し草
 
     //病魔
     static const int POISON_ATTACK = 65; // 毒攻撃
