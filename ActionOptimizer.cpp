@@ -66,21 +66,13 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
         genome.actions[i] = actions[i];
     }
-
-    Player nowPlayer[2];
-    nowPlayer[0] = players[0];
-    nowPlayer[1] = players[1];
     Player CopedPlayers[2];
     auto action = -1;
     auto Aactions = -1;
-    auto Adamage = -1;
-    int Eactions[2] = {-1, -1};
-    int Edamage[2] = {-1, -1};
+    // auto Adamage = -1;
+    // int Eactions[2] = {-1, -1};
+    // int Edamage[2] = {-1, -1};
     auto counter1 = 0;
-    auto processed = 0;
-    auto Initialized = false;
-    auto backToPasted = false;
-    auto Past = turns;
     //std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
     std::priority_queue<Genome> que;
 
@@ -119,9 +111,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     while (!que.empty() && (maxGenerations == -1 || maxGenerations > counter)) {
         currentGenome = que.top();
         que.pop();
-        // if (currentGenome.isEliminated) {
-        //     continue;
-        // }
 
         turns = currentGenome.turn;
 
@@ -155,12 +144,12 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         counter1 = 0;
         for (int i = result->position - 3; i < result->position; ++i) {
             if (result->isEnemy[i]) {
-                Eactions[counter1] = result->actions[i];
-                Edamage[counter1] = result->damages[i];
+                //Eactions[counter1] = result->actions[i];
+                //Edamage[counter1] = result->damages[i];
                 currentGenome.EActions[counter1++] = result->actions[i];
             } else {
                 Aactions = result->actions[i];
-                Adamage = result->damages[i];
+                //Adamage = result->damages[i];
                 currentGenome.Aactions = result->actions[i];
             }
         }
@@ -222,11 +211,11 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             }
         }
         auto AllyPlayer = CopedPlayers[0];
-        auto EnemyPlayer = CopedPlayers[1];
+        //auto EnemyPlayer = CopedPlayers[1];
 
 
         auto AllyPlayerPre = tmpgenomu.AllyPlayer;
-        auto EnemyPlayerPre = tmpgenomu.EnemyPlayer;
+        //auto EnemyPlayerPre = tmpgenomu.EnemyPlayer;
 
         currentGenome.Initialized = true;
         //if (!skip) {

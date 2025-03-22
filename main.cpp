@@ -473,7 +473,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     std::optional<BattleResult> result1;
     result1 = BattleResult();
-
+    Player players[2];
 
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
@@ -481,7 +481,6 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     for (int i = 0; i < 500; ++i) {
         auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 1000, gene, i * 2);
 
-        Player players[2];
         players[0] = copiedPlayers[0];
         players[1] = copiedPlayers[1];
 
@@ -523,7 +522,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
             std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
     std::cout << "elapsed time: " << double(elapsed_time1) / 1000 << " ms" << std::endl;
     std::cout << "Searcher Turn Consumed: " << BattleEmulator::getTurnProcessed() << " (" << (
-        static_cast<double>(BattleEmulator::getTurnProcessed()) / 10000) << "mann)" << std::endl;
+        static_cast<double>(BattleEmulator::getTurnProcessed()) / 10000) << " mann)" << std::endl;
     // 1秒あたりの探索回数 (万回.?? 形式)
     // 正しい計算：1秒あたりの探索回数 (万回/秒)
     double performance = (static_cast<double>(BattleEmulator::getTurnProcessed()) * 100.0) /
