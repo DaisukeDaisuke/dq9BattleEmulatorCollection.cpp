@@ -401,7 +401,7 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    uint64_t time1 = 0x22ccafef;
+    uint64_t time1 = 0x22e43199;
 
     int actions[350] = {
         BattleEmulator::ATTACK_ALLY,
@@ -417,8 +417,8 @@ int main() {
 
     priority_queue<Genome> que;
 
-    for (int i = 0; i < 300; ++i) {
-        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, time1, turns, 10000, actions, i * 2);
+    for (int i = 0; i < 400; ++i) {
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, time1, turns, 1000, actions, i * 2);
 
         Player players[2];
         players[0] = copiedPlayers[0];

@@ -39,8 +39,6 @@ void updateCompromiseScore(Genome &genome) {
     for (int i = 0; i < 2; ++i) {
         if (genome.EActions[i] == BattleEmulator::KASAP) {
             genome.compromiseScore -= 2;
-        } else if (genome.EActions[i] == BattleEmulator::DISRUPTIVE_WAVE) {
-            genome.compromiseScore -= 10;
         }
     }
 
@@ -48,8 +46,6 @@ void updateCompromiseScore(Genome &genome) {
     if (genome.Aactions == BattleEmulator::SLEEPING || genome.Aactions == BattleEmulator::CURE_SLEEPING || genome.
         Aactions == BattleEmulator::TURN_SKIPPED) {
         genome.compromiseScore -= 1; // 睡眠
-    } else if (genome.Aactions == BattleEmulator::PARALYSIS || genome.Aactions == BattleEmulator::CURE_PARALYSIS) {
-        genome.compromiseScore -= 100; // 麻痺（許容不可）
     } else {
         genome.compromiseScore = std::min(0, genome.compromiseScore + 1);
     }
@@ -116,6 +112,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     }
 
     que.push(genome);
+    std::optional<BattleResult> result;
+    result = BattleResult();
 
     Genome currentGenome;
     while (!que.empty() && (maxGenerations == -1 || maxGenerations > counter)) {
@@ -138,8 +136,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
         auto tmpgenomu = currentGenome;
 
-        std::optional<BattleResult> result;
-        result = BattleResult();
+
+
         BattleEmulator::Main(position, currentGenome.turn - currentGenome.processed, currentGenome.actions,
                              CopedPlayers,
                              result, seed,
@@ -235,7 +233,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         //if (!skip) {
 
 
-        if (AllyPlayer.PoisonEnable == true && !Bans.is_action_banned(BattleEmulator::SPECIAL_ANTIDOTE, turns) && AllyPlayerPre.SpecialAntidoteCount > 0) {
+        if (AllyPlayer.PoisonEnable == true && !Bans.is_action_banned(BattleEmulator::SPECIAL_ANTIDOTE, turns) &&
+            AllyPlayerPre.SpecialAntidoteCount > 0) {
             action = BattleEmulator::SPECIAL_ANTIDOTE;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
@@ -263,7 +262,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.EnemyPlayer = CopedPlayers[1];
 
             que.push(currentGenome);
-        }else if (!Bans.is_action_banned(BattleEmulator::SPECIAL_MEDICINE, turns) && AllyPlayerPre.SpecialMedicineCount > 0) {
+        } else if (!Bans.is_action_banned(BattleEmulator::SPECIAL_MEDICINE, turns) && AllyPlayerPre.SpecialMedicineCount
+                   > 0) {
             action = BattleEmulator::SPECIAL_MEDICINE;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
@@ -323,7 +323,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.AllyPlayer = CopedPlayers[0];
             currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            if (visited == 0&&ehp1 - currentGenome.EnemyPlayer.hp > 70) {
+            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 70) {
                 currentGenome.fitness += 30;
             }
 
