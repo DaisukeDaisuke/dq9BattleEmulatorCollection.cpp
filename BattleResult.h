@@ -8,6 +8,13 @@
 class BattleResult {
 
 public:
+    // 各メンバの内容を 0 にリセットする clear 関数
+    void clear() {
+        position = 0;
+        turn = 0;
+    }
+
+
     static void
     add(std::optional<BattleResult> &obj1, int action, int damage, bool isEnemy, int AtkBuffTurn, int BuffTurns, int MagicMirrorTurn, int turn,
         bool player0_has_initiative, int ehp, int ahp, uint64_t nowState, int scTurn, int amp) {

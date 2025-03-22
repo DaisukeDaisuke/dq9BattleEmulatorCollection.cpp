@@ -116,6 +116,9 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
     que.push(genome);
 
+    std::optional<BattleResult> result;
+    result = BattleResult();
+
     Genome currentGenome;
     while (!que.empty() && (maxGenerations == -1 || maxGenerations > counter)) {
         currentGenome = que.top();
@@ -137,8 +140,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
         auto tmpgenomu = currentGenome;
 
-        std::optional<BattleResult> result;
-        result = BattleResult();
+
+        result->clear();
         BattleEmulator::Main(position, currentGenome.turn - currentGenome.processed, currentGenome.actions,
                              CopedPlayers,
                              result, seed,

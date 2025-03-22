@@ -436,24 +436,26 @@ int main() {
 
     priority_queue<Genome> que;
 
-    for (int i = 0; i < 300; ++i) {
-        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, time1, turns, 10000, actions, i * 2);
+    std::optional<BattleResult> result1;
+    result1 = BattleResult();
+
+    auto *position = new int(1);
+    auto *nowState = new uint64_t(0);
+
+    for (int i = 0; i < 1200; ++i) {
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, time1, turns, 3000, actions, i * 2);
 
         Player players[2];
         players[0] = copiedPlayers[0];
         players[1] = copiedPlayers[1];
 
-        auto *position = new int(1);
-        auto *nowState = new uint64_t(0);
+        (*position) = 1;
+        (*nowState) = 0;
 
-
-        std::optional<BattleResult> result1;
-        result1 = BattleResult();
+        result1->clear();
         BattleEmulator::Main(position, turns + 100, genome.actions, players, result1, time1, nullptr, nullptr, -1,
                              nowState);
 
-        delete position;
-        delete nowState;
 
         if (players[0].hp >= 0&& players[1].hp == 0 && players[0].mp >= 0) {
             if (result1->turn < maxTurns) {
@@ -463,6 +465,10 @@ int main() {
             }
         }
     }
+
+
+    delete position;
+    delete nowState;
 
     std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
 
@@ -533,6 +539,12 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     priority_queue<Genome> que;
 
+    std::optional<BattleResult> result1;
+    result1 = BattleResult();
+
+    auto *position = new int(1);
+    auto *nowState = new uint64_t(0);
+
     for (int i = 0; i < 1200; ++i) {
         auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 2000, gene, i * 2);
 
@@ -540,17 +552,13 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
         players[0] = copiedPlayers[0];
         players[1] = copiedPlayers[1];
 
-        auto *position = new int(1);
-        auto *nowState = new uint64_t(0);
-
-
-        std::optional<BattleResult> result1;
-        result1 = BattleResult();
+        (*position) = 1;
+        (*nowState) = 0;
+        result1->clear();
         BattleEmulator::Main(position, turns + 100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
                              nowState);
 
-        delete position;
-        delete nowState;
+
 
         if (players[0].hp >= 0 && players[1].hp == 0 && players[0].mp >= 0) {
             if (result1->turn < maxTurns) {
@@ -560,6 +568,9 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
             }
         }
     }
+
+    delete position;
+    delete nowState;
 
     std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
 
