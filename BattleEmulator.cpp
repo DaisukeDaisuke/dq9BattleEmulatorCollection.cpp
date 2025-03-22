@@ -162,6 +162,16 @@ std::string BattleEmulator::getActionName(int actionId) {
     }
 }
 
+int turnProcessed = 0;
+
+void BattleEmulator::ResetTurnProcessed() {
+    turnProcessed = 0;
+}
+
+int BattleEmulator::getTurnProcessed() {
+    return turnProcessed;
+}
+
 bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], Player *players,
                           std::optional<BattleResult> &result,
                           uint64_t seed, const int eActions[350], const int damages[350], int mode,
@@ -184,6 +194,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         RunCount++;
     }
     for (int counterJ = startPos; counterJ < RunCount; ++counterJ) {
+        turnProcessed++;
         if (genePosition != -1) {
             genePosition = counterJ - 1;
         }
