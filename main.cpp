@@ -546,7 +546,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     auto *nowState = new uint64_t(0);
 
     for (int i = 0; i < 1200; ++i) {
-        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 2000, gene, i * 2);
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 5000, gene, i * 2);
 
         Player players[2];
         players[0] = copiedPlayers[0];
