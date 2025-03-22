@@ -998,12 +998,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
 
-            // if ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST) {
-            //     tmp = floor(baseDamage * 0.75);
-            // } else {
-            //     tmp = static_cast<double>(baseDamage);
-            // }
-
             tmp = static_cast<double>(baseDamage);
 
             if (kaisinn) {
