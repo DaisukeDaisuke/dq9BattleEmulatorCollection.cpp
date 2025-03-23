@@ -156,6 +156,8 @@ std::string BattleEmulator::getActionName(int actionId) {
             return "Deceleratle(bomi)";
         case BattleEmulator::SPECIAL_ANTIDOTE:
             return "!Special Antidote";
+        case BattleEmulator::ACROBATIC_STAR:
+            return "Acrobatic Star";
         default:
             return "Unknown Action";
     }
@@ -216,7 +218,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: "<< counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 526) {
+        if ((*position) == 898) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -484,7 +486,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                           tmpState, players[0].specialChargeTurn, players[0].mp);
                     }
                     if (action == HEAL || action == MEDICINAL_HERBS || action == MORE_HEAL || action == MIDHEAL ||
-                        action == FULLHEAL || action == SPECIAL_MEDICINE || action == GOSPEL_SONG || action == SPECIAL_ANTIDOTE) {
+                        action == FULLHEAL || action == SPECIAL_MEDICINE || action == GOSPEL_SONG || action ==
+                        SPECIAL_ANTIDOTE) {
                         Player::heal(players[0], basedamage);
                     } else {
                         Player::reduceHp(players[1], basedamage);
@@ -529,6 +532,17 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 players[0].speedLevel = 0;
                                 RecalculateBuff(players);
                             }
+                        }
+
+                        players[0].acrobaticStarTurn--;
+
+                        if (players[0].acrobaticStar && players[0].acrobaticStarTurn == 0) {
+                            players[0].acrobaticStar = false;
+                            (*position)++;//0x0215aed4 チートで100にすると次のターンから判定が行われず永遠にアクロバットスター状態になる。
+                            //3f800000
+                            //3f600000
+                            //3f200000
+                            //3ec00000
                         }
                     }
                 } else {
@@ -637,7 +651,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     for (int j = 0; j < 2; ++j) {
         preHP[j] = players[j].hp;
     }
-    actions[actionsPosition++] = Id;
+    if (Id != ACROBATSTAR_KAIHI && Id != COUNTER) {
+        actions[actionsPosition++] = Id;
+    }
     int baseDamage = 0;
     double tmp = 0;
     bool kaisinn = false;
@@ -836,15 +852,80 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             baseDamage = 0;
             resetCombo(NowState);
             break;
+        case BattleEmulator::COUNTER:
+            (*position)++; //0x02158584 会心(無効)
+            if (lcg::getPercent(position, 0x2710) < 500) {
+                kaisinn = true;
+            }
+            if (lcg::getPercent(position, 100) < 2) {
+                kaihi = true;
+            }
+            if (!kaihi) {
+                (*position)++; //盾ガード
+            }
+            (*position)++; //回避
+            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+            if (kaisinn) {
+                tmp = players[attacker].atk * lcg::floatRand(position, 0.95, 1.05);
+                baseDamage = static_cast<int>(floor(tmp));
+            }
+            if (!kaihi) {
+                ProcessRage(position, baseDamage, players);
+            }
+            Player::reduceHp(players[defender], baseDamage);
+
+            baseDamage = 0;
+            break;
+        case BattleEmulator::ACROBATSTAR_KAIHI:
+            //(*position) += 2;
+            //(*position)++;//アクロバットスター判定
+            if (lcg::getPercent(position, 0x2710) < 200) {
+                kaisinn = true;
+            }
+            (*position)++; //回避
+            FUN_0207564c(position, players[attacker].atk, players[defender].def);
+            if (!players[defender].specialCharge) {
+                (*position)++; //0x021ed7a8
+            }
+            baseDamage = 0;
+            break;
+        case BattleEmulator::ACROBATIC_STAR:
+            players[0].acrobaticStar = true;
+            players[0].acrobaticStarTurn = 6;
+            if (player0_has_initiative) {
+                players[0].specialCharge = false;
+            } else {
+                players[0].dirtySpecialCharge = true;
+            }
+            players[0].specialChargeTurn = 0;
+
+            (*position) += 2;
+            (*position)++; //関係ない
+            (*position)++; //会心
+            (*position)++; //回避
+            FUN_0207564c(position, players[attacker].defaultATK, players[defender].def);
+            (*position)++; //不明
+            break;
         case BattleEmulator::ATTACK_ENEMY:
         case BattleEmulator::SKY_ATTACK:
         case BattleEmulator::POISON_ATTACK:
             (*position) += 2;
-            (*position)++; // アクロバットスターとか
+            if (players[0].acrobaticStar) {
+                percent_tmp = lcg::getPercent(position, 100);
+                if (percent_tmp >= 0 && percent_tmp <= 49) {
+                    return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender, NowState);
+                }
+                if (percent_tmp >= 50 && percent_tmp < 75) {
+                    return callAttackFun(COUNTER, position, players, defender, attacker, NowState);
+                }
+            } else {
+                (*position)++;
+            }
+
 
             (*position)++; //会心
             if (!players[0].paralysis && !players[0].sleeping) {
-                if (lcg::getPercent(position, 100) < 2) {
+                if (!players[defender].acrobaticStar && lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
                 if (!kaihi && lcg::getPercent(position, 100) < 0.5000) {

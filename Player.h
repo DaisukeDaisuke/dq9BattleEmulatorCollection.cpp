@@ -48,6 +48,8 @@ struct Player {
     int PoisonTurn = -1;
     bool PoisonEnable = false;
     int SpecialAntidoteCount = 2;
+    bool acrobaticStar = false;
+    int acrobaticStarTurn = 0;
 
     // 他のメンバー変数やメンバー関数を追加する可能性があります
 

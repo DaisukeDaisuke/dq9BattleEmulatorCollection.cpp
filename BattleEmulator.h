@@ -90,12 +90,16 @@ public:
     static const int FLEE_ALLY = 53;//逃げる
     static const int MIRACLE_SLASH = 54;//ミラクルソード
     static const int SPECIAL_ANTIDOTE = 55;//特毒消し草
+    static const int ACROBATIC_STAR = 56;
 
     //病魔
     static const int POISON_ATTACK = 65; // 毒攻撃
     static const int DECELERATLE = 66; //ボミオス
     static const int KASAP = 67; //ルカナン
     static const int SWEET_BREATH = 68; //ルカナン
+
+    static const int ACROBATSTAR_KAIHI = 69;
+    static const int COUNTER = 70;
 
 
     static void ResetTurnProcessed();

@@ -267,6 +267,7 @@ std::string normalDump(AnalyzeData data) {
 }
 
 const std::string version = "v2.0.0";
+
 void showHeader() {
 #ifdef BUILD_DATE
     const std::string buildDate = BUILD_DATE;
@@ -289,7 +290,8 @@ void showHeader() {
 
 
 #if defined(OPTIMIZATION_O3_ENABLED)
-    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " <<
+    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O3), Build date: " << buildDate
+            << ", " <<
             buildTime << " UTC/GMT, Compiler: " << compiler << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
     std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << std::endl;
@@ -316,12 +318,11 @@ int main() {
     const Player copiedPlayers[2] = {
         // プレイヤー1
         {
-            103, 103.0, 89, 89, 97, 97, 69, 69,44, 36, // 最初のメンバー
+            103, 103.0, 89, 89, 97, 97, 69, 69, 44, 36, // 最初のメンバー
             36, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1
-            ,-1, 0, -1, false, 2,
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
         }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
         // プレイヤー2
@@ -330,8 +331,7 @@ int main() {
             255, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0
-            ,-1, 0, -1, false, 2,
+            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
@@ -341,57 +341,60 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x13409baa;
+    uint64_t time1 = 0x24588ee6;
 
     int dummy[100];
     lcg::init(time1);
     int *position1 = new int(1);
-/*
-    *NowStateの各ビットの使用状況は下記の通りである。
-    +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
-       |            Name            |     size      |
-    0  | Current Rotation Table     |     4bit      |
-    4  | Rotation Internal State    |     4bit      |
-    8  | Free Camera State          |     4bit      |
-    12 | Turn Count Processed       |     20bit     |
-    32 | Combo Previous Attack Id   |     2byte     |
-    40 | Combo Counter              |     1byte     |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                                 合計 6Byte
-*/
 
-    auto *NowState = new uint64_t(0);//エミュレーターの内部ステートを表すint
+    //0x24588ee6: 25, 25, 54, 55, 54, 54, 25, 54, 25, 54, 54, 54, 25, 50, 56, 50, 25, 54,
+    /*
+        *NowStateの各ビットの使用状況は下記の通りである。
+        +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
+           |            Name            |     size      |
+        0  | Current Rotation Table     |     4bit      |
+        4  | Rotation Internal State    |     4bit      |
+        8  | Free Camera State          |     4bit      |
+        12 | Turn Count Processed       |     20bit     |
+        32 | Combo Previous Attack Id   |     2byte     |
+        40 | Combo Counter              |     1byte     |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                     合計 6Byte
+    */
+
+    auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
-    //int32_t gene1[350] = {30, 31, 30, 33, 34, 31, 30, 31, 38, 31, 30, 30, 31, 30, 31, 34, 33, 34, 31, 34, 31, 30, 31, 33, 34, 34,};
+    //int32_t gene1[350] = {0};
+    int32_t gene1[350] = {25, 25, 54, 55, 54, 54, 25, 54, 25, 54, 54, 54, 25, 50, 56, 50, 25, 54};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::FLEE_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::FLEE_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
 
     //for (int i = 0; i < 10; ++i) {
-        (*NowState) = 0;
-        (*position1) = 1;
-        std::optional<BattleResult> dummy1;
-        dummy1 = BattleResult();
-        std::memcpy(players1, copiedPlayers, sizeof(players1));
-        BattleEmulator::Main(position1, counter, gene1, players1, dummy1, time1, dummy, dummy, -1, NowState);
+    (*NowState) = 0;
+    (*position1) = 1;
+    std::optional<BattleResult> dummy1;
+    dummy1 = BattleResult();
+    std::memcpy(players1, copiedPlayers, sizeof(players1));
+    BattleEmulator::Main(position1, (counter == 0 ? 1000 : counter), gene1, players1, dummy1, time1, dummy, dummy, -1,
+                         NowState);
 
-        std::stringstream ss1;
-        ss1 << time1 << " ";
+    std::stringstream ss1;
+    ss1 << time1 << " ";
 
-        if (dummy1.has_value()) {
-            std::cout << dumpTable(dummy1.value(), gene1, -1) << std::endl;
-        }
+    if (dummy1.has_value()) {
+        std::cout << dumpTable(dummy1.value(), gene1, -1) << std::endl;
+    }
     //}
     delete position1;
     delete NowState;
@@ -400,17 +403,12 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    uint64_t time1 = 0x22e43199;
+    uint64_t time1 = 0x24588ee6;
 
     int actions[350] = {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
-
-    int turns = 1;
-
-    lcg::init(time1);
-
     SearchRequest(copiedPlayers, time1, actions);
 
     return 0;
@@ -651,7 +649,8 @@ void mainLoop(const Player copiedPlayers[2]) {
     int damages[350] = {0};
 
     std::string input;
-    while (std::getline(std::cin, input)) {//意図せずcinが閉じられると無限ループするので対策
+    while (std::getline(std::cin, input)) {
+        //意図せずcinが閉じられると無限ループするので対策
         if (input.empty()) continue;
 
         char command = input[0];
