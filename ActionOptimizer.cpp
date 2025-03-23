@@ -53,11 +53,11 @@ void updateCompromiseScore(Genome &genome) {
 }
 
 
-
 // オレオレアルゴリズム実行
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
                                      int actions[350], int seedOffset) {
     std::mt19937 rng(seed + seedOffset);
+    bool CrackleEnable = (rng() % 2) == 0;
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
     auto counter = 0;
@@ -78,7 +78,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     auto counter1 = 0;
     //std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
     //std::priority_queue<Genome> que;
-    HeapQueue que(600);
+    HeapQueue que(300);
 
     genome = {};
 
@@ -113,7 +113,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
     Genome BaseGenome = {};
     BaseGenome.turn = INT32_MAX - 1;
-	bool found = false;
+    bool found = false;
     Genome currentGenome;
     while (!que.empty() && (maxGenerations == -1 || maxGenerations > counter)) {
         currentGenome = que.top();
@@ -122,7 +122,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         turns = currentGenome.turn;
 
         if (turns > 40) {
-			continue;
+            continue;
         }
 
         if (currentGenome.Initialized && turns > 1 && currentGenome.actions[turns - 1] > 0) {
@@ -149,16 +149,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         if (CopedPlayers[1].hp <= 0) {
             currentGenome.fitness += 100;
             //que.push(currentGenome);
-			if (BaseGenome.turn > currentGenome.turn) {
-				BaseGenome = currentGenome;//最適解を更新
-				found = true;
-			}
-			continue;
+            if (BaseGenome.turn > currentGenome.turn) {
+                BaseGenome = currentGenome; //最適解を更新
+                found = true;
+            }
+            continue;
         }
 
-		if (BaseGenome.turn < currentGenome.turn) {
-			continue;//最適解より長い回答は求めてない
-		}
+        if (BaseGenome.turn < currentGenome.turn) {
+            continue; //最適解より長い回答は求めてない
+        }
 
         counter1 = 0;
         for (int i = result->position - 3; i < result->position; ++i) {
@@ -460,13 +460,43 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
+        if (CrackleEnable && AllyPlayerPre.mp >= 8 && !Bans.is_action_banned(BattleEmulator::CRACKLE, turns)) {
+            action = BattleEmulator::CRACKLE;
+            if (tmpgenomu.Visited >= 1) {
+                currentGenome.fitness = baseFitness; // 固定値に
+                currentGenome.Visited = 0;
+            } else {
+                currentGenome.fitness = baseFitness + 7 + static_cast<int>(rng() % 20);
+            }
+            currentGenome.actions[turns - 1] = action;
+
+            CopedPlayers[0] = tmpgenomu.AllyPlayer;
+            CopedPlayers[1] = tmpgenomu.EnemyPlayer;
+
+            (*position) = tmpgenomu.position;
+            (*nowState) = tmpgenomu.state;
+
+            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+                                 CopedPlayers,
+                                 (std::optional<BattleResult> &) std::nullopt, seed,
+                                 nullptr, nullptr, -2, nowState);
+            currentGenome.position = (*position);
+            currentGenome.state = (*nowState);
+            currentGenome.turn = turns + 1;
+            currentGenome.processed = turns;
+            currentGenome.AllyPlayer = CopedPlayers[0];
+            currentGenome.EnemyPlayer = CopedPlayers[1];
+
+            que.push(currentGenome);
+        }
+
         counter++;
     }
 
     delete position;
     delete nowState;
     if (found) {
-		return BaseGenome;
+        return BaseGenome;
     }
     if (que.empty()) {
         return currentGenome;

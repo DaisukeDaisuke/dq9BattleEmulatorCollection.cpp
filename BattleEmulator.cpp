@@ -158,6 +158,8 @@ std::string BattleEmulator::getActionName(int actionId) {
             return "!Special Antidote";
         case BattleEmulator::ACROBATIC_STAR:
             return "Acrobatic Star";
+        case BattleEmulator::CRACKLE:
+            return "Crackle";
         default:
             return "Unknown Action";
     }
@@ -666,6 +668,38 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     auto attackCount = 0;
     bool defenseFlag = false; //防御した場合0x021e81a0のほうが優先度高いらしい。なんで
     switch (Id & 0xffff) {
+        case CRACKLE:
+            players[attacker].mp -= 8;
+            (*position) += 2;
+            if (lcg::getPercent(position, 0x2710) < 100) {
+                kaisinn = true;
+            }
+            (*position)++; //関係ない 0x021ec6f8
+            (*position)++; //盾ガード 0x021586fc
+            (*position)++; //偽回避 0x02157f58
+            baseDamage = FUN_021e8458_typeD(position, 8, 50);
+            if (kaisinn) {
+                tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
+                baseDamage = static_cast<int>(floor(tmp));
+            }
+            ProcessRage(position, baseDamage, players); // 適当
+            if (kaisinn) {
+                if (!players[1].rage) {
+                    (*position)++; //会心時特殊処理　0x021e54fc
+                    (*position)++; //会心時特殊処理　0x021eb8c8
+                } else {
+                    (*position)++; //会心時特殊処理　既に怒り狂ってる場合は1消費になる
+                }
+            }
+            (*position)++; //0x021e54fc
+            if (!players[0].specialCharge) {
+                if (lcg::getPercent(position, 100) < 1) {
+                    //0x021edaf4
+                    players[attacker].specialCharge = true;
+                    players[attacker].specialChargeTurn = 6;
+                }
+            }
+            break;
         case DECELERATLE:
             (*position) += 2;
             (*position)++; //会心 0x02158584

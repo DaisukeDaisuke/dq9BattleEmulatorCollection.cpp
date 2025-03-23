@@ -365,13 +365,17 @@ int main() {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {25, 25, 54, 55, 54, 54, 25, 54, 25, 54, 54, 54, 25, 50, 56, 50, 25, 54};
+    int32_t gene1[350] = {0};
+    //int32_t gene1[350] = {25, 25, 54, 55, 54, 54, 25, 54, 25, 54, 54, 54, 25, 50, 56, 50, 25, 54};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
-    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    // gene1[counter++] = BattleEmulator::FLEE_ALLY;
+    gene1[counter++] = BattleEmulator::CRACKLE;
+    gene1[counter++] = BattleEmulator::CRACKLE;
+    gene1[counter++] = BattleEmulator::CRACKLE;
+    gene1[counter++] = BattleEmulator::CRACKLE;
+    gene1[counter++] = BattleEmulator::CRACKLE;
+    gene1[counter++] = BattleEmulator::CRACKLE;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
     // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
