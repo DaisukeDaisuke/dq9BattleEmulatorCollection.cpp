@@ -12,7 +12,7 @@ constexpr uint64_t action_to_bit(int action) {
 }
 
 // 最大350ターン分の管理
-constexpr int MAX_TURNS = 350;
+constexpr int MAX_TURNS = 63;
 
 class ActionBanManager {
 private:
