@@ -446,6 +446,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             auto probability2 = lcg::getPercent(position, 100);
                             if (probability1 >= probability2) {
                                 players[0].sleeping = false;
+                                players[0].sleepingTurn = 0;
                                 action = CURE_SLEEPING;
                             }
                         } else {
@@ -738,7 +739,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             if (lcg::getPercent(position, 100) < 25 && !kaihi) {
                 players[defender].sleeping = true;
-                players[defender].sleeping = 2;
+                players[defender].sleepingTurn = 2;
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
                 if (baseDamage == 0) {
                     baseDamage = lcg::getPercent(position, 2); // 0x021e81a0
