@@ -5,3 +5,5 @@
 /cmake-build-release-mingw
 /cmake-build-relwithdebinfo-mingw
 /cmake-build-release
+/.vs
+/out
