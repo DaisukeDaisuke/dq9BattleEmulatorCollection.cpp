@@ -199,8 +199,8 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
             sp = specialAction;
 
             if (eAction[0] != "magic Burst" && eAction[1] != "magic Burst") {
-                if (!initiative && action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
-                    action == BattleEmulator::SLEEPING) {
+                if (!initiative && (action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
+                    action == BattleEmulator::SLEEPING)) {
                     sp = "---------------";
                 }
                 if ((action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
@@ -407,13 +407,42 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    uint64_t time1 = 0x24588ee6;
+    uint64_t seed = 0x23541dd2;
 
     int actions[350] = {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
-    SearchRequest(copiedPlayers, time1, actions);
+    //SearchRequest(copiedPlayers, time1, actions);
+
+    Genome genome = ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, 1, 2000, actions);
+
+    priority_queue<Genome> que;
+
+    std::optional<BattleResult> result1;
+    result1 = BattleResult();
+    Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
+
+    auto *position = new int(1);
+    auto *nowState = new uint64_t(0);
+
+    BattleEmulator::Main(position,100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
+                         nowState);
+
+    delete position;
+    delete nowState;
+
+    std::cout << dumpTable(result1.value(), genome.actions, 0) << std::endl;
+
+    std::cout << "0x" << std::hex << seed << std::dec << ": ";
+
+    for (auto i = 0; i < 100; ++i) {
+        if (genome.actions[i] == 0 || genome.actions[i] == -1) {
+            break;
+        }
+        std::cout << genome.actions[i] << ", ";
+    }
+    std::cout << std::endl;
 
     return 0;
 #endif

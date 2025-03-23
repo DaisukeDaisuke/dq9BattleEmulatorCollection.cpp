@@ -9,8 +9,6 @@
 
 void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, bool preemptive1, bool bakuti) {
     bool preemptive = true;
-    uint64_t before = -1;
-    auto moture = false;
     for (int i = 0; i < 3; ++i) {
         int32_t after = actions[i];
         //一部の特異点の挙動について対策する
@@ -40,7 +38,6 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
                 preemptive = false;
             //}
         }
-        before = after;
     }
 }
 

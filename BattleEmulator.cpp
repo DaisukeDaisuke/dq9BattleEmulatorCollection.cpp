@@ -14,12 +14,9 @@
 #include "BattleResult.h"
 
 
-int32_t actions[3];
-int actionsPosition = 0;
-int preHP[3] = {0, 0, 0};
-bool player0_has_initiative = false;
-bool TiggerSkyAttack = false;
 
+
+thread_local int preHP[3] = {0, 0, 0};
 
 void inline BattleEmulator::resetCombo(uint64_t *NowState) {
     (*NowState) &= ~(0xFFF00000000);
@@ -180,9 +177,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                           uint64_t seed, const int eActions[350], const int damages[350], int mode,
                           uint64_t *NowState) {
     resetCombo(NowState);
-    player0_has_initiative = false;
-    TiggerSkyAttack = false;
-    actionsPosition = 0;
+    bool player0_has_initiative = false;
     int genePosition = 0;
     int exCounter = 0;
     int exCounter1 = 0;
@@ -229,10 +224,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
         players[0].defence = 1.0;
 
-        for (int32_t &action: actions) {
-            action = -1;
-        }
-        actionsPosition = 0;
+        int32_t actions[3] = {0, 0, 0};
+        int actionsPosition = 0;
         double speed0 = players[0].speed * lcg::floatRand(position, 0.51, 1.0);
         double speed1 = players[1].speed * lcg::floatRand(position, 0.51, 1.0);
 
@@ -353,6 +346,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     (*position)++;
                     //--------end_FUN_02158dfc-------
                     basedamage = callAttackFun(c, position, players, 1, 0, NowState);
+                    actions[actionsPosition++] = c;
 
                     if (players[0].sleeping) {
                         actionTable = SLEEPING;
@@ -456,6 +450,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
                     //--------end_FUN_02158dfc-------
                     basedamage = callAttackFun(action, position, players, 0, 1, NowState);
+                    actions[actionsPosition++] = action;
+
                     if (mode == -1) {
                         auto def1 = -1;
                         if (players[0].BuffTurns > 0) {
@@ -595,7 +591,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
             (*position) += 1;
         }
-        camera::Main(position, actions, NowState, player0_has_initiative, TiggerSkyAttack);
+        camera::Main(position, actions, NowState, player0_has_initiative, false);
 
 #ifdef DEBUG2
         //DEBUG_COUT2((*position));
@@ -652,9 +648,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                                   uint64_t *NowState) {
     for (int j = 0; j < 2; ++j) {
         preHP[j] = players[j].hp;
-    }
-    if (Id != ACROBATSTAR_KAIHI && Id != COUNTER) {
-        actions[actionsPosition++] = Id;
     }
     int baseDamage = 0;
     double tmp = 0;
@@ -926,11 +919,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case BattleEmulator::ACROBATIC_STAR:
             players[0].acrobaticStar = true;
             players[0].acrobaticStarTurn = 6;
-            if (player0_has_initiative) {
-                players[0].specialCharge = false;
-            } else {
-                players[0].dirtySpecialCharge = true;
-            }
+            // if (player0_has_initiative) {
+            //     players[0].specialCharge = false;
+            // } else {
+            //     players[0].dirtySpecialCharge = true;
+            // }
+            players[0].specialCharge = false;
             players[0].specialChargeTurn = 0;
 
             (*position) += 2;
@@ -1038,10 +1032,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 if (baseDamage != 0) {
                     (*position)++; //目を覚ました
                     (*position)++; //不明
-                } else {
-                    if (Id == SKY_ATTACK) {
-                        TiggerSkyAttack = true;
-                    }
                 }
 
 

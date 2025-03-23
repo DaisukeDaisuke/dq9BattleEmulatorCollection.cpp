@@ -6,11 +6,13 @@
 #include <vector>
 #include <random>
 #include <functional>
+#include <future>
 #include <queue>
 #include "BattleEmulator.h"
 #include "Genome.h"
 #include "ActionBanManager.h"
 #include "HeapQueue.h"
+#include "lcg.h"
 
 constexpr int NUM_GENERATIONS = 100;
 constexpr int POPULATION_SIZE = 50;
@@ -53,13 +55,88 @@ void updateCompromiseScore(Genome &genome) {
 }
 
 
+// 並列処理のための関数
+Genome ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[], int start, int end) {
+    auto seed1 = seed;
+    auto turns1 = turns;
+    auto maxGenerations1 = maxGenerations;
+
+    Genome bestGenome;
+    bestGenome.fitness = INT_MAX;
+
+    std::unique_ptr<int> position = std::make_unique<int>(1);
+    std::unique_ptr<uint64_t> nowState = std::make_unique<uint64_t>(0);
+
+    for (int i = start; i < end; ++i) {
+        Player localPlayers[2] = { players[0], players[1] };
+        Genome candidate = RunAlgorithm(localPlayers, seed1, turns1, maxGenerations1, actions, i * 2);
+
+        std::optional<BattleResult> result1;
+        result1 = BattleResult();
+
+        Player localPlayers1[2] = { players[0], players[1] };
+
+        *position = 1;
+        *nowState = 0;
+
+        result1->clear();
+        BattleEmulator::Main(position.get(), 100, candidate.actions, localPlayers1, result1, seed, nullptr, nullptr, -1, nowState.get());
+
+        std::cout << result1->turn << std::endl;
+
+        if (localPlayers1[0].hp >= 0 && localPlayers1[1].hp == 0) {
+            candidate.turn = result1->turn;
+            if (candidate.turn < bestGenome.turn) {
+                candidate.AllyPlayer = localPlayers1[0];
+                candidate.EnemyPlayer = localPlayers1[1];
+                bestGenome = candidate;
+            }
+        }
+    }
+
+    return bestGenome;
+}
+
+
+
+
+// メインの並列処理関数
+Genome ActionOptimizer::RunAlgorithmAsync(const Player players[2], uint64_t seed, int turns, int totalIterations, int actions[350]) {
+    lcg::init(seed, true);
+    int numThreads = 4;
+    int chunkSize = totalIterations / numThreads;
+
+    std::vector<std::future<Genome>> futures;
+    futures.reserve(numThreads); // ✅ メモリ確保でスコープ外の問題を防ぐ
+
+    for (int i = 0; i < numThreads; ++i) {
+        int start = i * chunkSize;
+        int end = (i == numThreads - 1) ? totalIterations : start + chunkSize;
+
+        futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
+                                     std::cref(players), seed, turns, 2000, actions, start, end));
+    }
+
+    Genome bestGenome;
+    bestGenome.turn = INT_MAX;
+
+    for (auto& future : futures) {
+        Genome candidate = future.get();
+        if (candidate.turn < bestGenome.turn) {
+            bestGenome = candidate;
+        }
+    }
+
+    return bestGenome;
+}
+
 // オレオレアルゴリズム実行
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
                                      int actions[350], int seedOffset) {
     std::mt19937 rng(seed + seedOffset);
     bool CrackleEnable = (rng() % 2) == 0;
-    auto *position = new int(1);
-    auto *nowState = new uint64_t(0);
+    std::unique_ptr<int> position = std::make_unique<int>(1);
+    std::unique_ptr<uint64_t> nowState = std::make_unique<uint64_t>(0);
     auto counter = 0;
     Genome genome;
     ActionBanManager Bans;
@@ -131,16 +208,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
         CopedPlayers[0] = currentGenome.AllyPlayer;
         CopedPlayers[1] = currentGenome.EnemyPlayer;
-        (*position) = currentGenome.position;
-        (*nowState) = currentGenome.state;
+        *position = currentGenome.position;
+        *nowState = currentGenome.state;
 
         const auto tmpgenomu = currentGenome;
         result->clear(); //メモリ新規確保よりこっちのほうが早い
 
-        BattleEmulator::Main(position, currentGenome.turn - currentGenome.processed, currentGenome.actions,
+        BattleEmulator::Main(position.get(), currentGenome.turn - currentGenome.processed, currentGenome.actions,
                              CopedPlayers,
                              result, seed,
-                             nullptr, nullptr, -1, nowState);
+                             nullptr, nullptr, -1, nowState.get());
 
         if (CopedPlayers[0].hp <= 0) {
             continue;
@@ -211,8 +288,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 //todo
                 currentGenome.actions[turns - 1] = BattleEmulator::ATTACK_ALLY;
                 currentGenome.fitness += 10;
-                currentGenome.position = (*position);
-                currentGenome.state = (*nowState);
+                currentGenome.position = *(position);
+                currentGenome.state = *(nowState);
                 currentGenome.turn = turns + 1;
                 currentGenome.processed = turns;
                 currentGenome.AllyPlayer = CopedPlayers[0];
@@ -257,10 +334,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             (*position) = tmpgenomu.position;
             (*nowState) = tmpgenomu.state;
 
-            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
-                                 nullptr, nullptr, -2, nowState);
+                                 nullptr, nullptr, -2, nowState.get());
             currentGenome.position = (*position);
             currentGenome.state = (*nowState);
             currentGenome.turn = turns + 1;
@@ -286,10 +363,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             (*position) = tmpgenomu.position;
             (*nowState) = tmpgenomu.state;
 
-            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
-                                 nullptr, nullptr, -2, nowState);
+                                 nullptr, nullptr, -2, nowState.get());
             currentGenome.position = (*position);
             currentGenome.state = (*nowState);
             currentGenome.turn = turns + 1;
@@ -319,10 +396,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
             auto ehp1 = tmpgenomu.EnemyPlayer.hp;
 
-            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
-                                 nullptr, nullptr, -2, nowState);
+                                 nullptr, nullptr, -2, nowState.get());
             currentGenome.position = (*position);
             currentGenome.state = (*nowState);
             currentGenome.turn = turns + 1;
@@ -353,10 +430,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             (*position) = tmpgenomu.position;
             (*nowState) = tmpgenomu.state;
 
-            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
-                                 nullptr, nullptr, -2, nowState);
+                                 nullptr, nullptr, -2, nowState.get());
             currentGenome.position = (*position);
             currentGenome.state = (*nowState);
             currentGenome.turn = turns + 1;
@@ -384,10 +461,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 (*position) = tmpgenomu.position;
                 (*nowState) = tmpgenomu.state;
 
-                BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+                BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                      CopedPlayers,
                                      (std::optional<BattleResult> &) std::nullopt, seed,
-                                     nullptr, nullptr, -2, nowState);
+                                     nullptr, nullptr, -2, nowState.get());
                 currentGenome.position = (*position);
                 currentGenome.state = (*nowState);
                 currentGenome.turn = turns + 1;
@@ -416,10 +493,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             (*position) = tmpgenomu.position;
             (*nowState) = tmpgenomu.state;
 
-            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
-                                 nullptr, nullptr, -2, nowState);
+                                 nullptr, nullptr, -2, nowState.get());
             currentGenome.position = (*position);
             currentGenome.state = (*nowState);
             currentGenome.turn = turns + 1;
@@ -446,10 +523,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             (*position) = tmpgenomu.position;
             (*nowState) = tmpgenomu.state;
 
-            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
-                                 nullptr, nullptr, -2, nowState);
+                                 nullptr, nullptr, -2, nowState.get());
             currentGenome.position = (*position);
             currentGenome.state = (*nowState);
             currentGenome.turn = turns + 1;
@@ -476,10 +553,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             (*position) = tmpgenomu.position;
             (*nowState) = tmpgenomu.state;
 
-            BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
-                                 nullptr, nullptr, -2, nowState);
+                                 nullptr, nullptr, -2, nowState.get());
             currentGenome.position = (*position);
             currentGenome.state = (*nowState);
             currentGenome.turn = turns + 1;
@@ -493,13 +570,9 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         counter++;
     }
 
-    delete position;
-    delete nowState;
     if (found) {
         return BaseGenome;
     }
-    if (que.empty()) {
-        return currentGenome;
-    }
-    return que.top();
+    Genome bestGenome = que.empty() ? currentGenome : static_cast<Genome>(que.top());
+    return bestGenome;
 }
