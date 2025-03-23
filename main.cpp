@@ -292,14 +292,13 @@ void showHeader() {
     std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O3), Build date: " << buildDate << ", " <<
             buildTime << " UTC/GMT, Compiler: " << compiler << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-    std::cout << "dq9 Corvus battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << std::endl;
+    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << std::endl;
 #elif defined(NO_OPTIMIZATION)
-    std::cout << "dq9 Corvus battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << std::endl;
+    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << std::endl;
 #else
     std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
     << ", " << buildTime << std::endl;
 #endif
-    std::cout << "Waiting for input[q/b]: " << std::endl;
 }
 
 
