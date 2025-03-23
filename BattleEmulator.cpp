@@ -162,40 +162,40 @@ std::string BattleEmulator::getActionName(int actionId) {
     }
 }
 
-#if defined(MULTITHREADING)
+// #if defined(MULTITHREADING)
+//
+// static std::atomic<int> turnProcessed; // atomicを使用
+//
+// void BattleEmulator::ResetTurnProcessed() {
+//     turnProcessed.store(0, std::memory_order_relaxed); // relaxedで軽量にリセット
+// }
+//
+// int BattleEmulator::getTurnProcessed() {
+//     return turnProcessed.load(std::memory_order_relaxed); // relaxedで読み取り
+// }
+//
+// inline void BattleEmulator::processTurn() {
+//     // ここでturnProcessedをインクリメントする処理を追加
+//     turnProcessed.fetch_add(1, std::memory_order_relaxed); // atomic加算
+// }
+// #elif defined(NO_MULTITHREADING)
 
-static std::atomic<int> turnProcessed;  // atomicを使用
+thread_local int threadTurnProcessed = 0;
 
 void BattleEmulator::ResetTurnProcessed() {
-    turnProcessed.store(0, std::memory_order_relaxed);  // relaxedで軽量にリセット
+    threadTurnProcessed = 0;
 }
 
 int BattleEmulator::getTurnProcessed() {
-    return turnProcessed.load(std::memory_order_relaxed);  // relaxedで読み取り
+    return threadTurnProcessed;
 }
 
 inline void BattleEmulator::processTurn() {
     // ここでturnProcessedをインクリメントする処理を追加
-    turnProcessed.fetch_add(1, std::memory_order_relaxed);  // atomic加算
-}
-#elif defined(NO_MULTITHREADING)
-
-int turnProcessed = 0;
-
-void BattleEmulator::ResetTurnProcessed() {
-    turnProcessed = 0;
+    threadTurnProcessed++;
 }
 
-int BattleEmulator::getTurnProcessed() {
-    return turnProcessed;
-}
-
-inline void BattleEmulator::processTurn() {
-    // ここでturnProcessedをインクリメントする処理を追加
-    turnProcessed++;
-}
-
-#endif
+//#endif
 
 
 bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], Player *players,
@@ -217,6 +217,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         startPos = 1;
         RunCount++;
     }
+
+
     for (int counterJ = startPos; counterJ < RunCount; ++counterJ) {
         processTurn();
         if (genePosition != -1) {

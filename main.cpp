@@ -200,7 +200,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
 
             if (eAction[0] != "magic Burst" && eAction[1] != "magic Burst") {
                 if (!initiative && (action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
-                                    action == BattleEmulator::SLEEPING)) {
+                    action == BattleEmulator::SLEEPING)) {
                     sp = "---------------";
                 }
                 if ((action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
@@ -417,7 +417,7 @@ int main() {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
-    SearchRequest(copiedPlayers, seed, actions, 8);
+    SearchRequest(copiedPlayers, seed, actions, 4);
 
     return 0;
 #endif
@@ -468,7 +468,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
         turns++;
     }
 
-    auto [totalTurnProcessed, genome] = ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1000, gene, 8);
+    auto [turnProcessed,genome] = ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, 8);
 
     priority_queue<Genome> que;
 
@@ -479,7 +479,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
 
-    BattleEmulator::Main(position, 100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
+    BattleEmulator::Main(position,100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
                          nowState);
 
     delete position;
@@ -503,11 +503,11 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
             std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
     std::cout << "multithreading is enabled, thread count: " << numThreads << std::endl;
     std::cout << "elapsed time: " << double(elapsed_time1) / 1000 << " ms" << std::endl;
-    std::cout << "Searcher Turn Consumed: " << totalTurnProcessed << " (" << (
-        static_cast<double>(totalTurnProcessed) / 10000) << " mann)" << std::endl;
+    std::cout << "Searcher Turn Consumed: " << turnProcessed << " (" << (
+        static_cast<double>(turnProcessed) / 10000) << " mann)" << std::endl;
     // 1秒あたりの探索回数 (万回.?? 形式)
     // 正しい計算：1秒あたりの探索回数 (万回/秒)
-    double performance = (static_cast<double>(totalTurnProcessed) * 100.0) /
+    double performance = (static_cast<double>(turnProcessed) * 100.0) /
                          static_cast<double>(elapsed_time1);
     std::cout << "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
 #endif

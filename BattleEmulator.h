@@ -106,7 +106,6 @@ public:
     static const int COUNTER = 70;
 
 
-
     static void ResetTurnProcessed();
 
     static int getTurnProcessed();

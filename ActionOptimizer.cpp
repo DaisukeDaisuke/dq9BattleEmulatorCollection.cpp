@@ -121,7 +121,7 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
         int end = (i == numThreads - 1) ? totalIterations : start + chunkSize;
 
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
-                                     std::cref(players), seed, turns, 5000, actions, start, end));
+                                     std::cref(players), seed, turns, 1500, actions, start, end));
     }
 
     Genome bestGenome = {};
