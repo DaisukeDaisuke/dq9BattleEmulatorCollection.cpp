@@ -6,7 +6,10 @@
 #include <vector>
 #include <random>
 #include <functional>
+#ifdef defined(MULTITHREADING)
 #include <future>
+#endif
+#include <memory>
 #include <queue>
 #include "BattleEmulator.h"
 #include "Genome.h"
@@ -54,6 +57,7 @@ void updateCompromiseScore(Genome &genome) {
     }
 }
 
+#ifdef defined(MULTITHREADING)
 
 // 並列処理のための関数
 Genome ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[], int start, int end) {
@@ -61,8 +65,8 @@ Genome ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64
     auto turns1 = turns;
     auto maxGenerations1 = maxGenerations;
 
-    Genome bestGenome;
-    bestGenome.fitness = INT_MAX;
+    Genome bestGenome = {};
+    bestGenome.turn = INT_MAX;
 
     std::unique_ptr<int> position = std::make_unique<int>(1);
     std::unique_ptr<uint64_t> nowState = std::make_unique<uint64_t>(0);
@@ -81,8 +85,6 @@ Genome ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64
 
         result1->clear();
         BattleEmulator::Main(position.get(), 100, candidate.actions, localPlayers1, result1, seed, nullptr, nullptr, -1, nowState.get());
-
-        std::cout << result1->turn << std::endl;
 
         if (localPlayers1[0].hp >= 0 && localPlayers1[1].hp == 0) {
             candidate.turn = result1->turn;
@@ -103,7 +105,7 @@ Genome ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64
 // メインの並列処理関数
 Genome ActionOptimizer::RunAlgorithmAsync(const Player players[2], uint64_t seed, int turns, int totalIterations, int actions[350]) {
     lcg::init(seed, true);
-    int numThreads = 4;
+    int numThreads = 6;
     int chunkSize = totalIterations / numThreads;
 
     std::vector<std::future<Genome>> futures;
@@ -114,10 +116,10 @@ Genome ActionOptimizer::RunAlgorithmAsync(const Player players[2], uint64_t seed
         int end = (i == numThreads - 1) ? totalIterations : start + chunkSize;
 
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
-                                     std::cref(players), seed, turns, 2000, actions, start, end));
+                                     std::cref(players), seed, turns, 5000, actions, start, end));
     }
 
-    Genome bestGenome;
+    Genome bestGenome = {};
     bestGenome.turn = INT_MAX;
 
     for (auto& future : futures) {
@@ -129,6 +131,8 @@ Genome ActionOptimizer::RunAlgorithmAsync(const Player players[2], uint64_t seed
 
     return bestGenome;
 }
+
+#endif
 
 // オレオレアルゴリズム実行
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,

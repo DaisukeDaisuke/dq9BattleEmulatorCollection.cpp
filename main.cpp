@@ -288,15 +288,19 @@ void showHeader() {
     compiler = "msBuild";
 #endif
 
-
+#ifdef defined(MULTITHREADING)
+    std::string multiThreading = ", multithreading is supported";
+#elif defined(NO_MULTITHREADING)
+    std::string multiThreading = ", multithreading is disabled";
+#endif
 #if defined(OPTIMIZATION_O3_ENABLED)
     std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O3), Build date: " << buildDate
             << ", " <<
-            buildTime << " UTC/GMT, Compiler: " << compiler << std::endl;
+            buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << std::endl;
+    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(NO_OPTIMIZATION)
-    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << std::endl;
+    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #else
     std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
     << ", " << buildTime << std::endl;
@@ -413,36 +417,7 @@ int main() {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
-    //SearchRequest(copiedPlayers, time1, actions);
-
-    Genome genome = ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, 1, 2000, actions);
-
-    priority_queue<Genome> que;
-
-    std::optional<BattleResult> result1;
-    result1 = BattleResult();
-    Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
-
-    auto *position = new int(1);
-    auto *nowState = new uint64_t(0);
-
-    BattleEmulator::Main(position,100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
-                         nowState);
-
-    delete position;
-    delete nowState;
-
-    std::cout << dumpTable(result1.value(), genome.actions, 0) << std::endl;
-
-    std::cout << "0x" << std::hex << seed << std::dec << ": ";
-
-    for (auto i = 0; i < 100; ++i) {
-        if (genome.actions[i] == 0 || genome.actions[i] == -1) {
-            break;
-        }
-        std::cout << genome.actions[i] << ", ";
-    }
-    std::cout << std::endl;
+    SearchRequest(copiedPlayers, seed, actions);
 
     return 0;
 #endif
@@ -474,6 +449,52 @@ constexpr int32_t actions1[100] = {
     BattleEmulator::ATTACK_ALLY,
     BattleEmulator::DEFENCE,
 };
+#ifdef MULTITHREADING
+void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]) {
+    //SearchRequest(copiedPlayers, time1, actions);
+
+    int32_t gene[350] = {0};
+    auto turns = 0;
+    for (int i = 0; i < 350; ++i) {
+        gene[i] = aActions[i];
+        if (aActions[i] == -1) {
+            gene[i] = -1;
+            gene[i + 1] = -1;
+            break;
+        }
+        turns++;
+    }
+
+    Genome genome = ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1000, gene);
+
+    priority_queue<Genome> que;
+
+    std::optional<BattleResult> result1;
+    result1 = BattleResult();
+    Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
+
+    auto *position = new int(1);
+    auto *nowState = new uint64_t(0);
+
+    BattleEmulator::Main(position,100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
+                         nowState);
+
+    delete position;
+    delete nowState;
+
+    std::cout << dumpTable(result1.value(), genome.actions, 0) << std::endl;
+
+    std::cout << "0x" << std::hex << seed << std::dec << ": ";
+
+    for (auto i = 0; i < 100; ++i) {
+        if (genome.actions[i] == 0 || genome.actions[i] == -1) {
+            break;
+        }
+        std::cout << genome.actions[i] << ", ";
+    }
+    std::cout << std::endl;
+}
+#elif NO_MULTITHREADING
 
 void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]) {
 #ifdef DEBUG
@@ -560,6 +581,8 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     std::cout << "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
 #endif
 }
+
+#endif
 
 // ブルートフォースリクエスト関数
 [[nodiscard]] uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
