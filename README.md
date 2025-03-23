@@ -11,7 +11,7 @@ Please build with [jetBrains clion](https://www.jetbrains.com/ja-jp/clion/) usin
 
 また、erugiosu以降では、様々な機能を取り込みつつ、c++17水準で書かれており、幅広い環境virtual studio (cmakeサポート)、msbuild(
 cmake)での静的ビルドに対応しています。  
-このリポジトリ全体の制約として、windows.hは使ってません。なのでLinux等でもビルドできると思いますが、Linuxのg++についてはいまのところサポートしていません。
+このリポジトリ全体の制約として、windows.hは使ってません。なのでLinux等でもビルドできると思いますが、Linuxのg++についてはいまのところ正式にはサポートしていません。
 
 本番exeのビルドについては、github Actionsでビルドすることになっています。  
 一部の配布物はわざと配布してないことがあるので、その場合は(Github Actionsを他人のリポジトリで使う方法を知っていれば)
