@@ -78,7 +78,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     auto counter1 = 0;
     //std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
     //std::priority_queue<Genome> que;
-    HeapQueue que(300);
+    HeapQueue que(600);
 
     genome = {};
 
@@ -111,12 +111,19 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     std::optional<BattleResult> result;
     result = BattleResult();
 
+    Genome BaseGenome = {};
+    BaseGenome.turn = INT32_MAX - 1;
+	bool found = false;
     Genome currentGenome;
     while (!que.empty() && (maxGenerations == -1 || maxGenerations > counter)) {
         currentGenome = que.top();
         que.pop();
 
         turns = currentGenome.turn;
+
+        if (turns > 40) {
+			continue;
+        }
 
         if (currentGenome.Initialized && turns > 1 && currentGenome.actions[turns - 1] > 0) {
             Bans.ban_action(turns - 1, currentGenome.actions[turns - 1]);
@@ -141,9 +148,17 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
         if (CopedPlayers[1].hp <= 0) {
             currentGenome.fitness += 100;
-            que.push(currentGenome);
-            break;
+            //que.push(currentGenome);
+			if (BaseGenome.turn > currentGenome.turn) {
+				BaseGenome = currentGenome;//最適解を更新
+				found = true;
+			}
+			continue;
         }
+
+		if (BaseGenome.turn < currentGenome.turn) {
+			continue;//最適解より長い回答は求めてない
+		}
 
         counter1 = 0;
         for (int i = result->position - 3; i < result->position; ++i) {
@@ -450,6 +465,9 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
     delete position;
     delete nowState;
+    if (found) {
+		return BaseGenome;
+    }
     if (que.empty()) {
         return currentGenome;
     }

@@ -8,7 +8,7 @@
 #include <iostream>
 
 // Define the size of the array
-const int ARRAY_SIZE = 5000;
+const int ARRAY_SIZE = 10000;
 
 double precalculatedValues[ARRAY_SIZE]; // 固定メモリ
 int nowCounter = 1;
