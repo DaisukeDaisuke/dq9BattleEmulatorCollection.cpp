@@ -538,7 +538,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
                         if (players[0].acrobaticStar && players[0].acrobaticStarTurn == 0) {
                             players[0].acrobaticStar = false;
-                            (*position)++;//0x0215aed4 チートで100にすると次のターンから判定が行われず永遠にアクロバットスター状態になる。
+                            (*position)++; //0x0215aed4 チートで100にすると次のターンから判定が行われず永遠にアクロバットスター状態になる。
                             //3f800000
                             //3f600000
                             //3f200000
