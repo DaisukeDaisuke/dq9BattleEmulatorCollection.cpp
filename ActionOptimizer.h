@@ -12,10 +12,15 @@
 
 class ActionOptimizer {
 public:
-    static Genome RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[350], int seedOffset);
-    static Genome RunAlgorithmAsync(const Player players[2], uint64_t seed, int turns, int totalIterations, int actions[350]);
+    static Genome RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[350],
+                               int seedOffset);
+
+    static std::pair<int, Genome> RunAlgorithmAsync(const Player players[2], uint64_t seed, int turns,
+                                                    int totalIterations, int actions[350], int numThreads);
+
 private:
-    static Genome RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[], int start, int end);
+    static std::pair<int, Genome> RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns,
+                                                           int maxGenerations, int actions[], int start, int end);
 };
 
 

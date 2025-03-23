@@ -6,6 +6,9 @@
 #define NEWDIRECTORY_BATTLEEMULATOR_H
 
 
+#if defined(MULTITHREADING)
+#include <atomic>
+#endif
 #include <cstdint>
 #include <optional>
 #include "Player.h"
@@ -103,9 +106,12 @@ public:
     static const int COUNTER = 70;
 
 
+
     static void ResetTurnProcessed();
 
     static int getTurnProcessed();
+
+    static void processTurn();
 
     static bool
     Main(int *position, int RunCount, const int32_t Gene[350], Player *players,

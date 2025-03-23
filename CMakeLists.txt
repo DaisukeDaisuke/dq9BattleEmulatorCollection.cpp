@@ -73,7 +73,7 @@ elseif(MSVC)
     set_property(TARGET rbe_single PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET rbe_multi PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-    target_compile_options(rbe_single PRIVATE /W4)
+    target_compile_options(rbe_single PRIVATE /W4 /MP)
     target_compile_options(rbe_multi PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
 
     target_link_options(rbe_single PRIVATE /INCREMENTAL:NO /DEBUG)

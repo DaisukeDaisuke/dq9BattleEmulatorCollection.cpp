@@ -6,7 +6,7 @@
 #include <vector>
 #include <random>
 #include <functional>
-#ifdef defined(MULTITHREADING)
+#if defined(MULTITHREADING)
 #include <future>
 #endif
 #include <memory>
@@ -57,10 +57,13 @@ void updateCompromiseScore(Genome &genome) {
     }
 }
 
-#ifdef defined(MULTITHREADING)
+#if defined(MULTITHREADING)
 
 // 並列処理のための関数
-Genome ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[], int start, int end) {
+std::pair<int, Genome> ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns,
+                                                                 int maxGenerations, int actions[], int start,
+                                                                 int end) {
+    BattleEmulator::ResetTurnProcessed();
     auto seed1 = seed;
     auto turns1 = turns;
     auto maxGenerations1 = maxGenerations;
@@ -72,19 +75,20 @@ Genome ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64
     std::unique_ptr<uint64_t> nowState = std::make_unique<uint64_t>(0);
 
     for (int i = start; i < end; ++i) {
-        Player localPlayers[2] = { players[0], players[1] };
+        Player localPlayers[2] = {players[0], players[1]};
         Genome candidate = RunAlgorithm(localPlayers, seed1, turns1, maxGenerations1, actions, i * 2);
 
         std::optional<BattleResult> result1;
         result1 = BattleResult();
 
-        Player localPlayers1[2] = { players[0], players[1] };
+        Player localPlayers1[2] = {players[0], players[1]};
 
         *position = 1;
         *nowState = 0;
 
         result1->clear();
-        BattleEmulator::Main(position.get(), 100, candidate.actions, localPlayers1, result1, seed, nullptr, nullptr, -1, nowState.get());
+        BattleEmulator::Main(position.get(), 100, candidate.actions, localPlayers1, result1, seed, nullptr, nullptr, -1,
+                             nowState.get());
 
         if (localPlayers1[0].hp >= 0 && localPlayers1[1].hp == 0) {
             candidate.turn = result1->turn;
@@ -95,20 +99,21 @@ Genome ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64
             }
         }
     }
+    // TurnProcessedを取得
+    int turnProcessed = BattleEmulator::getTurnProcessed();
 
-    return bestGenome;
+    // turnProcessedとbestGenomeをペアで返す
+    return std::make_pair(turnProcessed, bestGenome);
 }
 
 
-
-
 // メインの並列処理関数
-Genome ActionOptimizer::RunAlgorithmAsync(const Player players[2], uint64_t seed, int turns, int totalIterations, int actions[350]) {
+std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2], uint64_t seed, int turns,
+                                                          int totalIterations, int actions[350], int numThreads) {
     lcg::init(seed, true);
-    int numThreads = 6;
     int chunkSize = totalIterations / numThreads;
 
-    std::vector<std::future<Genome>> futures;
+    std::vector<std::future<std::pair<int, Genome> > > futures;
     futures.reserve(numThreads); // ✅ メモリ確保でスコープ外の問題を防ぐ
 
     for (int i = 0; i < numThreads; ++i) {
@@ -122,14 +127,17 @@ Genome ActionOptimizer::RunAlgorithmAsync(const Player players[2], uint64_t seed
     Genome bestGenome = {};
     bestGenome.turn = INT_MAX;
 
-    for (auto& future : futures) {
-        Genome candidate = future.get();
+    int totalTurnProcessed = 0;
+
+    for (auto &future: futures) {
+        auto [turnProcessed, candidate] = future.get(); // ペアを取得
+        totalTurnProcessed += turnProcessed;
         if (candidate.turn < bestGenome.turn) {
             bestGenome = candidate;
         }
     }
 
-    return bestGenome;
+    return std::make_pair(totalTurnProcessed, bestGenome);
 }
 
 #endif

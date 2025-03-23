@@ -29,7 +29,7 @@ std::string rtrim(const std::string &s);
 
 std::string trim(const std::string &s);
 
-void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]);
+void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
 
 uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                            int eActions[350],
@@ -200,7 +200,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
 
             if (eAction[0] != "magic Burst" && eAction[1] != "magic Burst") {
                 if (!initiative && (action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
-                    action == BattleEmulator::SLEEPING)) {
+                                    action == BattleEmulator::SLEEPING)) {
                     sp = "---------------";
                 }
                 if ((action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
@@ -288,7 +288,7 @@ void showHeader() {
     compiler = "msBuild";
 #endif
 
-#ifdef defined(MULTITHREADING)
+#if defined(MULTITHREADING)
     std::string multiThreading = ", multithreading is supported";
 #elif defined(NO_MULTITHREADING)
     std::string multiThreading = ", multithreading is disabled";
@@ -417,7 +417,7 @@ int main() {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
-    SearchRequest(copiedPlayers, seed, actions);
+    SearchRequest(copiedPlayers, seed, actions, 8);
 
     return 0;
 #endif
@@ -450,8 +450,11 @@ constexpr int32_t actions1[100] = {
     BattleEmulator::DEFENCE,
 };
 #ifdef MULTITHREADING
-void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]) {
-    //SearchRequest(copiedPlayers, time1, actions);
+void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads) {
+#ifdef DEBUG
+    auto t0 = std::chrono::high_resolution_clock::now();
+    BattleEmulator::ResetTurnProcessed();
+#endif
 
     int32_t gene[350] = {0};
     auto turns = 0;
@@ -465,7 +468,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
         turns++;
     }
 
-    Genome genome = ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1000, gene);
+    auto [totalTurnProcessed, genome] = ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1000, gene, 8);
 
     priority_queue<Genome> que;
 
@@ -476,7 +479,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
 
-    BattleEmulator::Main(position,100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
+    BattleEmulator::Main(position, 100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
                          nowState);
 
     delete position;
@@ -493,10 +496,25 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
         std::cout << genome.actions[i] << ", ";
     }
     std::cout << std::endl;
+
+#ifdef DEBUG
+    auto t3 = std::chrono::high_resolution_clock::now();
+    auto elapsed_time1 =
+            std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
+    std::cout << "multithreading is enabled, thread count: " << numThreads << std::endl;
+    std::cout << "elapsed time: " << double(elapsed_time1) / 1000 << " ms" << std::endl;
+    std::cout << "Searcher Turn Consumed: " << totalTurnProcessed << " (" << (
+        static_cast<double>(totalTurnProcessed) / 10000) << " mann)" << std::endl;
+    // 1秒あたりの探索回数 (万回.?? 形式)
+    // 正しい計算：1秒あたりの探索回数 (万回/秒)
+    double performance = (static_cast<double>(totalTurnProcessed) * 100.0) /
+                         static_cast<double>(elapsed_time1);
+    std::cout << "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
+#endif
 }
 #elif NO_MULTITHREADING
 
-void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]) {
+void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads = 1) {
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
     BattleEmulator::ResetTurnProcessed();
@@ -569,6 +587,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
 #ifdef DEBUG
     auto t3 = std::chrono::high_resolution_clock::now();
+    std::cout << "multithreading is disabled" << std::endl;
     auto elapsed_time1 =
             std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
     std::cout << "elapsed time: " << double(elapsed_time1) / 1000 << " ms" << std::endl;
@@ -758,7 +777,7 @@ void mainLoop(const Player copiedPlayers[2]) {
 
             auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
             if (foundSeeds == 1) {
-                SearchRequest(copiedPlayers, seed, aActions);
+                SearchRequest(copiedPlayers, seed, aActions, 8);
             }
             continue;
         }

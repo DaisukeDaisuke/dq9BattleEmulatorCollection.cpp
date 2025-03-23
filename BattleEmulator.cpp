@@ -162,6 +162,24 @@ std::string BattleEmulator::getActionName(int actionId) {
     }
 }
 
+#if defined(MULTITHREADING)
+
+static std::atomic<int> turnProcessed;  // atomicを使用
+
+void BattleEmulator::ResetTurnProcessed() {
+    turnProcessed.store(0, std::memory_order_relaxed);  // relaxedで軽量にリセット
+}
+
+int BattleEmulator::getTurnProcessed() {
+    return turnProcessed.load(std::memory_order_relaxed);  // relaxedで読み取り
+}
+
+inline void BattleEmulator::processTurn() {
+    // ここでturnProcessedをインクリメントする処理を追加
+    turnProcessed.fetch_add(1, std::memory_order_relaxed);  // atomic加算
+}
+#elif defined(NO_MULTITHREADING)
+
 int turnProcessed = 0;
 
 void BattleEmulator::ResetTurnProcessed() {
@@ -171,6 +189,14 @@ void BattleEmulator::ResetTurnProcessed() {
 int BattleEmulator::getTurnProcessed() {
     return turnProcessed;
 }
+
+inline void BattleEmulator::processTurn() {
+    // ここでturnProcessedをインクリメントする処理を追加
+    turnProcessed++;
+}
+
+#endif
+
 
 bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], Player *players,
                           std::optional<BattleResult> &result,
@@ -192,7 +218,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         RunCount++;
     }
     for (int counterJ = startPos; counterJ < RunCount; ++counterJ) {
-        turnProcessed++;
+        processTurn();
         if (genePosition != -1) {
             genePosition = counterJ - 1;
         }
