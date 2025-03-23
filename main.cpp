@@ -200,7 +200,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
 
             if (eAction[0] != "magic Burst" && eAction[1] != "magic Burst") {
                 if (!initiative && (action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
-                    action == BattleEmulator::SLEEPING)) {
+                                    action == BattleEmulator::SLEEPING)) {
                     sp = "---------------";
                 }
                 if ((action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
@@ -307,6 +307,7 @@ void showHeader() {
 #endif
 }
 
+const int THREAD_COUNT = 4;
 
 //int main(int argc, char *argv[]) {
 int main() {
@@ -417,7 +418,7 @@ int main() {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
-    SearchRequest(copiedPlayers, seed, actions, 4);
+    SearchRequest(copiedPlayers, seed, actions, THREAD_COUNT);
 
     return 0;
 #endif
@@ -468,7 +469,8 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
         turns++;
     }
 
-    auto [turnProcessed,genome] = ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, 8);
+    auto [turnProcessed,genome] =
+            ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
 
     priority_queue<Genome> que;
 
@@ -479,7 +481,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
 
-    BattleEmulator::Main(position,100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
+    BattleEmulator::Main(position, 100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
                          nowState);
 
     delete position;
@@ -777,7 +779,7 @@ void mainLoop(const Player copiedPlayers[2]) {
 
             auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
             if (foundSeeds == 1) {
-                SearchRequest(copiedPlayers, seed, aActions, 8);
+                SearchRequest(copiedPlayers, seed, aActions, THREAD_COUNT);
             }
             continue;
         }

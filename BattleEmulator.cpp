@@ -14,8 +14,6 @@
 #include "BattleResult.h"
 
 
-
-
 thread_local int preHP[3] = {0, 0, 0};
 
 void inline BattleEmulator::resetCombo(uint64_t *NowState) {
@@ -948,11 +946,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case BattleEmulator::ACROBATIC_STAR:
             players[0].acrobaticStar = true;
             players[0].acrobaticStarTurn = 6;
-            // if (player0_has_initiative) {
-            //     players[0].specialCharge = false;
-            // } else {
-            //     players[0].dirtySpecialCharge = true;
-            // }
+        // if (player0_has_initiative) {
+        //     players[0].specialCharge = false;
+        // } else {
+        //     players[0].dirtySpecialCharge = true;
+        // }
             players[0].specialCharge = false;
             players[0].specialChargeTurn = 0;
 

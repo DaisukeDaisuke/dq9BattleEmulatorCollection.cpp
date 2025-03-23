@@ -10,7 +10,7 @@
 #include <future>
 #endif
 #include <memory>
-#include <queue>
+//#include <queue>
 #include "BattleEmulator.h"
 #include "Genome.h"
 #include "ActionBanManager.h"
