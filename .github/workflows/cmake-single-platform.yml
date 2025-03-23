@@ -28,28 +28,34 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Build
+    - name: Build multiThread
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rbe_single
 
-    - name: Rename the executable file
-      run: |
-        $source = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/newDirectory.exe"
-        $destination = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
-        Rename-Item -Path $source -NewName $destination
+    - name: Build singleThread
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rbe_multi
 
-    - name: echo SHA256
-      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
+    - name: echo SHA256 rbe_single
+      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.exe"
 
-    - name: echo SHA1
-      run: Get-FileHash -Algorithm SHA1 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
+    - name: echo SHA1 rbe_single
+      run: Get-FileHash -Algorithm SHA1 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.exe"
+
+    - name: echo SHA256 rbe_multi
+      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.exe"
+
+    - name: echo SHA1 rbe_multi
+      run: Get-FileHash -Algorithm SHA1 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.exe"
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.4.3
       with:
         # Artifact name
-        name: vs_be
+        name: rbe
         path: |
-          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe
-          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/newDirectory.pdb
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.pdb
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.pdb
+          "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.exe"
+          "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.exe"
 
