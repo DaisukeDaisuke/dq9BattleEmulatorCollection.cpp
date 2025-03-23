@@ -243,11 +243,11 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         int enemyAction[2] = {0, 0};
         while (counter != 2) {
             int preAction = 0;
-            const int table[6] = {
-                ATTACK_ENEMY, POISON_ATTACK, ATTACK_ENEMY, DECELERATLE, KASAP,
-                SWEET_BREATH
-            };
-            enemyAction[counter] = table[ProcessEnemyRandomAction44(position)];
+            // const int table[6] = {
+            //     ATTACK_ENEMY, POISON_ATTACK, ATTACK_ENEMY, DECELERATLE, KASAP,
+            //     SWEET_BREATH
+            // };
+            enemyAction[counter] = ProcessEnemyRandomAction44(position);
 
             if (counter == 1 && enemyAction[0] == enemyAction[1]) {
                 if (enemyAction[1] == POISON_ATTACK) {
@@ -1154,39 +1154,13 @@ int BattleEmulator::ProcessEnemyRandomAction2A(int *position) {
 
 int BattleEmulator::ProcessEnemyRandomAction44(int *position) {
     //0x0208aca8
-    const int patternTable[6] = {68, 58, 48, 38, 27, 17};
-    //125
-    //43+42+43+43
-    int rand = lcg::getPercent(position, 0x100) + 1;
-
-    //std::cout << "actions rand: " << rand << std::endl;
-
-    for (int i = 0; i < 6; ++i) {
-        if (rand <= patternTable[i]) {
-            return i;
-        }
-        rand = rand - patternTable[i];
-    }
-    return 5;
-}
-
-int BattleEmulator::FUN_0208aecc(int *position, uint64_t *NowState) {
-    uint64_t previousState = ((*NowState) >> 4) & 0xf;
-    if (previousState == 3) {
-        previousState = 0;
-    }
-    uint64_t r0_var2 = lcg::getSeed(position);
-    uint64_t r3_var3 = previousState;
-    uint64_t r2_var5 = r0_var2 & 0x1;
-    uint64_t r0_var6 = r3_var3 << 0x1 & 0xFFFFFFFF;
-    uint64_t r1_var7 = r0_var6 & 0xff;
-    uint64_t r0_var8 = r3_var3 + 0x1;
-    uint64_t r3_var9 = r1_var7 + r2_var5;
-    previousState = static_cast<int>(r0_var8);
-    uint64_t r3_var12 = r3_var9 & 0xff;
-    (*NowState) &= ~0xf0;
-    (*NowState) |= (previousState << 4);
-    return static_cast<int>(r3_var12);
+    int rnd = lcg::getPercent(position, 0x100) + 1;
+    if (rnd <= 68) return ATTACK_ENEMY;
+    if (rnd <= 68 + 58) return POISON_ATTACK;
+    if (rnd <= 68 + 58 + 48) return ATTACK_ENEMY;
+    if (rnd <= 68 + 58 + 48 + 38) return DECELERATLE;
+    if (rnd <= 68 + 58 + 48 + 38 + 27) return KASAP;
+    return SWEET_BREATH;
 }
 
 int BattleEmulator::CalculateMoreHealBase(Player *players) {
