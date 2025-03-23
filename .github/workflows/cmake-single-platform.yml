@@ -49,13 +49,11 @@ jobs:
       run: Get-FileHash -Algorithm SHA1 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.exe"
 
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4.4.3
+      uses: actions/upload-artifact@v4
       with:
         # Artifact name
         name: rbe
         path: |
-          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.pdb
-          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.exe
 
