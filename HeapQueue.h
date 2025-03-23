@@ -19,12 +19,11 @@ public:
         heap.reserve(maxSize);
     }
 
-    void push(const Genome& genome) {
+    void push(const Genome &genome) {
         if (heap.size() < maxSize) {
             heap.push_back(genome);
             std::push_heap(heap.begin(), heap.end());
-        }
-        else {
+        } else {
             // 200 を超えたら、最小要素を削除（最小ヒープのように管理）
             if (genome.fitness > heap.front().fitness) {
                 std::pop_heap(heap.begin(), heap.end());
@@ -51,7 +50,6 @@ public:
         return heap.size();
     }
 };
-
 
 
 #endif //HEAPQUEUE_H

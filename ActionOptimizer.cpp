@@ -78,7 +78,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     auto counter1 = 0;
     //std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
     //std::priority_queue<Genome> que;
-    HeapQueue que(200);
+    HeapQueue que(300);
 
     genome = {};
 
