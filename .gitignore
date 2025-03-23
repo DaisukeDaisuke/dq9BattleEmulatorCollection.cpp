@@ -4,3 +4,5 @@
 /cmake-build-debug-mingw
 /cmake-build-release-mingw
 /cmake-build-relwithdebinfo-mingw
+/cmake-build-debug
+/cmake-build-release

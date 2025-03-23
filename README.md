@@ -9,8 +9,23 @@ Please build with [jetBrains clion](https://www.jetbrains.com/ja-jp/clion/) usin
 
 [稀に不安定なバージョンを無料で使えたりする](https://www.jetbrains.com/ja-jp/clion/nextversion/)ので、それでビルドするのはありかもしれません。ストレージめっちゃ食うけど
 
+また、erugiosu以降では、様々な機能を取り込みつつ、c++17水準で書かれており、幅広い環境virtual studio (cmakeサポート)、msbuild(
+cmake)での静的ビルドに対応しています。  
+このリポジトリ全体の制約として、windows.hは使ってません。なのでLinux等でもビルドできると思いますが、Linuxのg++についてはいまのところサポートしていません。
+
+本番exeのビルドについては、github Actionsでビルドすることになっています。  
+一部の配布物はわざと配布してないことがあるので、その場合は(Github Actionsを他人のリポジトリで使う方法を知っていれば)
+自由にクラウド、またはローカルでビルドできます。
+
 ## branches
 ブランチ紹介
+
+### bilyouma
+
+9一人旅用 病魔パンデルム用バトルエミュ。対応するレベルなど、詳細は後日記述します。   
+マルチスレッド対応(4コア)
+や、ボトルネックの緩和策の実装、AddressSanitizerでのバグチェックなど、新機能を大量に取り入れています。   
+いまのところ入力文字列(引数)は未定です。
 
 ### erugiosu
 エルギオス僧侶レベル50のグリーンタイツバトルエミュです。debug.hのフラグが全て折られている場合、対話型プログラムとして起動します。  
