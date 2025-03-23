@@ -13,9 +13,10 @@ Please build with [jetBrains clion](https://www.jetbrains.com/ja-jp/clion/) usin
 cmake)での静的ビルドに対応しています。  
 このリポジトリ全体の制約として、windows.hは使ってません。なのでLinux等でもビルドできると思いますが、Linuxのg++についてはいまのところ正式にはサポートしていません。
 
-本番exeのビルドについては、github Actionsでビルドすることになっています。  
+本番exeのビルドについては、Github Actionsでビルドすることになっています。  
 一部の配布物はわざと配布してないことがあるので、その場合は(Github Actionsを他人のリポジトリで使う方法を知っていれば)
 自由にクラウド、またはローカルでビルドできます。
+コマンドラインでのビルド方法は各ブランチのワークフローファイル見てください。
 
 ## branches
 ブランチ紹介
