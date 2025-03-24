@@ -20,13 +20,13 @@ elseif(MSVC)
 endif()
 
 
-if (MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "AddressSanitizer (ASan) is enabled for Debug build")
 
     # AddressSanitizer を有効化
     add_compile_options(/fsanitize=address)
     add_link_options(/INCREMENTAL:NO /DEBUG)  # INCREMENTAL LINKING は無効化
-endif ()
+endif()
 #if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Werror -Wshadow -Wstrict-aliasing -Wunreachable-code -Wnull-dereference -Winit-self -Wfloat-equal -Wconversion -Wstrict-overflow=5 -fsanitize=undefined")
 #endif()
