@@ -16,7 +16,7 @@ private:
 
     static double calculatePercent(uint64_t input);
 public:
-    static void init(uint64_t seed);
+    static void init(uint64_t seed, bool init = false);
 
     static int getPercent(int *position, int max);
 

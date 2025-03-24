@@ -8,15 +8,22 @@
 #include <iostream>
 
 // Define the size of the array
-const int ARRAY_SIZE = 10000;
+const int ARRAY_SIZE = 5000;
 
 double precalculatedValues[ARRAY_SIZE]; // 固定メモリ
 int nowCounter = 1;
 uint64_t now_seed;
 
-void lcg::init(uint64_t seed) {
-    nowCounter = 1;
+void lcg::init(uint64_t seed, bool init) {
+    nowCounter = 0;
     now_seed = seed;
+
+    if (init) {
+        for (int i = 0; i < ARRAY_SIZE - 1; ++i) {
+            now_seed = lcg_rand(now_seed);
+            precalculatedValues[nowCounter++] = calculatePercent(now_seed) * 0.01;
+        }
+    }
 }
 
 void lcg::GenerateifNeed(int need) {

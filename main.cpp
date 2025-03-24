@@ -29,7 +29,7 @@ std::string rtrim(const std::string &s);
 
 std::string trim(const std::string &s);
 
-void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]);
+void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
 
 uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                            int eActions[350],
@@ -199,8 +199,8 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
             sp = specialAction;
 
             if (eAction[0] != "magic Burst" && eAction[1] != "magic Burst") {
-                if (!initiative && action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
-                    action == BattleEmulator::SLEEPING) {
+                if (!initiative && (action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
+                                    action == BattleEmulator::SLEEPING)) {
                     sp = "---------------";
                 }
                 if ((action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
@@ -288,21 +288,26 @@ void showHeader() {
     compiler = "msBuild";
 #endif
 
-
+#if defined(MULTITHREADING)
+    std::string multiThreading = ", multithreading is supported";
+#elif defined(NO_MULTITHREADING)
+    std::string multiThreading = ", multithreading is disabled";
+#endif
 #if defined(OPTIMIZATION_O3_ENABLED)
     std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O3), Build date: " << buildDate
             << ", " <<
-            buildTime << " UTC/GMT, Compiler: " << compiler << std::endl;
+            buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << std::endl;
+    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(NO_OPTIMIZATION)
-    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << std::endl;
+    std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #else
     std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
     << ", " << buildTime << std::endl;
 #endif
 }
 
+const int THREAD_COUNT = 4;
 
 //int main(int argc, char *argv[]) {
 int main() {
@@ -407,13 +412,13 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    uint64_t time1 = 0x24588ee6;
+    uint64_t seed = 0x23541dd2;
 
     int actions[350] = {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
-    SearchRequest(copiedPlayers, time1, actions);
+    SearchRequest(copiedPlayers, seed, actions, THREAD_COUNT);
 
     return 0;
 #endif
@@ -445,8 +450,73 @@ constexpr int32_t actions1[100] = {
     BattleEmulator::ATTACK_ALLY,
     BattleEmulator::DEFENCE,
 };
+#ifdef MULTITHREADING
+void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads) {
+#ifdef DEBUG
+    auto t0 = std::chrono::high_resolution_clock::now();
+    BattleEmulator::ResetTurnProcessed();
+#endif
 
-void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]) {
+    int32_t gene[350] = {0};
+    auto turns = 0;
+    for (int i = 0; i < 350; ++i) {
+        gene[i] = aActions[i];
+        if (aActions[i] == -1) {
+            gene[i] = -1;
+            gene[i + 1] = -1;
+            break;
+        }
+        turns++;
+    }
+
+    auto [turnProcessed,genome] =
+            ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
+
+    priority_queue<Genome> que;
+
+    std::optional<BattleResult> result1;
+    result1 = BattleResult();
+    Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
+
+    auto *position = new int(1);
+    auto *nowState = new uint64_t(0);
+
+    BattleEmulator::Main(position, 100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
+                         nowState);
+
+    delete position;
+    delete nowState;
+
+    std::cout << dumpTable(result1.value(), genome.actions, 0) << std::endl;
+
+    std::cout << "0x" << std::hex << seed << std::dec << ": ";
+
+    for (auto i = 0; i < 100; ++i) {
+        if (genome.actions[i] == 0 || genome.actions[i] == -1) {
+            break;
+        }
+        std::cout << genome.actions[i] << ", ";
+    }
+    std::cout << std::endl;
+
+#ifdef DEBUG
+    auto t3 = std::chrono::high_resolution_clock::now();
+    auto elapsed_time1 =
+            std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
+    std::cout << "multithreading is enabled, thread count: " << numThreads << std::endl;
+    std::cout << "elapsed time: " << double(elapsed_time1) / 1000 << " ms" << std::endl;
+    std::cout << "Searcher Turn Consumed: " << turnProcessed << " (" << (
+        static_cast<double>(turnProcessed) / 10000) << " mann)" << std::endl;
+    // 1秒あたりの探索回数 (万回.?? 形式)
+    // 正しい計算：1秒あたりの探索回数 (万回/秒)
+    double performance = (static_cast<double>(turnProcessed) * 100.0) /
+                         static_cast<double>(elapsed_time1);
+    std::cout << "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
+#endif
+}
+#elif NO_MULTITHREADING
+
+void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads = 1) {
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
     BattleEmulator::ResetTurnProcessed();
@@ -519,6 +589,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
 #ifdef DEBUG
     auto t3 = std::chrono::high_resolution_clock::now();
+    std::cout << "multithreading is disabled" << std::endl;
     auto elapsed_time1 =
             std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
     std::cout << "elapsed time: " << double(elapsed_time1) / 1000 << " ms" << std::endl;
@@ -531,6 +602,8 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     std::cout << "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
 #endif
 }
+
+#endif
 
 // ブルートフォースリクエスト関数
 [[nodiscard]] uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
@@ -706,7 +779,7 @@ void mainLoop(const Player copiedPlayers[2]) {
 
             auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
             if (foundSeeds == 1) {
-                SearchRequest(copiedPlayers, seed, aActions);
+                SearchRequest(copiedPlayers, seed, aActions, THREAD_COUNT);
             }
             continue;
         }
