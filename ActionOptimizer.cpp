@@ -10,6 +10,7 @@
 #include "BattleEmulator.h"
 #include "Genome.h"
 #include "ActionBanManager.h"
+#include "HeapQueue.h"
 
 constexpr int NUM_GENERATIONS = 100;
 constexpr int POPULATION_SIZE = 50;
@@ -85,7 +86,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     auto backToPasted = false;
     auto Past = turns;
     //std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
-    std::priority_queue<Genome> que;
+    HeapQueue que(300);
 
     genome = {};
 
