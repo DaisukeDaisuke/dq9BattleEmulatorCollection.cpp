@@ -21,7 +21,7 @@ void lcg::init(uint64_t seed, bool init) {
     if (init) {
         for (int i = 0; i < ARRAY_SIZE - 1; ++i) {
             now_seed = lcg_rand(now_seed);
-            precalculatedValues[nowCounter++] = calculatePercent(now_seed) * 0.01;
+            precalculatedValues[++nowCounter] = calculatePercent(now_seed) * 0.01;
         }
     }
 }
@@ -33,7 +33,7 @@ void lcg::GenerateifNeed(int need) {
     }
     for (int i = nowCounter; i < need+2; ++i) {
         now_seed = lcg_rand(now_seed);
-        precalculatedValues[nowCounter++] = calculatePercent(now_seed) * 0.01;
+        precalculatedValues[++nowCounter] = calculatePercent(now_seed) * 0.01;
     }
 }
 

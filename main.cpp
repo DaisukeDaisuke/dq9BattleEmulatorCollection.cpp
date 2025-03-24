@@ -266,7 +266,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v2.0.0";
+const std::string version = "v2.0.1";
 
 void showHeader() {
 #ifdef BUILD_DATE
@@ -346,10 +346,10 @@ int main() {
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
     //time1 = 0x1aa6c05d;
-    uint64_t time1 = 0x24588ee6;
+    uint64_t time1 = 0x22f09d67;
 
     int dummy[100];
-    lcg::init(time1);
+    lcg::init(time1, false);
     int *position1 = new int(1);
 
     //0x24588ee6: 25, 25, 54, 55, 54, 54, 25, 54, 25, 54, 54, 54, 25, 50, 56, 50, 25, 54,
@@ -412,7 +412,7 @@ int main() {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x23541dd2;
+    uint64_t seed = 0x22f09d67;
 
     int actions[350] = {
         BattleEmulator::ATTACK_ALLY,
@@ -549,7 +549,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
 
-    for (int i = 0; i < 1500; ++i) {
+    for (int i = 0; i < 1000; ++i) {
         auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 1500, gene, i * 2);
 
         players[0] = copiedPlayers[0];
