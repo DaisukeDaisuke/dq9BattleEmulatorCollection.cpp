@@ -50,6 +50,9 @@ set(SOURCES
         Genome.h
         ActionBanManager.h
         HeapQueue.h
+        InputBuilder.cpp
+        InputBuilder.h
+        ResultStructure.h
 )
 
 # シングルスレッド版（multithreading = OFF）

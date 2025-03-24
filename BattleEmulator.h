@@ -16,94 +16,94 @@
 
 class BattleEmulator {
 public:
-    static const int TYPE_2A = 0;
-    static const int TYPE_2B = 1;
-    static const int TYPE_2C = 2;
-    static const int TYPE_2E = 3;
-    static const int TYPE_2D = 4;
+    static constexpr int TYPE_2A = 0;
+    static constexpr int TYPE_2B = 1;
+    static constexpr int TYPE_2C = 2;
+    static constexpr int TYPE_2E = 3;
+    static constexpr int TYPE_2D = 4;
 
 
     //0は配列の初期であり、永久欠番とする
 
     //2A
-    static const int ATTACK_ENEMY = 1;
-    static const int ULTRA_HIGH_SPEED_COMBO = 2;
-    static const int SWITCH_2B = 3;
-    static const int SWITCH_2C = 4;
-    static const int LIGHTNING_STORM = 5;
-    static const int CRITICAL_ATTACK = 6;
+    static constexpr int ATTACK_ENEMY = 1;
+    static constexpr int ULTRA_HIGH_SPEED_COMBO = 2;
+    static constexpr int SWITCH_2B = 3;
+    static constexpr int SWITCH_2C = 4;
+    static constexpr int LIGHTNING_STORM = 5;
+    static constexpr int CRITICAL_ATTACK = 6;
 
     //2C
-    static const int SKY_ATTACK = 8;
-    static const int MERA_ZOMA = 9; //kafrizzらしい
-    static const int FREEZING_BLIZZARD = 10; //ここえるふぶき
-    static const int SWITCH_2A = 11;
-    static const int LULLAB_EYE = 12; //あやしいひとみ
-    static const int SWITCH_2E = 13;
+    static constexpr int SKY_ATTACK = 8;
+    static constexpr int MERA_ZOMA = 9; //kafrizzらしい
+    static constexpr int FREEZING_BLIZZARD = 10; //ここえるふぶき
+    static constexpr int SWITCH_2A = 11;
+    static constexpr int LULLAB_EYE = 12; //あやしいひとみ
+    static constexpr int SWITCH_2E = 13;
 
 
     //2B
-    static const int LAUGH = 15;
-    static const int DISRUPTIVE_WAVE = 16; //凍てつく波動
-    static const int BURNING_BREATH = 17; //やけつくいき
-    static const int DARK_BREATH = 18; //黒い霧
-    static const int SWITCH_2D = 19;
+    static constexpr int LAUGH = 15;
+    static constexpr int DISRUPTIVE_WAVE = 16; //凍てつく波動
+    static constexpr int BURNING_BREATH = 17; //やけつくいき
+    static constexpr int DARK_BREATH = 18; //黒い霧
+    static constexpr int SWITCH_2D = 19;
 
-    static const int INACTIVE_ENEMY = 21;
-    static const int INACTIVE_ALLY = 22;
-    static const int MEDICINAL_HERBS = 23;
-    static const int PARALYSIS = 24;
-    static const int ATTACK_ALLY = 25;
-    static const int HEAL = 26;
-    static const int DEFENCE = 27;
-    static const int CURE_PARALYSIS = 28;
+    static constexpr int INACTIVE_ENEMY = 21;
+    static constexpr int INACTIVE_ALLY = 22;
+    static constexpr int MEDICINAL_HERBS = 23;
+    static constexpr int PARALYSIS = 24;
+    static constexpr int ATTACK_ALLY = 25;
+    static constexpr int HEAL = 26;
+    static constexpr int DEFENCE = 27;
+    static constexpr int CURE_PARALYSIS = 28;
 
 
-    static const int BUFF = 30;
-    static const int MAGIC_MIRROR = 31;
-    static const int MORE_HEAL = 32; //ベホイム
-    static const int DOUBLE_UP = 33; //すてみ
-    static const int MULTITHRUST = 34; //さみだれ
-    static const int SLEEPING = 35;
-    static const int MIDHEAL = 36; //ベホイミ
-    static const int FULLHEAL = 37; //ベホマ
-    static const int DEFENDING_CHAMPION = 38; //大防御
+    static constexpr int BUFF = 30;
+    static constexpr int MAGIC_MIRROR = 31;
+    static constexpr int MORE_HEAL = 32; //ベホイム
+    static constexpr int DOUBLE_UP = 33; //すてみ
+    static constexpr int MULTITHRUST = 34; //さみだれ
+    static constexpr int SLEEPING = 35;
+    static constexpr int MIDHEAL = 36; //ベホイミ
+    static constexpr int FULLHEAL = 37; //ベホマ
+    static constexpr int DEFENDING_CHAMPION = 38; //大防御
 
     //2D
-    static const int PSYCHE_UP = 39; //ためる(敵)
+    static constexpr int PSYCHE_UP = 39; //ためる(敵)
 
-    static const int CURE_SLEEPING = 40; //表示用
+    static constexpr int CURE_SLEEPING = 40; //表示用
 
     //2E
-    static const int MEDITATION = 41; //瞑想
-    static const int MAGIC_BURST = 42; //マダンテ
-    static const int RESTORE_MP = 43; //いのり
-    static const int MERCURIAL_THRUST = 44; //しっぷう突き
-    static const int THUNDER_THRUST = 45; //一閃突き
-    static const int TURN_SKIPPED = 46; //スキップしたとき
+    static constexpr int MEDITATION = 41; //瞑想
+    static constexpr int MAGIC_BURST = 42; //マダンテ
+    static constexpr int RESTORE_MP = 43; //いのり
+    static constexpr int MERCURIAL_THRUST = 44; //しっぷう突き
+    static constexpr int THUNDER_THRUST = 45; //一閃突き
+    static constexpr int TURN_SKIPPED = 46; //スキップしたとき
 
 
-    static const int SAGE_ELIXIR = 47; //賢者の聖水
-    static const int ELFIN_ELIXIR = 48; //エルフののみぐすり
-    static const int MAGIC_WATER = 49; //まほうのせいすい
-    static const int SPECIAL_MEDICINE = 50; //特やくそう
-    static const int DEAD1 = 51; //ゴスペルソング
-    static const int GOSPEL_SONG = 52; //ゴスペルソング
+    static constexpr int SAGE_ELIXIR = 47; //賢者の聖水
+    static constexpr int ELFIN_ELIXIR = 48; //エルフののみぐすり
+    static constexpr int MAGIC_WATER = 49; //まほうのせいすい
+    static constexpr int SPECIAL_MEDICINE = 50; //特やくそう
+    static constexpr int DEAD1 = 51; //ゴスペルソング
+    static constexpr int GOSPEL_SONG = 52; //ゴスペルソング
 
-    static const int FLEE_ALLY = 53; //逃げる
-    static const int MIRACLE_SLASH = 54; //ミラクルソード
-    static const int SPECIAL_ANTIDOTE = 55; //特毒消し草
-    static const int ACROBATIC_STAR = 56; //アクロバットスター
-    static const int CRACKLE = 57; //ヒャダルコ
+    static constexpr int FLEE_ALLY = 53; //逃げる
+    static constexpr int MIRACLE_SLASH = 54; //ミラクルソード
+    static constexpr int SPECIAL_ANTIDOTE = 55; //特毒消し草
+    static constexpr int ACROBATIC_STAR = 56; //アクロバットスター
+    static constexpr int CRACKLE = 57; //ヒャダルコ
 
     //病魔
-    static const int POISON_ATTACK = 65; // 毒攻撃
-    static const int DECELERATLE = 66; //ボミオス
-    static const int KASAP = 67; //ルカナン
-    static const int SWEET_BREATH = 68; //ルカナン
+    static constexpr int POISON_ATTACK = 65; // 毒攻撃
+    static constexpr int DECELERATLE = 66; //ボミオス
+    static constexpr int KASAP = 67; //ルカナン
+    static constexpr int SWEET_BREATH = 68; //ルカナン
 
-    static const int ACROBATSTAR_KAIHI = 69;
-    static const int COUNTER = 70;
+    static constexpr int ACROBATSTAR_KAIHI = 69;
+    static constexpr int COUNTER = 70;
 
 
     static void ResetTurnProcessed();

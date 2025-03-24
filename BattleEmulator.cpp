@@ -333,17 +333,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 actionTable = ATTACK_ALLY;
             }
         } else {
-            if (players[0].hp >= 35) {
-                actionTable = ATTACK_ALLY;
-            } else {
-                if (players[0].mp >= 2) {
-                    actionTable = HEAL;
-                } else if (players[0].SpecialMedicineCount >= 1) {
-                    actionTable = SPECIAL_MEDICINE;
-                } else {
-                    actionTable = ATTACK_ALLY;
-                }
-            }
+            actionTable = ATTACK_ALLY;
         }
 
 
@@ -411,24 +401,30 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     } else if (mode != -1 && mode != -2) {
                         if (
                             c == ATTACK_ENEMY ||
-                            c == ULTRA_HIGH_SPEED_COMBO ||
-                            c == SKY_ATTACK ||
-                            c == CRITICAL_ATTACK ||
-                            c == DARK_BREATH ||
-                            c == FREEZING_BLIZZARD ||
-                            c == MERA_ZOMA ||
-                            c == LIGHTNING_STORM ||
-                            c == MAGIC_BURST
+                            c == POISON_ATTACK ||
+                            c == KASAP ||
+                            c == DECELERATLE ||
+                            c == SWEET_BREATH
                         ) {
                             if (damages[exCounter] == -1) {
                                 return true;
                             }
-                            //                            int need = damages[exCounter++] - basedamage;
-                            //                            if (std::abs(need) == 0) {
-                            //                                return false;
-                            //                            }
-                            if (damages[exCounter++] != basedamage) {
-                                return false;
+                            if (c == KASAP) {
+                                if (damages[exCounter++] != -3) {
+                                    return false;
+                                }
+                            }else if (c == DECELERATLE) {
+                                if (damages[exCounter++] != -2) {
+                                    return false;
+                                }
+                            }else if (c == SWEET_BREATH) {
+                                if (damages[exCounter++] != -4) {
+                                    return false;
+                                }
+                            }else if (damages[exCounter] >= 0) {
+                                if (damages[exCounter++] != basedamage) {
+                                    return false;
+                                }
                             }
                         }
                     }
@@ -514,11 +510,18 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         action == FULLHEAL || action == SPECIAL_MEDICINE || action == GOSPEL_SONG || action ==
                         SPECIAL_ANTIDOTE) {
                         Player::heal(players[0], basedamage);
+                        if (action == SPECIAL_MEDICINE || action == SPECIAL_ANTIDOTE) {
+                            if (mode != -1 && mode != -2) {
+                                if (damages[exCounter] == -5) {
+                                    exCounter++;
+                                }
+                            }
+                        }
                     } else {
                         Player::reduceHp(players[1], basedamage);
 
                         if (mode != -1 && mode != -2) {
-                            if (action == MULTITHRUST || action == ATTACK_ALLY || action == MERCURIAL_THRUST) {
+                            if (action == ATTACK_ALLY || action == MIRACLE_SLASH) {
                                 if (damages[exCounter] == -1) {
                                     return true;
                                 }
