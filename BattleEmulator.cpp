@@ -241,7 +241,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: "<< counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 898) {
+        if ((*position) == 573) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -740,7 +740,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 players[defender].speedTurn = 7;
                 RecalculateBuff(players);
             } else {
-                (*position)++; //0x021ed7a8
+                process7A8(position, 0, players, defender);
             }
             baseDamage = 0;
             resetCombo(NowState);
@@ -751,7 +751,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //関係ない 0x021ec6f8
             if (!players[0].paralysis && !players[0].sleeping) {
                 //TODO 眠ってるときのやけつくいき
-                if (lcg::getPercent(position, 100) < 2) {
+                if (!players[defender].acrobaticStar && lcg::getPercent(position, 100) < 2) {
                     //0x021587b0 回避
                     kaihi = true;
                 }
@@ -769,9 +769,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     (*position)++; //0x021e54fc
                 }
             }
-            if (!players[0].paralysis && !players[0].sleeping && !players[0].specialCharge) {
-                (*position)++; //0x021ed7a8 必殺(敵)
-            }
+            process7A8(position, 0, players, defender);
             baseDamage = 0;
             resetCombo(NowState);
             break;
@@ -795,7 +793,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 players[defender].BuffTurns = 7;
                 RecalculateBuff(players);
             } else {
-                (*position)++; //0x021ed7a8
+                process7A8(position, 0, players, defender);
             }
             baseDamage = 0;
             resetCombo(NowState);

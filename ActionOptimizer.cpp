@@ -519,7 +519,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-        if (AllyPlayerPre.specialCharge == true && !Bans.is_action_banned(BattleEmulator::ACROBATIC_STAR, turns)) {
+        if (AllyPlayerPre.specialCharge == true && AllyPlayerPre.acrobaticStar == false && !Bans.is_action_banned(BattleEmulator::ACROBATIC_STAR, turns)) {
             action = BattleEmulator::ACROBATIC_STAR;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に

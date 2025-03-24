@@ -352,7 +352,7 @@ int main() {
     lcg::init(time1, false);
     int *position1 = new int(1);
 
-    //0x24588ee6: 25, 25, 54, 55, 54, 54, 25, 54, 25, 54, 54, 54, 25, 50, 56, 50, 25, 54,
+    //0x22f09d67: 25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25,
     /*
         *NowStateの各ビットの使用状況は下記の通りである。
         +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
@@ -370,17 +370,17 @@ int main() {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
-    //int32_t gene1[350] = {25, 25, 54, 55, 54, 54, 25, 54, 25, 54, 54, 54, 25, 50, 56, 50, 25, 54};
+    //int32_t gene1[350] = {0};
+    int32_t gene1[350] = {25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25, BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-
-    gene1[counter++] = BattleEmulator::CRACKLE;
-    gene1[counter++] = BattleEmulator::CRACKLE;
-    gene1[counter++] = BattleEmulator::CRACKLE;
-    gene1[counter++] = BattleEmulator::CRACKLE;
-    gene1[counter++] = BattleEmulator::CRACKLE;
-    gene1[counter++] = BattleEmulator::CRACKLE;
+    //
+    // gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::CRACKLE;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
     // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
