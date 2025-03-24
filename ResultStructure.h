@@ -14,19 +14,18 @@ struct InputEntry {
 };
 
 struct ResultStructure {
-    int Edamage[350] = {};       // 敵側ダメージ
+    int Edamage[350] = {}; // 敵側ダメージ
     int EdamageCounter = 0;
-    int Aactions[350] = {};      // 味方行動ID
+    int Aactions[350] = {}; // 味方行動ID
     int AactionsCounter = 0;
-    int Adamage[350] = {};       // 味方ダメージ（候補によって振り分け）
+    int Adamage[350] = {}; // 味方ダメージ（候補によって振り分け）
     int AdamageCounter = 0;
-    int AII_damage[350] = {};    // 入力順序通りの全ダメージコピー
+    int AII_damage[350] = {}; // 入力順序通りの全ダメージコピー
     int AII_damageCounter = 0;
 
     ResultStructure()
         : EdamageCounter(0), AactionsCounter(0),
-          AdamageCounter(0), AII_damageCounter(0)
-    {
+          AdamageCounter(0), AII_damageCounter(0) {
         std::memset(Edamage, 0, sizeof(Edamage));
         std::memset(Aactions, 0, sizeof(Aactions));
         std::memset(Adamage, 0, sizeof(Adamage));

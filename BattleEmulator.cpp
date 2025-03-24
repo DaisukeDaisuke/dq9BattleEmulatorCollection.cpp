@@ -413,15 +413,15 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 if (damages[exCounter++] != -3) {
                                     return false;
                                 }
-                            }else if (c == DECELERATLE) {
+                            } else if (c == DECELERATLE) {
                                 if (damages[exCounter++] != -2) {
                                     return false;
                                 }
-                            }else if (c == SWEET_BREATH) {
+                            } else if (c == SWEET_BREATH) {
                                 if (damages[exCounter++] != -4) {
                                     return false;
                                 }
-                            }else if (damages[exCounter] >= 0) {
+                            } else if (damages[exCounter] >= 0) {
                                 if (damages[exCounter++] != basedamage) {
                                     return false;
                                 }

@@ -6,7 +6,6 @@
 #define INPUTBUILDER_H
 
 
-
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -18,10 +17,12 @@
 class InputBuilder {
 public:
     void push(int damage);
+
     std::vector<ResultStructure> makeStructure();
 
 private:
     std::vector<InputEntry> inputs;
+
     void generateCombinations(size_t index, ResultStructure current, std::vector<ResultStructure> &results);
 };
 

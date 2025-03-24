@@ -64,7 +64,7 @@ std::vector<ResultStructure> InputBuilder::makeStructure() {
     return results;
 }
 
-void InputBuilder::generateCombinations(size_t index, ResultStructure current, std::vector<ResultStructure>& results) {
+void InputBuilder::generateCombinations(size_t index, ResultStructure current, std::vector<ResultStructure> &results) {
     if (index == inputs.size()) {
         results.push_back(current);
         return;
@@ -74,9 +74,10 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
     current.AII_damage[current.AII_damageCounter++] = inputs[index].damage;
 
     const InputEntry &entry = inputs[index];
-    for (int candidate : entry.candidates) {
+    for (int candidate: entry.candidates) {
         ResultStructure next = current; // 既にAII_damageが追加済み
-        if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::KASAP || candidate == BattleEmulator::DECELERATLE) {
+        if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::KASAP || candidate ==
+            BattleEmulator::DECELERATLE) {
             next.Edamage[next.EdamageCounter++] = entry.damage;
         } else {
             next.Aactions[next.AactionsCounter++] = candidate;

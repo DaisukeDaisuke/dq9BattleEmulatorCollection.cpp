@@ -498,7 +498,7 @@ int main(int argc, char *argv[]) {
     // 構造体の組み合わせを作成
     try {
         auto results = builder.makeStructure();
-        for (const auto &result : results) {
+        for (const auto &result: results) {
             result.print(); // 結果の出力
 
             // スタックを配列に変換
@@ -519,7 +519,10 @@ int main(int argc, char *argv[]) {
             damages[result.AII_damageCounter] = -1;
 
 
-            auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, result.AactionsCounter, aActions, damages);
+            FoundSeed = 0;
+            foundSeeds = 0;
+            auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, result.AactionsCounter, aActions,
+                                          damages);
             if (foundSeeds == 1) {
                 SearchRequest(copiedPlayers, seed, aActions, THREAD_COUNT);
             }
@@ -528,8 +531,6 @@ int main(int argc, char *argv[]) {
         std::cerr << e.what() << std::endl;
         return 1;
     }
-
-
 
 
     std::cout << performanceLogger.rdbuf();
@@ -620,9 +621,9 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     double performance = (static_cast<double>(turnProcessed) * 100.0) /
                          static_cast<double>(elapsed_time1);
     performanceLogger << "Searcher multi: Turn Consumed: " << turnProcessed << " (" << (
-        static_cast<double>(turnProcessed) / 10000) << " mann), " <<
-            "elapsed time: " << double(elapsed_time1) / 1000 << " ms, "  <<
-                "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s"  << std::endl;
+                static_cast<double>(turnProcessed) / 10000) << " mann), " <<
+            "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
+            "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s"  << std::endl;
 #endif
 }
 #elif NO_MULTITHREADING
@@ -715,7 +716,8 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
 #endif
 
-void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t end, int turns, int gene[350], int damages[350]) {
+void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t end, int turns, int gene[350],
+                        int damages[350]) {
     int *position = new int(1);
     auto *nowState = new uint64_t(0);
     int maxElement = 350;
@@ -809,9 +811,9 @@ void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t 
         double performance = (static_cast<double>(turnProcessed) * 100.0) /
                              static_cast<double>(elapsed_time1);
         performanceLogger << "BruteForcer: Turn Consumed: " << turnProcessed << " (" << (
-            static_cast<double>(turnProcessed) / 10000) << " mann), " <<
-                "elapsed time: " << double(elapsed_time1) / 1000 << " ms, "  <<
-                    "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s"  << std::endl;
+                    static_cast<double>(turnProcessed) / 10000) << " mann), " <<
+                "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
+                "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s"  << std::endl;
 #endif
 
         return FoundSeed;
