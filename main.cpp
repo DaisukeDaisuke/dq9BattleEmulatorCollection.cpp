@@ -623,7 +623,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     performanceLogger << "Searcher multi: Turn Consumed: " << turnProcessed << " (" << (
                 static_cast<double>(turnProcessed) / 10000) << " mann), " <<
             "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
-            "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s"  << std::endl;
+            "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
 #endif
 }
 #elif NO_MULTITHREADING
@@ -813,7 +813,7 @@ void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t 
         performanceLogger << "BruteForcer: Turn Consumed: " << turnProcessed << " (" << (
                     static_cast<double>(turnProcessed) / 10000) << " mann), " <<
                 "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
-                "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s"  << std::endl;
+                "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
 #endif
 
         return FoundSeed;
