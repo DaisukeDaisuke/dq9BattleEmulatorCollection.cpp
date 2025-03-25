@@ -241,7 +241,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: "<< counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 573) {
+        if ((*position) == 399) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -912,12 +912,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (lcg::getPercent(position, 0x2710) < 500) {
                 kaisinn = true;
             }
-            if (lcg::getPercent(position, 100) < 2) {
-                kaihi = true;
-            }
-            if (!kaihi) {
+            (*position)++;//みかわし(無効) xxx0x021587b0
+            // if (!kaihi) {
                 (*position)++; //盾ガード
-            }
+            // }
             (*position)++; //回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
             if (kaisinn) {

@@ -359,7 +359,7 @@ int main(int argc, char *argv[]) {
     3840264243
     */
 
-    uint64_t time1 = 3838815720;
+    uint64_t time1 = 0x22e2dbaf;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -383,16 +383,18 @@ int main(int argc, char *argv[]) {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
-    //int32_t gene1[350] = {25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25, BattleEmulator::ATTACK_ALLY};
+    //int32_t gene1[350] = {0};
+    //0x22e2dbaf:
+
+    int32_t gene1[350] = {25, 25, 50, 27, 54, 57, 56, 25, 54, 57, 57,  BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::CRACKLE;
     // gene1[counter++] = BattleEmulator::CRACKLE;
     // gene1[counter++] = BattleEmulator::CRACKLE;
@@ -428,13 +430,15 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x23a1d939;
+    uint64_t seed = 0x22e2dbaf;
 
     int actions[350] = {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
     SearchRequest(copiedPlayers, seed, actions, THREAD_COUNT);
+
+    std::cout << performanceLogger.rdbuf() << std::endl;
 
     return 0;
 #endif
