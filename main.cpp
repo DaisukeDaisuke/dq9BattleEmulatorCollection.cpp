@@ -263,7 +263,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v2.0.4";
+const std::string version = "v2.0.5";
 
 std::stringstream performanceLogger = std::stringstream();
 
@@ -444,6 +444,17 @@ void PerformanceDebug(const std::string &name, int turnProcessed, double elapsed
 }
 
 int main(int argc, char *argv[]) {
+    volatile std::string repoURL = u8"Hello Analyzerヽ(*・ω・)ﾉ, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/bilyouma !branch: bilyouma";
+    volatile std::string explanation1 = u8"This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
+
+#if defined(MULTITHREADING)
+    volatile std::string explanation2 = u8", multithreading is enabled, -j " + std::to_string(THREAD_COUNT) + ", Some functions have been added to ActionOptimizer, and SearchRequest has been modified for multi-threading.";
+#elif defined(NO_MULTITHREADING)
+    volatile std::string explanation2 = ", multithreading is disabled";
+#endif
+    volatile std::string explanation3 = u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
+    volatile std::string explanation4 = u8"Have fun exploring the artists!";
+
     showHeader();
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
