@@ -56,4 +56,5 @@ jobs:
         path: |
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.exe
-
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.pdb
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.pdb

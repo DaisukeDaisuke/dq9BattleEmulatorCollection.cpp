@@ -8,6 +8,8 @@
 #include <iostream>
 #include <cstring>
 
+#include "BattleEmulator.h"
+
 struct InputEntry {
     int damage = 0;
     std::vector<int> candidates;
@@ -39,7 +41,15 @@ struct ResultStructure {
         }
         std::cout << "\n[Ally Action IDs](" << AactionsCounter << "): ";
         for (int i = 0; i < AactionsCounter; ++i) {
-            std::cout << Aactions[i] << " ";
+            if (Aactions[i] == BattleEmulator::ATTACK_ALLY) {
+                std::cout << "a" << " ";
+            }else if (Aactions[i] == BattleEmulator::MIRACLE_SLASH) {
+                std::cout << "m" << " ";
+            }else if ((Aactions[i] == BattleEmulator::SPECIAL_MEDICINE) || (Aactions[i] == BattleEmulator::SPECIAL_ANTIDOTE)) {
+                std::cout << "h" << " ";
+            }else {
+                std::cout << Aactions[i] << " ";
+            }
         }
         std::cout << "\n[Ally Damage](" << AdamageCounter << "): ";
         for (int i = 0; i < AdamageCounter; ++i) {

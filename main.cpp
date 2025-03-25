@@ -524,6 +524,7 @@ int main(int argc, char *argv[]) {
             if (foundSeeds == 1) {
                 SearchRequest(copiedPlayers, seed, aActions, THREAD_COUNT);
             }
+            std::cout << "--------------------------" << std::endl;
         }
     } catch (const std::runtime_error &e) {
         std::cerr << e.what() << std::endl;
@@ -747,11 +748,11 @@ void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t 
 #endif
 
     std::cout << "BruteForceRequest executed with time " << hours << ":" << minutes << ":" << seconds << std::endl;
-    std::cout << "\naActions: ";
-    for (int i = 0; i < 350 && aActions[i] != -1; ++i) std::cout << aActions[i] << " ";
-    std::cout << "\ndamages: ";
-    for (int i = 0; i < 350 && damages[i] != -1; ++i) std::cout << damages[i] << " ";
-    std::cout << std::endl;
+    // std::cout << "\naActions: ";
+    // for (int i = 0; i < 350 && aActions[i] != -1; ++i) std::cout << aActions[i] << " ";
+    // std::cout << "\ndamages: ";
+    // for (int i = 0; i < 350 && damages[i] != -1; ++i) std::cout << damages[i] << " ";
+    // std::cout << std::endl;
     BattleEmulator::ResetTurnProcessed();
 
     foundSeeds = 0;
@@ -759,14 +760,13 @@ void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t 
 
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 15;
-    //std::cout << totalSeconds << std::endl;
-    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 3) * (1 / 0.12515)));
+    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 2.5) * (1 / 0.12515)));
     time1 = time1 << 16;
-    std::cout << time1 << std::endl;
+    //std::cout << time1 << std::endl;
 
-    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 3) * (1 / 0.125155)));
+    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 2.5) * (1 / 0.125155)));
     time2 = time2 << 16;
-    std::cout << time2 << std::endl;
+    //std::cout << time2 << std::endl;
     int32_t gene[350] = {0};
     for (int i = 0; i < 350; ++i) {
         gene[i] = aActions[i];
@@ -807,6 +807,8 @@ void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t 
                              static_cast<double>(elapsed_time1);
         performanceLogger << "BruteForcer: Turn Consumed: " << turnProcessed << " (" << (
                     static_cast<double>(turnProcessed) / 10000) << " mann), " <<
+                "Seed Processd: " << (time2 - time1) << "  (" << (
+                    static_cast<double>(time2 - time1) / 10000) << " mann), " <<
                 "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
                 "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
 #endif
