@@ -263,7 +263,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v2.0.1";
+const std::string version = "v2.0.2";
 
 std::stringstream performanceLogger = std::stringstream();
 
@@ -446,8 +446,9 @@ int main(int argc, char *argv[]) {
         std::cout << BattleEmulator::getActionName(BattleEmulator::SPECIAL_MEDICINE) << R"(:   "h")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
-        std::cout << "WARNING: Do not write 0 damage." << std::endl;
+        std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
         std::cout << "example: " << argv[0] << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
+        std::cout << "example: " << argv[0] << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
         std::cerr << "argc!!" << std::endl;
         return 1;
     }
