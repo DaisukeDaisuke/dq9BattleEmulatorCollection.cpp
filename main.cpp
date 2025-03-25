@@ -263,7 +263,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v2.0.6";
+const std::string version = "v2.0.7";
 
 std::stringstream performanceLogger = std::stringstream();
 
@@ -443,21 +443,21 @@ void PerformanceDebug(const std::string &name, int turnProcessed, double elapsed
             "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
 }
 
-int main(int argc, char *argv[]) {
-    volatile std::string repoURL =
-            "Hello Analyzerヽ(*・ω・)ﾉ, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/bilyouma !branch: bilyouma";
-    volatile std::string explanation1 =
-            "This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
+volatile const char repoURL[] =
+        u8"Hello Analyzerヽ(*・ω・)ﾉ, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/bilyouma !branch: bilyouma";
+volatile const char explanation1[] =
+        u8"This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
 
 #if defined(MULTITHREADING)
-    volatile std::string explanation2 = ", multithreading is enabled, -j " + std::to_string(THREAD_COUNT) +
-                                        ", Some functions have been added to ActionOptimizer, and SearchRequest has been modified for multi-threading.";
+volatile const char explanation2[] = u8"multithreading is enabled, Some functions have been added to ActionOptimizer, and SearchRequest has been modified for multi-threading.";
 #elif defined(NO_MULTITHREADING)
-    volatile std::string explanation2 = ", multithreading is disabled";
+volatile const char explanation2[] = u8", multithreading is disabled";
 #endif
-    volatile std::string explanation3 =
-            "2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
-    volatile std::string explanation4 = "Have fun exploring the artists!";
+volatile const char  explanation3[] =
+        u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
+volatile const char explanation4[] = u8"Have fun exploring the artists!";
+
+int main(int argc, char *argv[]) {
 
     showHeader();
 #ifdef DEBUG
@@ -569,6 +569,15 @@ int main(int argc, char *argv[]) {
 
     return 0;
 #endif
+
+    if (argc > 1 && trim(argv[1]) == "info2025325") {
+        printf("%s\n", const_cast<const char*>(repoURL));
+        printf("%s\n", const_cast<const char*>(explanation1));
+        printf("%s\n", const_cast<const char*>(explanation2));
+        printf("%s\n", const_cast<const char*>(explanation3));
+        printf("%s\n", const_cast<const char*>(explanation4));
+        return 0;
+    }
 
     if (argc < 5) {
         help(argv[0]);
