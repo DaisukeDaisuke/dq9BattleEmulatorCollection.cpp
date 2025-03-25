@@ -52,13 +52,11 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmSingleThread(const Player pl
     std::unique_ptr<int> position = std::make_unique<int>(1);
     std::unique_ptr<uint64_t> nowState = std::make_unique<uint64_t>(0);
 
+    std::optional<BattleResult> result1;
+    result1 = BattleResult();
+
     for (int i = start; i < end; ++i) {
-        Player localPlayers[2] = {players[0], players[1]};
-        Genome candidate = RunAlgorithm(localPlayers, seed1, turns1, maxGenerations1, actions, i * 2);
-
-        std::optional<BattleResult> result1;
-        result1 = BattleResult();
-
+        Genome candidate = RunAlgorithm(players, seed1, turns1, maxGenerations1, actions, i * 2);
         Player localPlayers1[2] = {players[0], players[1]};
 
         *position = 1;
@@ -71,8 +69,8 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmSingleThread(const Player pl
         if (localPlayers1[0].hp >= 0 && localPlayers1[1].hp == 0) {
             candidate.turn = result1->turn;
             if (candidate.turn < bestGenome.turn) {
-                candidate.AllyPlayer = localPlayers1[0];
-                candidate.EnemyPlayer = localPlayers1[1];
+                candidate.AllyPlayer.hp = localPlayers1[0].hp;
+                candidate.EnemyPlayer.hp = localPlayers1[1].hp;
                 bestGenome = candidate;
             }
         }
@@ -136,7 +134,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
         genome.actions[i] = actions[i];
     }
-    Player CopedPlayers[2];
     auto action = -1;
     auto Aactions = -1;
     // auto Adamage = -1;
@@ -196,8 +193,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             Bans.ban_action(turns - 1, currentGenome.actions[turns - 1]);
         }
 
-        CopedPlayers[0] = currentGenome.AllyPlayer;
-        CopedPlayers[1] = currentGenome.EnemyPlayer;
+
+        Player CopedPlayers[2] = {currentGenome.AllyPlayer, currentGenome.EnemyPlayer};
         *position = currentGenome.position;
         *nowState = currentGenome.state;
 
@@ -296,7 +293,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 continue;
             }
         }
-        auto AllyPlayer = CopedPlayers[0];
+        const auto AllyPlayer = CopedPlayers[0];
         //auto EnemyPlayer = CopedPlayers[1];
 
 

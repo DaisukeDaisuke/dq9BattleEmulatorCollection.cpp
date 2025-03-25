@@ -710,13 +710,11 @@ void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t 
     int *position = new int(1);
     auto *nowState = new uint64_t(0);
     int maxElement = 350;
-    Player players[2];
     for (uint64_t seed = start; seed < end; ++seed) {
         lcg::init(seed);
         (*nowState) = 0;
         (*position) = 1;
-        players[0] = copiedPlayers[0];
-        players[1] = copiedPlayers[1];
+        Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
 
 
         bool resultBool = BattleEmulator::Main(position, turns, gene, players,

@@ -61,6 +61,7 @@ struct ResultStructure {
         for (int i = 0; i < AII_damageCounter; ++i) {
             std::cout << AII_damage[i] << " ";
         }
+        std::cout << std::endl;
     }
 };
 
