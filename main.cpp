@@ -20,6 +20,16 @@
 
 #endif
 
+
+// MinGW/GCC用のnoinline属性
+#ifndef NOINLINE
+#ifdef _MSC_VER
+#define NOINLINE __declspec(noinline)
+#else
+#define NOINLINE
+#endif
+#endif
+
 int toint(char *string);
 
 //void processResult(const Player *copiedPlayers, const uint64_t seed, std::string input);
@@ -29,7 +39,9 @@ std::string ltrim(const std::string &s);
 std::string rtrim(const std::string &s);
 
 std::string trim(const char *s);
+
 std::string trim(const std::string &s);
+bool isMatchStrWithTrim(const char* s1, const char* s2);
 
 
 void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
@@ -265,7 +277,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v2.0.9";
+const std::string version = "v2.0.10";
 
 std::stringstream performanceLogger = std::stringstream();
 
@@ -347,22 +359,22 @@ constexpr Player BasePlayers[2] = {
     } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 };
 
-bool ProcessInputBuilder(const int argc, char *argv[], InputBuilder &builder) {
+NOINLINE bool ProcessInputBuilder(const int argc, char *argv[], InputBuilder &builder) {
     // 4番目以降の引数を `push()` に入れる
     for (int i = 4; i < argc; ++i) {
-        if (trim(argv[i]) == "h") {
+        if (isMatchStrWithTrim(argv[i], "h")) {
             builder.push(-5);
             continue;
         }
-        if (trim(argv[i]) == "a" || trim(argv[i]) == "s") {
+        if (isMatchStrWithTrim(argv[i], "a") || isMatchStrWithTrim(argv[i], "s")) {
             builder.push(-4);
             continue;
         }
-        if (trim(argv[i]) == "b" || trim(argv[i]) == "d") {
+        if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "d")) {
             builder.push(-2);
             continue;
         }
-        if (trim(argv[i]) == "r" || trim(argv[i]) == "k") {
+        if (isMatchStrWithTrim(argv[i], "r") || isMatchStrWithTrim(argv[i], "k")) {
             builder.push(-3);
             continue;
         }
@@ -377,7 +389,7 @@ bool ProcessInputBuilder(const int argc, char *argv[], InputBuilder &builder) {
     return true;
 }
 
-int ProgramMain(int hours, int minutes, int seconds, InputBuilder &builder) {
+NOINLINE int ProgramMain(int hours, int minutes, int seconds, InputBuilder &builder) {
     // 構造体の組み合わせを作成
     try {
         auto results = builder.makeStructure();
@@ -461,7 +473,7 @@ const char explanation3[] =
 const char explanation4[] = u8"Have fun exploring the artists!";
 
 bool EasterEgg(int argc, char *argv[]) {
-    if (argc > 1 && trim(argv[1]) == "info2025325") {
+    if (argc > 1 && isMatchStrWithTrim(argv[1], "info2025325")) {
         printf("%s\n", repoURL);
         printf("%s\n", explanation1);
         printf("%s\n", explanation2);
@@ -865,14 +877,6 @@ int toint(char *str) {
     }
 }
 
-// MinGW/GCC用のnoinline属性
-#ifndef NOINLINE
-#ifdef _MSC_VER
-#define NOINLINE __declspec(noinline)
-#else
-#define NOINLINE
-#endif
-#endif
 
 
 // 左側の空白をトリム
@@ -900,3 +904,6 @@ NOINLINE std::string trim(const std::string &s) {
     return rtrim(ltrim(s));
 }
 
+NOINLINE bool isMatchStrWithTrim(const char* s1, const char* s2) {
+    return trim(s1) == trim(s2);
+}
