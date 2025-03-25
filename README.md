@@ -35,26 +35,7 @@ Please build with [jetBrains clion](https://www.jetbrains.com/ja-jp/clion/) usin
       "project": "CMakeLists.txt",
       "projectTarget": "rbe_multi.exe",
       "name": "rbe_multi.exe",
-      "args": [
-        "0",
-        "2",
-        "26",
-        "26",
-        "r",
-        "21",
-        "32",
-        "r",
-        "b",
-        "b",
-        "22",
-        "35",
-        "b",
-        "23",
-        "36",
-        "0",
-        "22",
-        "h"
-      ]
+      "args": ["0", "2", "26", "26", "r", "21", "32", "r", "b", "b", "22", "35", "b", "23", "36", "0", "22", "h"]
     }
   ]
 }
