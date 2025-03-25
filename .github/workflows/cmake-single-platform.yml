@@ -48,6 +48,9 @@ jobs:
     - name: echo SHA1 rbe_multi
       run: Get-FileHash -Algorithm SHA1 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.exe"
 
+    - name: Copy License file
+      run: Copy-Item -Path "${{github.workspace}}/LICENSE" -Destination "${{github.workspace}}/build/${{env.BUILD_TYPE}}/"
+
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -58,3 +61,4 @@ jobs:
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_single.pdb
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/LICENSE
