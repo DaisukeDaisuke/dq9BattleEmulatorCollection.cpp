@@ -863,20 +863,29 @@ int toint(char *str) {
     }
 }
 
+// MinGW/GCC用のnoinline属性
+#ifndef NOINLINE
+#ifdef _MSC_VER
+#define NOINLINE __declspec(noinline)
+#else
+#define NOINLINE
+#endif
+#endif
+
 
 // 左側の空白をトリム
-std::string ltrim(const std::string &s) {
+NOINLINE std::string ltrim(const std::string &s) {
     size_t start = s.find_first_not_of(" \t\n\r\f\v");
     return (start == std::string::npos) ? "" : s.substr(start);
 }
 
 // 右側の空白をトリム
-std::string rtrim(const std::string &s) {
+NOINLINE std::string rtrim(const std::string &s) {
     size_t end = s.find_last_not_of(" \t\n\r\f\v");
     return (end == std::string::npos) ? "" : s.substr(0, end + 1);
 }
 
 // 両側の空白をトリム
-std::string trim(const std::string &s) {
+NOINLINE std::string trim(const std::string &s) {
     return rtrim(ltrim(s));
 }
