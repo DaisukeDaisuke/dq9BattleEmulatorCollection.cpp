@@ -35,9 +35,6 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                            int aActions[350], int damages[350]);
 
-
-void mainLoop(const Player copiedPlayers[2]);
-
 using namespace std;
 
 int foundSeeds = 0;
@@ -535,9 +532,6 @@ int main(int argc, char *argv[]) {
 
     std::cout << performanceLogger.rdbuf();
 
-    return 0;
-
-    mainLoop(copiedPlayers);
     return 0;
 
 #ifdef DEBUG
