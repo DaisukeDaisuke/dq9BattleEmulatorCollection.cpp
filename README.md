@@ -18,7 +18,7 @@ Please build with [jetBrains clion](https://www.jetbrains.com/ja-jp/clion/) usin
 、自由にクラウド、またはローカルでビルドできます。  
 コマンドラインでのビルド方法は各ブランチのワークフローファイル見てください。
 
-## hou to add argc on vs22
+## how to add argc on vs22
 
 `./.vs/launch.vs.json`をエクスプローラーで表示設定にして直接編集するか  
 `デバック > [rbe_multi]デバックおよび機能の設定`でlaunch.vs.jsonを開き、  
