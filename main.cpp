@@ -28,7 +28,9 @@ std::string ltrim(const std::string &s);
 
 std::string rtrim(const std::string &s);
 
+std::string trim(const char *s);
 std::string trim(const std::string &s);
+
 
 void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
 
@@ -263,7 +265,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v2.0.8";
+const std::string version = "v2.0.9";
 
 std::stringstream performanceLogger = std::stringstream();
 
@@ -885,7 +887,16 @@ NOINLINE std::string rtrim(const std::string &s) {
     return (end == std::string::npos) ? "" : s.substr(0, end + 1);
 }
 
+
+// char* を受け取るバージョン（std::stringに変換せず処理）
+NOINLINE std::string trim(const char *s) {
+    if (s == nullptr) return "";
+    std::string str(s);
+    return trim(str);
+}
+
 // 両側の空白をトリム
 NOINLINE std::string trim(const std::string &s) {
     return rtrim(ltrim(s));
 }
+
