@@ -18,6 +18,48 @@ Please build with [jetBrains clion](https://www.jetbrains.com/ja-jp/clion/) usin
 、自由にクラウド、またはローカルでビルドできます。  
 コマンドラインでのビルド方法は各ブランチのワークフローファイル見てください。
 
+## hou to add argc on vs22
+
+`./.vs/launch.vs.json`をエクスプローラーで表示設定にして直接編集するか  
+`デバック > [rbe_multi]デバックおよび機能の設定`でlaunch.vs.jsonを開き、  
+デフォルトで生成されているjosnに下記の位置でargsカラムを追加します。
+そしてctrl+Sで保存してcmakeを再読み込みすれば、argc付きで起動するようになります
+
+```json
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "rbe_multi.exe",
+      "name": "rbe_multi.exe",
+      "args": [
+        "0",
+        "2",
+        "26",
+        "26",
+        "r",
+        "21",
+        "32",
+        "r",
+        "b",
+        "b",
+        "22",
+        "35",
+        "b",
+        "23",
+        "36",
+        "0",
+        "22",
+        "h"
+      ]
+    }
+  ]
+}
+```
+
 ## branches
 ブランチ紹介
 
