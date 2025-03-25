@@ -35,6 +35,7 @@ struct ResultStructure {
     }
 
     void print() const {
+        std::cout << "--------------------------" << std::endl;
         std::cout << "[Enemy Damage](" << EdamageCounter << "): ";
         for (int i = 0; i < EdamageCounter; ++i) {
             std::cout << Edamage[i] << " ";
@@ -43,11 +44,12 @@ struct ResultStructure {
         for (int i = 0; i < AactionsCounter; ++i) {
             if (Aactions[i] == BattleEmulator::ATTACK_ALLY) {
                 std::cout << "a" << " ";
-            }else if (Aactions[i] == BattleEmulator::MIRACLE_SLASH) {
+            } else if (Aactions[i] == BattleEmulator::MIRACLE_SLASH) {
                 std::cout << "m" << " ";
-            }else if ((Aactions[i] == BattleEmulator::SPECIAL_MEDICINE) || (Aactions[i] == BattleEmulator::SPECIAL_ANTIDOTE)) {
+            } else if ((Aactions[i] == BattleEmulator::SPECIAL_MEDICINE) || (
+                           Aactions[i] == BattleEmulator::SPECIAL_ANTIDOTE)) {
                 std::cout << "h" << " ";
-            }else {
+            } else {
                 std::cout << Aactions[i] << " ";
             }
         }
@@ -59,7 +61,6 @@ struct ResultStructure {
         for (int i = 0; i < AII_damageCounter; ++i) {
             std::cout << AII_damage[i] << " ";
         }
-        std::cout << "\n--------------------------\n";
     }
 };
 

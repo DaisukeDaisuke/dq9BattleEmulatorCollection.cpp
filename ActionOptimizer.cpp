@@ -17,28 +17,6 @@
 #include "HeapQueue.h"
 #include "lcg.h"
 
-constexpr int NUM_GENERATIONS = 100;
-constexpr int POPULATION_SIZE = 50;
-constexpr int GENE_LENGTH = 10; // 行動配列の長さ
-
-constexpr int32_t actions1[13] = {
-    BattleEmulator::BUFF,
-    BattleEmulator::MAGIC_MIRROR,
-    BattleEmulator::MORE_HEAL,
-    BattleEmulator::DOUBLE_UP,
-    BattleEmulator::MULTITHRUST,
-    BattleEmulator::MIDHEAL,
-    BattleEmulator::FULLHEAL,
-    BattleEmulator::DEFENDING_CHAMPION,
-    BattleEmulator::SAGE_ELIXIR,
-    BattleEmulator::ELFIN_ELIXIR,
-    BattleEmulator::SPECIAL_MEDICINE,
-    BattleEmulator::ATTACK_ALLY,
-    BattleEmulator::DEFENCE,
-};
-
-constexpr int ACTION_COUNT = sizeof(actions1) / sizeof(actions1[0]);
-
 
 void updateCompromiseScore(Genome &genome) {
     //敵の行動に応じた減点

@@ -263,11 +263,11 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v2.0.2";
+const std::string version = "v2.0.3";
 
 std::stringstream performanceLogger = std::stringstream();
 
-const int THREAD_COUNT = 4;
+constexpr int THREAD_COUNT = 4;
 
 
 void showHeader() {
@@ -309,9 +309,140 @@ void showHeader() {
 #endif
 }
 
+void help(const char *program_name) {
+    std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
+    std::cout << "tables" << std::endl;
+    std::cout << BattleEmulator::getActionName(BattleEmulator::KASAP) << R"(:   "r" or "k")" << std::endl;
+    std::cout << BattleEmulator::getActionName(BattleEmulator::SPECIAL_MEDICINE) << R"(:   "h")" << std::endl;
+    std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
+    std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
+    std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
+    std::cout << "example: " << program_name << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
+    std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
+    std::cerr << "error: Not enough argc!!" << std::endl;
+}
 
 //int main(int argc, char *argv[]) {
 //int main() {
+
+constexpr Player BasePlayers[2] = {
+    // プレイヤー1
+    {
+        103, 103.0, 89, 89, 97, 97, 69, 69, 44, 36, // 最初のメンバー
+        36, false, false, 0, false, 0, -1,
+        // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+        6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+        false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+    }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+
+    // プレイヤー2
+    {
+        696, 696.0, 68, 68, 68, 68, 50, 50, 0, 255, // 最初のメンバー
+        255, false, false, 0, false, 0, -1,
+        // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+        0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+        false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
+    } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+};
+
+bool ProcessInputBuilder(const int argc, char *argv[], InputBuilder &builder) {
+    // 4番目以降の引数を `push()` に入れる
+    for (int i = 4; i < argc; ++i) {
+        if (trim(argv[i]) == "h") {
+            builder.push(-5);
+            continue;
+        }
+        if (trim(argv[i]) == "a" || trim(argv[i]) == "s") {
+            builder.push(-4);
+            continue;
+        }
+        if (trim(argv[i]) == "b" || trim(argv[i]) == "d") {
+            builder.push(-2);
+            continue;
+        }
+        if (trim(argv[i]) == "r" || trim(argv[i]) == "k") {
+            builder.push(-3);
+            continue;
+        }
+        int damage = toint(argv[i]);
+        if (damage >= 0) {
+            builder.push(damage);
+        } else {
+            std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+int ProgramMain(int hours, int minutes, int seconds, InputBuilder &builder) {
+    // 構造体の組み合わせを作成
+    try {
+        auto results = builder.makeStructure();
+        for (const auto &result: results) {
+            result.print(); // 結果の出力
+
+            // スタックを配列に変換
+            int aActions[350] = {0};
+            int damages[350] = {0};
+
+            // Aactions をスタックにコピー
+            for (int i = 0; i < result.AactionsCounter; ++i) {
+                aActions[i] = result.Aactions[i];
+            }
+            aActions[result.AactionsCounter] = -1;
+
+            // AII_damage をスタックにコピー
+            for (int i = 0; i < result.AII_damageCounter; ++i) {
+                damages[i] = result.AII_damage[i];
+            }
+            damages[result.AII_damageCounter] = -1;
+
+
+            FoundSeed = 0;
+            foundSeeds = 0;
+            auto seed = BruteForceRequest(BasePlayers, hours, minutes, seconds, result.AactionsCounter, aActions,
+                                          damages);
+            if (foundSeeds == 1) {
+                SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT);
+            }
+        }
+    } catch (const std::runtime_error &e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+void dumptableMain(BattleResult &result1, Genome &genome, uint64_t seed) {
+    std::cout << dumpTable(result1, genome.actions, 0) << std::endl;
+
+    std::cout << "0x" << std::hex << seed << std::dec << ": ";
+
+    for (auto i = 0; i < 100; ++i) {
+        if (genome.actions[i] == 0 || genome.actions[i] == -1) {
+            break;
+        }
+        std::cout << genome.actions[i] << ", ";
+    }
+    std::cout << std::endl;
+}
+
+void PerformanceDebug(const std::string &name, int turnProcessed, double elapsed_time1, uint64_t seeds) {
+    // 正しい計算：1秒あたりの探索回数 (万回/秒)
+    double performance = (static_cast<double>(turnProcessed) * 100.0) /
+                         static_cast<double>(elapsed_time1);
+    performanceLogger << name << ": Turn Consumed: " << turnProcessed << " (" << (
+        static_cast<double>(turnProcessed) / 10000) << " mann), ";
+
+    if (seeds != 0) {
+        performanceLogger << "Seed Processd: " << (seeds) << "  (" << (
+            static_cast<double>(seeds) / 10000) << " mann), ";
+    }
+    performanceLogger << "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
+            "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
+}
+
 int main(int argc, char *argv[]) {
     showHeader();
 #ifdef DEBUG
@@ -322,25 +453,6 @@ int main(int argc, char *argv[]) {
     //https://zenn.dev/reputeless/books/standard-cpp-for-competitive-programming/viewer/library-ios-iomanip#3.1-c-%E8%A8%80%E8%AA%9E%E3%81%AE%E5%85%A5%E5%87%BA%E5%8A%9B%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%E3%83%A0%E3%81%A8%E3%81%AE%E5%90%8C%E6%9C%9F%E3%82%92%E7%84%A1%E5%8A%B9%E3%81%AB%E3%81%99%E3%82%8B
     //std::cin.tie(0)->sync_with_stdio(0);
 
-    const Player copiedPlayers[2] = {
-        // プレイヤー1
-        {
-            103, 103.0, 89, 89, 97, 97, 69, 69, 44, 36, // 最初のメンバー
-            36, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            696, 696.0, 68, 68, 68, 68, 50, 50, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
 
 #ifdef DEBUG2
     //time1 = 0x199114b2;
@@ -412,7 +524,7 @@ int main(int argc, char *argv[]) {
     (*position1) = 1;
     std::optional<BattleResult> dummy1;
     dummy1 = BattleResult();
-    std::memcpy(players1, copiedPlayers, sizeof(players1));
+    std::memcpy(players1, BasePlayers, sizeof(players1));
     BattleEmulator::Main(position1, (counter == 0 ? 1000 : counter), gene1, players1, dummy1, time1, dummy, dummy, -1,
                          NowState);
 
@@ -436,7 +548,7 @@ int main(int argc, char *argv[]) {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
-    SearchRequest(copiedPlayers, seed, actions, THREAD_COUNT);
+    SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
 
     std::cout << performanceLogger.rdbuf() << std::endl;
 
@@ -444,16 +556,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     if (argc < 5) {
-        std::cout << "Usage: " << argv[0] << " h m s [actions...]" << std::endl;
-        std::cout << "tables" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::KASAP) << R"(:   "r" or "k")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SPECIAL_MEDICINE) << R"(:   "h")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
-        std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
-        std::cout << "example: " << argv[0] << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
-        std::cout << "example: " << argv[0] << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
-        std::cerr << "argc!!" << std::endl;
+        help(argv[0]);
         return 1;
     }
 
@@ -469,101 +572,19 @@ int main(int argc, char *argv[]) {
 
     // `InputBuilder` インスタンス作成
     InputBuilder builder;
-
-    // 4番目以降の引数を `push()` に入れる
-    for (int i = 4; i < argc; ++i) {
-        if (trim(argv[i]) == "h") {
-            builder.push(-5);
-            continue;
-        }
-        if (trim(argv[i]) == "a" || trim(argv[i]) == "s") {
-            builder.push(-4);
-            continue;
-        }
-        if (trim(argv[i]) == "b" || trim(argv[i]) == "d") {
-            builder.push(-2);
-            continue;
-        }
-        if (trim(argv[i]) == "r" || trim(argv[i]) == "k") {
-            builder.push(-3);
-            continue;
-        }
-        int damage = toint(argv[i]);
-        if (damage >= 0) {
-            builder.push(damage);
-        } else {
-            std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
-            return 1;
-        }
-    }
-
-    // 構造体の組み合わせを作成
-    try {
-        auto results = builder.makeStructure();
-        for (const auto &result: results) {
-            result.print(); // 結果の出力
-
-            // スタックを配列に変換
-            int aActions[350] = {0};
-            int damages[350] = {0};
-
-
-            // Aactions をスタックにコピー
-            for (int i = 0; i < result.AactionsCounter; ++i) {
-                aActions[i] = result.Aactions[i];
-            }
-            aActions[result.AactionsCounter] = -1;
-
-            // AII_damage をスタックにコピー
-            for (int i = 0; i < result.AII_damageCounter; ++i) {
-                damages[i] = result.AII_damage[i];
-            }
-            damages[result.AII_damageCounter] = -1;
-
-
-            FoundSeed = 0;
-            foundSeeds = 0;
-            auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, result.AactionsCounter, aActions,
-                                          damages);
-            if (foundSeeds == 1) {
-                SearchRequest(copiedPlayers, seed, aActions, THREAD_COUNT);
-            }
-            std::cout << "--------------------------" << std::endl;
-        }
-    } catch (const std::runtime_error &e) {
-        std::cerr << e.what() << std::endl;
-        return 1;
-    }
-
-
+    ProcessInputBuilder(argc, argv, builder);
+    auto exitCode = ProgramMain(hours, minutes, seconds, builder);
     std::cout << performanceLogger.rdbuf();
-
-    return 0;
-
 #ifdef DEBUG
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
     std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
 #endif
-    return 0;
+
+    return exitCode;
 }
 
-constexpr int32_t actions1[100] = {
-    BattleEmulator::BUFF,
-    BattleEmulator::MAGIC_MIRROR,
-    BattleEmulator::MORE_HEAL,
-    BattleEmulator::DOUBLE_UP,
-    BattleEmulator::MULTITHRUST,
-    BattleEmulator::MIDHEAL,
-    BattleEmulator::FULLHEAL,
-    BattleEmulator::DEFENDING_CHAMPION,
-    BattleEmulator::SAGE_ELIXIR,
-    BattleEmulator::ELFIN_ELIXIR,
-    BattleEmulator::SPECIAL_MEDICINE,
-    BattleEmulator::ATTACK_ALLY,
-    BattleEmulator::DEFENCE,
-};
 #ifdef MULTITHREADING
 void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads) {
 #ifdef DEBUG
@@ -601,29 +622,13 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     delete position;
     delete nowState;
 
-    std::cout << dumpTable(result1.value(), genome.actions, 0) << std::endl;
-
-    std::cout << "0x" << std::hex << seed << std::dec << ": ";
-
-    for (auto i = 0; i < 100; ++i) {
-        if (genome.actions[i] == 0 || genome.actions[i] == -1) {
-            break;
-        }
-        std::cout << genome.actions[i] << ", ";
-    }
-    std::cout << std::endl;
+    dumptableMain(result1.value(), genome, seed);
 
 #ifdef DEBUG
     auto t3 = std::chrono::high_resolution_clock::now();
     auto elapsed_time1 =
             std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
-    // 正しい計算：1秒あたりの探索回数 (万回/秒)
-    double performance = (static_cast<double>(turnProcessed) * 100.0) /
-                         static_cast<double>(elapsed_time1);
-    performanceLogger << "Searcher multi: Turn Consumed: " << turnProcessed << " (" << (
-                static_cast<double>(turnProcessed) / 10000) << " mann), " <<
-            "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
-            "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
+    PerformanceDebug("Searcher multi", turnProcessed, static_cast<double>(elapsed_time1), 0);
 #endif
 }
 #elif NO_MULTITHREADING
@@ -687,30 +692,14 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     delete position;
     delete nowState;
 
-    std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
-
-    std::cout << "0x" << std::hex << seed << std::dec << ": ";
-
-    for (auto i = 0; i < 100; ++i) {
-        if (bestGenome.actions[i] == 0 || bestGenome.actions[i] == -1) {
-            break;
-        }
-        std::cout << bestGenome.actions[i] << ", ";
-    }
-    std::cout << std::endl;
+    dumptableMain(bestResult, bestGenome, seed);
 
 #ifdef DEBUG
     auto turnProcessed = BattleEmulator::getTurnProcessed();
     auto t3 = std::chrono::high_resolution_clock::now();
     auto elapsed_time1 =
             std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
-    // 正しい計算：1秒あたりの探索回数 (万回/秒)
-    double performance = (static_cast<double>(turnProcessed) * 100.0) /
-                         static_cast<double>(elapsed_time1);
-    performanceLogger << "Searcher single: Turn Consumed: " << turnProcessed << " (" << (
-        static_cast<double>(turnProcessed) / 10000) << " mann), " <<
-            "elapsed time: " << double(elapsed_time1) / 1000 << " ms, "  <<
-                "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s"  << std::endl;
+    PerformanceDebug("Searcher single", turnProcessed, static_cast<double>(elapsed_time1), 0);
 #endif
 }
 
@@ -766,11 +755,9 @@ void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t 
     totalSeconds = totalSeconds - 15;
     auto time1 = static_cast<uint64_t>(floor((totalSeconds - 2.5) * (1 / 0.12515)));
     time1 = time1 << 16;
-    //std::cout << time1 << std::endl;
 
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 2.5) * (1 / 0.125155)));
     time2 = time2 << 16;
-    //std::cout << time2 << std::endl;
     int32_t gene[350] = {0};
     for (int i = 0; i < 350; ++i) {
         gene[i] = aActions[i];
@@ -806,15 +793,8 @@ void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t 
         auto t3 = std::chrono::high_resolution_clock::now();
         auto elapsed_time1 =
                 std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
-        // 正しい計算：1秒あたりの探索回数 (万回/秒)
-        double performance = (static_cast<double>(turnProcessed) * 100.0) /
-                             static_cast<double>(elapsed_time1);
-        performanceLogger << "BruteForcer: Turn Consumed: " << turnProcessed << " (" << (
-                    static_cast<double>(turnProcessed) / 10000) << " mann), " <<
-                "Seed Processd: " << (time2 - time1) << "  (" << (
-                    static_cast<double>(time2 - time1) / 10000) << " mann), " <<
-                "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
-                "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
+        PerformanceDebug("BruteForcer", turnProcessed, static_cast<int>(elapsed_time1), time2 - time1);
+
 #endif
 
         return FoundSeed;
