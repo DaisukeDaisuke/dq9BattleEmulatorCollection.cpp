@@ -22,7 +22,7 @@ Please build with [jetBrains clion](https://www.jetbrains.com/ja-jp/clion/) usin
 
 `./.vs/launch.vs.json`をエクスプローラーで表示設定にして直接編集するか  
 `デバック > [rbe_multi]デバックおよび機能の設定`でlaunch.vs.jsonを開き、  
-デフォルトで生成されているjosnに下記の位置でargsカラムを追加します。
+デフォルトで生成されているjsonに下記の位置でargsカラムを追加します。
 そしてctrl+Sで保存してcmakeを再読み込みすれば、argc付きで起動するようになります
 
 ```json
