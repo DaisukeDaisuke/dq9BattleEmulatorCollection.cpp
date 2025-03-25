@@ -443,19 +443,32 @@ void PerformanceDebug(const std::string &name, int turnProcessed, double elapsed
             "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
 }
 
-volatile const char repoURL[] =
+const char repoURL[] =
         u8"Hello Analyzerヽ(*・ω・)ﾉ, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/bilyouma !branch: bilyouma";
-volatile const char explanation1[] =
+const char explanation1[] =
         u8"This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
 
 #if defined(MULTITHREADING)
-volatile const char explanation2[] = u8"multithreading is enabled, Some functions have been added to ActionOptimizer, and SearchRequest has been modified for multi-threading.";
+const char explanation2[] =
+        u8"multithreading is enabled, Some functions have been added to ActionOptimizer, and SearchRequest has been modified for multi-threading.";
 #elif defined(NO_MULTITHREADING)
-volatile const char explanation2[] = u8", multithreading is disabled";
+const char explanation2[] = u8", multithreading is disabled";
 #endif
-volatile const char  explanation3[] =
+const char explanation3[] =
         u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
-volatile const char explanation4[] = u8"Have fun exploring the artists!";
+const char explanation4[] = u8"Have fun exploring the artists!";
+
+bool EasterEgg(int argc, char *argv[]) {
+    if (argc > 1 && trim(argv[1]) == "info2025325") {
+        printf("%s\n", repoURL);
+        printf("%s\n", explanation1);
+        printf("%s\n", explanation2);
+        printf("%s\n", explanation3);
+        printf("%s\n", explanation4);
+        return true;
+    }
+    return false;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -570,13 +583,8 @@ int main(int argc, char *argv[]) {
     return 0;
 #endif
 
-    if (argc > 1 && trim(argv[1]) == "info2025325") {
-        printf("%s\n", const_cast<const char*>(repoURL));
-        printf("%s\n", const_cast<const char*>(explanation1));
-        printf("%s\n", const_cast<const char*>(explanation2));
-        printf("%s\n", const_cast<const char*>(explanation3));
-        printf("%s\n", const_cast<const char*>(explanation4));
-        return 0;
+    if (EasterEgg(argc, argv)) {
+        return 1;
     }
 
     if (argc < 5) {
