@@ -82,8 +82,8 @@ stdの優先度付きキューが同じ優先度のものがあった場合、�
 エルギオス以降では、物量によってかき消されるので基本発生しにくいです。    
 
 ### Q: mingw版のexeが3mbとかになるんだけど
-A: `CMAKE_CXX_FLAGS`に`-s`フラグつけるとデバックシンボルが埋め込めれなくなりデバックが不可能になる代わりに2mbぐらい減ります。  
-devenvでビルドしたものについてしりません。  
+A: `CMakeLists.txt`の`CMAKE_CXX_FLAGS`に`-s`フラグつけるとデバックシンボルが埋め込めれなくなりデバックが不可能になる代わりに2mbぐらい減ります。  
+devenvでビルドしたものについてしりません。Github Actionsでビルドしたものを使ってください(エルギオス以降であれば静的リンクで400kbなので)。  
 ```cmake
 if(MINGW)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections -s")
