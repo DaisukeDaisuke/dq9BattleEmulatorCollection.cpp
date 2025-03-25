@@ -263,7 +263,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v2.0.3";
+const std::string version = "v2.0.4";
 
 std::stringstream performanceLogger = std::stringstream();
 
