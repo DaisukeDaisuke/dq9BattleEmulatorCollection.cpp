@@ -263,7 +263,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v2.0.7";
+const std::string version = "v2.0.8";
 
 std::stringstream performanceLogger = std::stringstream();
 
@@ -444,7 +444,7 @@ void PerformanceDebug(const std::string &name, int turnProcessed, double elapsed
 }
 
 const char repoURL[] =
-        u8"Hello Analyzerヽ(*・ω・)ﾉ, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/bilyouma !branch: bilyouma";
+        u8"Hello Analyzer!, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/bilyouma !branch: bilyouma";
 const char explanation1[] =
         u8"This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
 
