@@ -9,7 +9,6 @@
 
 #include "lcg.h"
 #include "BattleEmulator.h"
-#include "AnalyzeData.h"
 #include "debug.h"
 #include "ActionOptimizer.h"
 #include "InputBuilder.h"
@@ -52,7 +51,6 @@ uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes
 using namespace std;
 
 int foundSeeds = 0;
-std::vector<AnalyzeData> analyzeDataMap;
 
 uint64_t FoundSeed = 0;
 
@@ -247,37 +245,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
 
     return ss6.str();
 }
-
-std::string normalDump(AnalyzeData data);
-
-std::string normalDump(AnalyzeData data) {
-    int counter = 0;
-    BattleResult result = *data.getBattleResult();
-    std::stringstream ss;
-    for (int i = 0; i < result.position; ++i) {
-        auto action = result.actions[i];
-        auto damage = result.damages[i];
-        if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
-            ss << "h ";
-            counter++;
-        } else if (damage != 0) {
-            ss << damage << " ";
-        }
-        if (counter == 10) {
-            ss << std::endl;
-            counter = 0;
-        }
-    }
-    auto turn = result.turn + 1;
-    if (data.getWinStatus()) {
-        ss << "W " << turn;
-    } else {
-        ss << "L " << turn;
-    }
-    return ss.str();
-}
-
-const std::string version = "v2.0.10";
+const char *version = "v2.0.10";
 
 std::stringstream performanceLogger = std::stringstream();
 
@@ -286,13 +254,13 @@ constexpr int THREAD_COUNT = 4;
 
 void showHeader() {
 #ifdef BUILD_DATE
-    const std::string buildDate = BUILD_DATE;
+    const auto buildDate = BUILD_DATE;
 #else
     const std::string buildDate = "Unknown";
 #endif
 
 #ifdef BUILD_TIME
-    const std::string buildTime = BUILD_TIME;
+    const auto buildTime = BUILD_TIME;
 #else
     const std::string buildTime = "Unknown";
 #endif
@@ -442,7 +410,7 @@ void dumptableMain(BattleResult &result1, Genome &genome, uint64_t seed) {
     std::cout << std::endl;
 }
 
-void PerformanceDebug(const std::string &name, int turnProcessed, double elapsed_time1, uint64_t seeds) {
+void PerformanceDebug(const char *name, int turnProcessed, double elapsed_time1, uint64_t seeds) {
     // 正しい計算：1秒あたりの探索回数 (万回/秒)
     double performance = (static_cast<double>(turnProcessed) * 100.0) /
                          static_cast<double>(elapsed_time1);

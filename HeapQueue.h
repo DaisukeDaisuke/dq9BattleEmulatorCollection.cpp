@@ -38,15 +38,15 @@ public:
         heap.pop_back();
     }
 
-    Genome top() const {
+    [[nodiscard]] Genome top() const {
         return heap.front();
     }
 
-    bool empty() const {
+    [[nodiscard]] bool empty() const {
         return heap.empty();
     }
 
-    size_t size() const {
+    [[nodiscard]] size_t size() const {
         return heap.size();
     }
 };

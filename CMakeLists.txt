@@ -44,7 +44,6 @@ set(SOURCES
         debug.cpp
         debug.h
         BattleResult.h
-        AnalyzeData.h
         ActionOptimizer.cpp
         ActionOptimizer.h
         Genome.h
