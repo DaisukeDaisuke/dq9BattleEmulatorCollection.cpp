@@ -51,6 +51,7 @@ namespace {
 
     uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                                int aActions[350], int damages[350]);
+
     void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed);
 
     void printHeader(std::stringstream &ss);
@@ -348,6 +349,7 @@ namespace {
         std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
+
     NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
         // 4番目以降の引数を `push()` に入れる
         for (int i = 4; i < argc; ++i) {
