@@ -5,8 +5,6 @@
 #ifndef NEWDIRECTORY_BATTLERESULT_H
 #define NEWDIRECTORY_BATTLERESULT_H
 
-#include <cstring>
-
 class BattleResult {
 
 public:

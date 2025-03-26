@@ -5,9 +5,10 @@
 #include "ActionOptimizer.h"
 #include <vector>
 #include <random>
-#include <functional>
+//#include <functional>
 #if defined(MULTITHREADING)
 #include <future>
+#include "lcg.h"
 #endif
 #include <memory>
 //#include <queue>
@@ -15,10 +16,8 @@
 #include "Genome.h"
 #include "ActionBanManager.h"
 #include "HeapQueue.h"
-#include "lcg.h"
 
-
-void updateCompromiseScore(Genome &genome) {
+void ActionOptimizer::updateCompromiseScore(Genome &genome) {
     //敵の行動に応じた減点
     for (int i = 0; i < 2; ++i) {
         if (genome.EActions[i] == BattleEmulator::KASAP) {

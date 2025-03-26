@@ -23,6 +23,9 @@ private:
     static std::pair<int, Genome> RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[], int start, int end);
 
 #endif
+
+private:
+    static void updateCompromiseScore(Genome &genome);
 };
 
 

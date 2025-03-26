@@ -42,9 +42,4 @@
 #endif
 
 
-class debug {
-
-};
-
-
 #endif //NEWDIRECTORY_DEBUG_H
