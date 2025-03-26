@@ -51,12 +51,6 @@ struct Player {
     bool acrobaticStar = false;
     int acrobaticStarTurn = 0;
 
-    // 他のメンバー変数やメンバー関数を追加する可能性があります
-
-    constexpr static bool isSpecialCharge(const Player &obj) {
-        return obj.specialCharge;
-    }
-
     constexpr static bool isPlayerAlive(const Player &obj) {
         return obj.hp != 0;
     }
