@@ -381,8 +381,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             poi = players[0].PoisonTurn;
                         } else if (players[0].PoisonEnable == true) {
                             poi = 0;
-                        } else if (players[0].PoisonEnable == false) {
-                            poi = -1;
                         }
 
                         auto agl = -1;
@@ -488,8 +486,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             poi = players[0].PoisonTurn;
                         } else if (players[0].PoisonEnable == true) {
                             poi = 0;
-                        } else if (players[0].PoisonEnable == false) {
-                            poi = -1;
                         }
 
                         auto agl = -1;
@@ -587,8 +583,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             poi = players[0].PoisonTurn;
                         } else if (players[0].PoisonEnable == true) {
                             poi = 0;
-                        } else if (players[0].PoisonEnable == false) {
-                            poi = -1;
                         }
 
                         auto agl = -1;
@@ -738,13 +732,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     //TODO 0ダメージのときの消費を調べる
                     (*position)++; //0x021e54fc
                 }
-                process7A8(position, 0, players, defender);
                 players[defender].speedLevel--;
                 players[defender].speedTurn = 7;
                 RecalculateBuff(players);
-            } else {
-                process7A8(position, 0, players, defender);
             }
+            process7A8(position, 0, players, defender);
             baseDamage = 0;
             resetCombo(NowState);
             break;
@@ -791,13 +783,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     //TODO 0ダメージのときの消費を調べる
                     (*position)++; //0x021e54fc
                 }
-                process7A8(position, 0, players, defender);
                 players[defender].BuffLevel--;
                 players[defender].BuffTurns = 7;
                 RecalculateBuff(players);
-            } else {
-                process7A8(position, 0, players, defender);
             }
+            process7A8(position, 0, players, defender);
             baseDamage = 0;
             resetCombo(NowState);
             break;
@@ -1242,6 +1232,10 @@ void BattleEmulator::process7A8(int *position, int baseDamage, Player players[2]
             //hpが0以下の場合必殺チャージの判定は発生しない。
             //必殺チャージ(敵)
             if (!players[defender].specialCharge) {
+                if (baseDamage == 0) {
+                    (*position)++;
+                    return;
+                }
                 auto percent_tmp = lcg::getPercent(position, 100);
                 double tmp = baseDamage;
                 if (!players[0].paralysis && !players[0].sleeping) {

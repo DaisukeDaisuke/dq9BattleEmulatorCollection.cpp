@@ -821,7 +821,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-        uint64_t seed = 0x22e2dbaf;
+        uint64_t seed = 0x2b316550;
 
         int actions[350] = {
             BattleEmulator::ATTACK_ALLY,
