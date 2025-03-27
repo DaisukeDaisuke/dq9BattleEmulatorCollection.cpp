@@ -47,9 +47,9 @@ namespace {
 
     void help(const char *program_name);
 
-    void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
+    void SearchRequest(Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
 
-    uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
+    uint64_t BruteForceRequest(Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                                int aActions[350], int damages[350]);
 
     void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed);
@@ -82,28 +82,6 @@ namespace {
     const char explanation3[] =
             u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
     const char explanation4[] = u8"Have fun exploring the artists!";
-
-    constexpr Player BasePlayers[2] = {
-        // プレイヤー1
-        {
-            112, 112.0, 133, 133, 107, 107, 76, 76, 43, 40, // 最初のメンバー
-            40, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            1256, 696.0, 110, 110, 90, 90, 36, 36, 0, 32, // 最初のメンバー
-            32, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
-
-
     // ヘッダーを出力する関数
     void printHeader(std::stringstream &ss) {
         ss << std::left << std::setw(6) << "turn"
@@ -347,7 +325,7 @@ namespace {
         return true;
     }
 
-    NOINLINE int ProgramMain(int hours, int minutes, int seconds) {
+    NOINLINE int ProgramMain(Player players[2], int hours, int minutes, int seconds) {
         // 構造体の組み合わせを作成
         try {
             auto results = builder.makeStructure();
@@ -373,10 +351,10 @@ namespace {
 
                 FoundSeed = 0;
                 foundSeeds = 0;
-                auto seed = BruteForceRequest(BasePlayers, hours, minutes, seconds, result.AactionsCounter, aActions,
+                auto seed = BruteForceRequest(players, hours, minutes, seconds, result.AactionsCounter, aActions,
                                               damages);
                 if (foundSeeds == 1) {
-                    SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT);
+                    SearchRequest(players, seed, aActions, THREAD_COUNT);
                 }
             }
         } catch (const std::runtime_error &e) {
@@ -428,7 +406,7 @@ namespace {
     }
 
 #ifdef MULTITHREADING
-    void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads) {
+    void SearchRequest(Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads) {
 #ifdef DEBUG
         auto t0 = std::chrono::high_resolution_clock::now();
         BattleEmulator::ResetTurnProcessed();
@@ -447,7 +425,7 @@ namespace {
         }
 
         auto [turnProcessed,genome] =
-                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
+                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads);
 
         std::optional<BattleResult> result1;
         result1 = BattleResult();
@@ -570,7 +548,7 @@ namespace {
     }
 
     // ブルートフォースリクエスト関数
-    [[nodiscard]] uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds,
+    [[nodiscard]] uint64_t BruteForceRequest(Player copiedPlayers[2], int hours, int minutes, int seconds,
                                              int turns,
                                              int aActions[350], int damages[350]) {
 #ifdef DEBUG
@@ -689,6 +667,28 @@ namespace {
     }
 }
 
+
+constexpr Player BasePlayers[2] = {
+    // プレイヤー1
+    {
+        112, 112.0, 133, 133, 107, 107, 76, 76, 43, 40, // 最初のメンバー
+        40, false, false, 0, false, 0, -1,
+        // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+        8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+        false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1, -1
+    }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+
+    // プレイヤー2
+    {
+        1256, 1256.0, 110, 110, 90, 90, 36, 36, 0, 32, // 最初のメンバー
+        32, false, false, 0, false, 0, -1,
+        // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+        0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+        false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1, -1
+    } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+};
+
+
 int main(int argc, char *argv[]) {
     showHeader();
 #ifdef DEBUG
@@ -717,12 +717,13 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x044dbafa;
+    uint64_t time1 = 0x0b023d65;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
 
+    //0x44dbafa: 25, 25, 25, 50, 53, 54, 54, 54, 50, 53, 54, 25, 50, 25, 54, 50, 25, 56, 54, 53, 54, 27,
     //0x22f09d67: 25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25,
     /*
         *NowStateの各ビットの使用状況は下記の通りである。
@@ -743,30 +744,46 @@ int main(int argc, char *argv[]) {
     Player players1[2];
     int32_t gene1[350] = {0};
     //0x22e2dbaf:
-
-    //int32_t gene1[350] = {25, 25, 50, 27, 54, 57, 56, 25, 54, 57, 57,  BattleEmulator::ATTACK_ALLY};
+    //0x44dbafa: 25, 25, 25, 50, 54, 25, 50, 54, 56, 54, 25, 54, 53, 53, 25, 50, 25, 56, 54, 25, 54,
+    //int32_t gene1[350] = {25, 25, 25, 50, 53, 54, 54, 54, 50, 53, 54, 25, 50, 25, 54, 50, 25, 56, 54, 53, 54, 27,  BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-    //
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+
+
+
+
+    //
     // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
     // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
@@ -806,17 +823,20 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x044dbafa;
+    uint64_t seed = 0x01b433d8;
 
     int actions[350] = {
-            BattleEmulator::ATTACK_ALLY,
-            -1,
-        };
-        SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
+        BattleEmulator::ATTACK_ALLY,
+        -1,
+    };
+    Player Player5[2] = {BasePlayers[0], BasePlayers[1]};
+    Player5[0].atk = 116;
+    Player5[0].defaultATK = 116;
+    SearchRequest(Player5, seed, actions, THREAD_COUNT);
 
-        std::cout << performanceLogger.rdbuf() << std::endl;
+    std::cout << performanceLogger.rdbuf() << std::endl;
 
-        return 0;
+    return 0;
 #endif
 
     if (EasterEgg(argc, argv)) {
@@ -829,18 +849,22 @@ int main(int argc, char *argv[]) {
     }
 
     // 戦闘発生時間の取得
-    const int hours = toint(argv[1]);
-    const int minutes = toint(argv[2]);
-    const int seconds = toint(argv[3]);
+    const int hcount = toint(argv[1]);
+    const int hours = toint(argv[2]);
+    const int minutes = toint(argv[3]);
+    const int seconds = toint(argv[4]);
 
-    if (hours < 0 || minutes < 0 || seconds < 0) {
+    if (hours < 0 || minutes < 0 || seconds < 0 || hcount < 0) {
         std::cerr << "Invalid time parameters" << std::endl;
         return 1;
     }
 
+    Player players2[2] = {BasePlayers[0], BasePlayers[1]};
+
+    players2[0].SpecialMedicineCount = hcount;
 
     ProcessInputBuilder(argc, argv);
-    auto exitCode = ProgramMain(hours, minutes, seconds);
+    auto exitCode = ProgramMain(players2, hours, minutes, seconds);
     std::cout << performanceLogger.rdbuf();
 #ifdef DEBUG
     auto t1 = std::chrono::high_resolution_clock::now();

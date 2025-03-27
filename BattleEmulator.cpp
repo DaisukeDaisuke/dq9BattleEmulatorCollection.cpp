@@ -13,10 +13,6 @@
 #include "debug.h"
 #include "BattleResult.h"
 
-
-thread_local int preHP[3] = {0, 0, 0};
-
-
 const char *BattleEmulator::getActionName(int actionId) {
     switch (actionId) {
         case BattleEmulator::BUFF:
@@ -187,7 +183,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 190) {
+        if ((*position) == 537) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -206,7 +202,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         int32_t actionTable = -1;
 
         if (enemyAction == ATTACK_ENEMY) {
-            (*position)++; //0x02156874 0x00000002 4 攻撃先
+            if (!players[0].rage) {
+                (*position)++; //0x02156874 0x00000002 4 攻撃先
+            }
             (*position) += 2;
         }
         if (enemyAction == TIDAL_WAVE || enemyAction == MASSIVE_SWIPE) {
@@ -248,6 +246,12 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     int mitore = lcg::getPercent(position, 100); //0x02158964
                     if (mitore < 90) {
                         c = INACTIVE_ENEMY;
+                    }
+                }
+                if (players[0].rage) {
+                    players[0].rageTurns--;
+                    if (players[0].rageTurns <= 0) {
+                        players[0].rage = false;
                     }
                 }
                 (*position)++;
@@ -426,7 +430,7 @@ double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
 
 //コンパイラが毎回コピーするコードを生成するからグローバルスコープに追い出しとく
 const int proportionTable2[9] = {90, 90, 64, 32, 16, 8, 4, 2, 1}; //最後の項目を調べるのは手動　P:\lua\isilyudaru\hissatuteki.lua
-const int proportionTable3[9] = {93, 83, 73, 62, 52, 42, 31, 21, 11}; //6ダメージ以下で0% 309 new: 112 103
+const int proportionTable3[9] = {101, 90, 79, 68, 57, 45, 34, 23, 12}; //6ダメージ以下で0% 309 new: 112 103
 // double proportionTable1[9] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2, 0.1};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
 const double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5}; //一部の敵は特殊テンションテーブルを倍率として使う
 
@@ -448,9 +452,6 @@ echo implode(", ", $results);
 
 int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender,
                                   uint64_t *NowState) {
-    for (int j = 0; j < 2; ++j) {
-        preHP[j] = players[j].hp;
-    }
     int baseDamage = 0;
     double tmp = 0;
     bool kaisinn = false;
@@ -629,9 +630,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp = players[attacker].atk * lcg::floatRand(position, 0.95, 1.05);
                 baseDamage = static_cast<int>(floor(tmp));
             }
-            if (!kaihi) {
-                ProcessRage(position, baseDamage, players);
-            }
+            ProcessRage(position, baseDamage, players);
             Player::reduceHp(players[defender], baseDamage);
 
             baseDamage = 0;
@@ -671,7 +670,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case BattleEmulator::SKY_ATTACK:
         case BattleEmulator::MASSIVE_SWIPE:
             (*position) += 2;
-            if (players[0].acrobaticStar && (Id & 0xffff) != MASSIVE_SWIPE) {
+            if (players[0].acrobaticStar) {
                 percent_tmp = lcg::getPercent(position, 100);
                 if (percent_tmp >= 0 && percent_tmp <= 49) {
                     return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender, NowState);
@@ -1038,13 +1037,14 @@ void BattleEmulator::RecalculateBuff(Player *players) {
 }
 
 void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players) {
-    auto percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
+    auto percent1 = FUN_021dbc04(players[1].hp - baseDamage, players[1].maxHp);
     if (percent1 < 0.5) {
-        double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
+        double percent = FUN_021dbc04(players[1].hp, players[1].maxHp);
         if (percent >= 0.5) {
-            if (!players[1].rage) {
+            if (!players[0].rage) {
                 (*position)++;
-                (*position)++;
+                players[0].rage = true;
+                players[0].rageTurns = lcg::intRangeRand(position, 2, 4);
             } else {
                 (*position)++;
             }
