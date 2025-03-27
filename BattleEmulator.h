@@ -104,6 +104,8 @@ public:
 
     static constexpr int ACROBATSTAR_KAIHI = 69;
     static constexpr int COUNTER = 70;
+    static constexpr int TIDAL_WAVE = 71; // つなみ
+    static constexpr int MASSIVE_SWIPE = 72; // なぎはらい
 
 
     static void ResetTurnProcessed();
@@ -117,7 +119,7 @@ public:
          std::optional<BattleResult> &result, uint64_t seed, const int eActions[350], const int damages[350], int mode,
          uint64_t *NowState);
 
-    static std::string getActionName(int actionId);
+    static const char *getActionName(int actionid);
 
     static int roundCustom(double value);
 
@@ -133,10 +135,6 @@ private:
     static int CalculateMidHealBase(Player players[2]);
 
     static int FUN_0208aecc(int *position, uint64_t *NowState);
-
-    static void resetCombo(uint64_t *NowState);
-
-    static double processCombo(int32_t Id, double damage, uint64_t *NowState);
 
     static int FUN_0207564c(int *position, int atk, int def);
 

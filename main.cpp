@@ -86,8 +86,8 @@ namespace {
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
-            103, 103.0, 89, 89, 97, 97, 69, 69, 44, 36, // 最初のメンバー
-            36, false, false, 0, false, 0, -1,
+            112, 112.0, 133, 133, 107, 107, 76, 76, 43, 40, // 最初のメンバー
+            40, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
@@ -95,8 +95,8 @@ namespace {
 
         // プレイヤー2
         {
-            696, 696.0, 68, 68, 68, 68, 50, 50, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
+            1256, 696.0, 110, 110, 90, 90, 36, 36, 0, 32, // 最初のメンバー
+            32, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
@@ -110,22 +110,16 @@ namespace {
                 << std::setw(18) << "sp"
                 << std::setw(18) << "aAct"
                 << std::setw(18) << "eAct1"
-                << std::setw(18) << "eAct2"
                 << std::setw(6) << "aD"
                 << std::setw(6) << "eD1"
-                << std::setw(6) << "eD2"
                 << std::setw(6) << "ahp"
                 << std::setw(6) << "ehp"
                 << std::setw(6) << "amp"
 
-                << std::setw(6) << "ini"
+                //<< std::setw(6) << "ini"
                 << std::setw(6) << "Para"
-                << std::setw(6) << "Sle"
-                << std::setw(6) << "DET"
-                << std::setw(6) << "POT"
-                << std::setw(6) << "BOT"
                 << std::setw(6) << "Sct" << "\n";
-        ss << std::string(153, '-') << "\n"; // 区切り線を出力
+        ss << std::string(99, '-') << "\n"; // 区切り線を出力
     }
 
     std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns);
@@ -136,15 +130,14 @@ namespace {
         int currentTurn = -1;
         int eDamage[2] = {-1, -1}, aDamage = -1;
         bool initiative_tmp = false;
-        std::string eAction[2], aAction, sp, tmpState, ATKTurn1, DEFTurn1, magicMirrorTurn1, specialChargeTurn1, amp1,
+        std::string eAction[2], aAction, sp, tmpState, ATKTurn1, specialChargeTurn1, amp1,
                 ahp2,
-                ehp2, amp2, poisonTurn1, SpeedTurn1;
+                ehp2, amp2;
         auto counter = 0;
         // データのループ
         for (int i = 0; i < result.position; ++i) {
             auto action = result.actions[i];
             auto damage = result.damages[i];
-            auto DEFTurn = result.BuffTurnss[i];
             auto turn = result.turns[i];
             auto initiative = result.initiative[i];
             auto ehp1 = result.ehp[i];
@@ -152,8 +145,6 @@ namespace {
             auto isEnemy = result.isEnemy[i];
             auto state = result.state[i] & 0xf;
             auto specialChargeTurn = result.scTurn[i];
-            auto poisonTurn = result.PoisonTurns[i];
-            auto SpeedTurn = result.SpeedTurn[i];
             int amp = -1;
             if (i >= 1) {
                 amp = result.amp[i - 1];
@@ -190,21 +181,16 @@ namespace {
                                 << std::setw(18) << sp
                                 << std::setw(18) << aAction
                                 << std::setw(18) << eAction[0]
-                                << std::setw(18) << eAction[1]
                                 << std::setw(6) << aDamage
                                 << std::setw(6) << eDamage[0]
-                                << std::setw(6) << eDamage[1]
                                 << std::setw(6) << ahp2
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
-                                << std::setw(6) << (initiative_tmp ? "yes" : "")
+                                //<< std::setw(6) << (initiative_tmp ? "yes" : "")
                                 << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis")
                                                         ? "yes"
                                                         : "")
                                 << std::setw(6) << ((aAction == "Sleeping" || aAction == "Cure Sleeping") ? "yes" : "")
-                                << std::setw(6) << DEFTurn1
-                                << std::setw(6) << poisonTurn1
-                                << std::setw(6) << SpeedTurn1
                                 << std::setw(6) << specialChargeTurn1
                                 << std::setw(11) << "" << "\n";
                     }
@@ -221,10 +207,6 @@ namespace {
                 initiative_tmp = false;
                 counter = 0;
                 ATKTurn1 = "";
-                DEFTurn1 = "";
-                poisonTurn1 = "";
-                SpeedTurn1 = "";
-                magicMirrorTurn1 = "";
                 specialChargeTurn1 = "";
             }
 
@@ -239,16 +221,6 @@ namespace {
                 amp2 = std::to_string(amp);
                 aAction = BattleEmulator::getActionName(action);
                 aDamage = damage;
-                if (DEFTurn >= 0) {
-                    DEFTurn1 = std::to_string(DEFTurn);
-                }
-                if (poisonTurn >= 0) {
-                    poisonTurn1 = std::to_string(poisonTurn);
-                }
-
-                if (SpeedTurn >= 0) {
-                    SpeedTurn1 = std::to_string(SpeedTurn);
-                }
                 if (specialChargeTurn > 0) {
                     specialChargeTurn1 = std::to_string(specialChargeTurn);
                 }
@@ -277,19 +249,14 @@ namespace {
                     << std::setw(18) << sp
                     << std::setw(18) << aAction
                     << std::setw(18) << eAction[0]
-                    << std::setw(18) << eAction[1]
                     << std::setw(6) << aDamage
                     << std::setw(6) << eDamage[0]
-                    << std::setw(6) << eDamage[1]
                     << std::setw(6) << ahp2
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
-                    << std::setw(6) << (initiative_tmp ? "yes" : "")
+                    //<< std::setw(6) << (initiative_tmp ? "yes" : "")
                     << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
                     << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
-                    << std::setw(6) << DEFTurn1
-                    << std::setw(6) << poisonTurn1
-                    << std::setw(6) << SpeedTurn1
                     << std::setw(6) << specialChargeTurn1
                     << std::setw(11) << "" << "\n";
         }
@@ -734,96 +701,114 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef DEBUG2
-        //time1 = 0x199114b2;
-        //time1 = 0x226d97a6;
-        //time1 = 0x1c2a9bda;
-        //time1 = 0x1aa6c05d;
-        //3838815720
-        //3839393442
+    //time1 = 0x199114b2;
+    //time1 = 0x226d97a6;
+    //time1 = 0x1c2a9bda;
+    //time1 = 0x1aa6c05d;
+    //3838815720
+    //3839393442
 
-        /*
-            *3836431220
-            3838263295
-            3838361070
-            3838815720
-            3839393442
-            3840264243
-            */
-
-        uint64_t time1 = 0x22e2dbaf;
-
-        int dummy[100];
-        lcg::init(time1, false);
-        int *position1 = new int(1);
-
-        //0x22f09d67: 25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25,
-        /*
-            *NowStateの各ビットの使用状況は下記の通りである。
-            +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
-               |            Name            |     size      |
-            0  | Current Rotation Table     |     4bit      |
-            4  | Rotation Internal State    |     4bit      |
-            8  | Free Camera State          |     4bit      |
-            12 | Turn Count Processed       |     20bit     |
-            32 | Combo Previous Attack Id   |     2byte     |
-            40 | Combo Counter              |     1byte     |
-            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                                         合計 6Byte
+    /*
+        *3836431220
+        3838263295
+        3838361070
+        3838815720
+        3839393442
+        3840264243
         */
 
-        auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
+    uint64_t time1 = 0x044dbafa;
 
-        Player players1[2];
-        //int32_t gene1[350] = {0};
-        //0x22e2dbaf:
+    int dummy[100];
+    lcg::init(time1, false);
+    int *position1 = new int(1);
 
-        int32_t gene1[350] = {25, 25, 50, 27, 54, 57, 56, 25, 54, 57, 57,  BattleEmulator::ATTACK_ALLY};
-        //gene1[19-1] = BattleEmulator::DEFENCE;
-        int counter = 0;
-        //
-        // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-        // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-        // gene1[counter++] = BattleEmulator::CRACKLE;
-        // gene1[counter++] = BattleEmulator::CRACKLE;
-        // gene1[counter++] = BattleEmulator::CRACKLE;
-        // gene1[counter++] = BattleEmulator::CRACKLE;
-        // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    //0x22f09d67: 25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25,
+    /*
+        *NowStateの各ビットの使用状況は下記の通りである。
+        +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
+           |            Name            |     size      |
+        0  | Current Rotation Table     |     4bit      |
+        4  | Rotation Internal State    |     4bit      |
+        8  | Free Camera State          |     4bit      |
+        12 | Turn Count Processed       |     20bit     |
+        32 | Combo Previous Attack Id   |     2byte     |
+        40 | Combo Counter              |     1byte     |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                     合計 6Byte
+    */
 
-        //for (int i = 0; i < 10; ++i) {
-        (*NowState) = 0;
-        (*position1) = 1;
-        std::optional<BattleResult> dummy1;
-        dummy1 = BattleResult();
-        std::memcpy(players1, BasePlayers, sizeof(players1));
-        BattleEmulator::Main(position1, (counter == 0 ? 1000 : counter), gene1, players1, dummy1, time1, dummy, dummy, -1,
-                             NowState);
+    auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
-        std::stringstream ss1;
-        ss1 << time1 << " ";
+    Player players1[2];
+    int32_t gene1[350] = {0};
+    //0x22e2dbaf:
 
-        if (dummy1.has_value()) {
-            std::cout << dumpTable(dummy1.value(), gene1, -1) << std::endl;
-        }
-        //}
-        delete position1;
-        delete NowState;
+    //int32_t gene1[350] = {25, 25, 50, 27, 54, 57, 56, 25, 54, 57, 57,  BattleEmulator::ATTACK_ALLY};
+    //gene1[19-1] = BattleEmulator::DEFENCE;
+    int counter = 0;
+    //
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
 
-        return 0;
+    //for (int i = 0; i < 10; ++i) {
+    (*NowState) = 0;
+    (*position1) = 1;
+    std::optional<BattleResult> dummy1;
+    dummy1 = BattleResult();
+    std::memcpy(players1, BasePlayers, sizeof(players1));
+    BattleEmulator::Main(position1, (counter == 0 ? 1000 : counter), gene1, players1, dummy1, time1, dummy, dummy, -1,
+                         NowState);
+
+    std::stringstream ss1;
+    ss1 << time1 << " ";
+
+    if (dummy1.has_value()) {
+        std::cout << dumpTable(dummy1.value(), gene1, -1) << std::endl;
+    }
+    //}
+    delete position1;
+    delete NowState;
+
+    return 0;
 #endif
 
 #ifdef DEBUG3
-        uint64_t seed = 0x2b316550;
+    uint64_t seed = 0x044dbafa;
 
-        int actions[350] = {
+    int actions[350] = {
             BattleEmulator::ATTACK_ALLY,
             -1,
         };
