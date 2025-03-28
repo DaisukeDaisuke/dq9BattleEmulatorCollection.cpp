@@ -117,7 +117,7 @@ public:
          std::optional<BattleResult> &result, uint64_t seed, const int eActions[350], const int damages[350], int mode,
          uint64_t *NowState);
 
-    static const char * getActionName(int actionId);
+    static const char *getActionName(int actionId);
 
     static int roundCustom(double value);
 

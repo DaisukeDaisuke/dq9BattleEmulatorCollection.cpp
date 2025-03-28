@@ -802,9 +802,9 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-        uint64_t seed = 0x22d7e800;
+    uint64_t seed = 0x22d7e800;
 
-        int actions[350] = {
+    int actions[350] = {
             BattleEmulator::ATTACK_ALLY,
             -1,
         };
