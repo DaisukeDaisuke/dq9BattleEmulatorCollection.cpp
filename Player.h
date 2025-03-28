@@ -51,6 +51,8 @@ struct Player {
     bool acrobaticStar = false;
     int acrobaticStarTurn = 0;
     int rageTurns = -1;
+    int medicinal_herbs_count = 7;
+    bool inactive = false;
 
     constexpr static bool isPlayerAlive(const Player &obj) {
         return obj.hp != 0;

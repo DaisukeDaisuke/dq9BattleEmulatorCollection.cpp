@@ -94,7 +94,7 @@ namespace {
                 << std::setw(6) << "ehp"
                 << std::setw(6) << "amp"
 
-                //<< std::setw(6) << "ini"
+                << std::setw(6) << "ini"
                 << std::setw(6) << "Para"
                 << std::setw(6) << "Sct" << "\n";
         ss << std::string(99, '-') << "\n"; // 区切り線を出力
@@ -164,7 +164,7 @@ namespace {
                                 << std::setw(6) << ahp2
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
-                                //<< std::setw(6) << (initiative_tmp ? "yes" : "")
+                                << std::setw(6) << (initiative_tmp ? "yes" : "")
                                 << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis")
                                                         ? "yes"
                                                         : "")
@@ -232,7 +232,7 @@ namespace {
                     << std::setw(6) << ahp2
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
-                    //<< std::setw(6) << (initiative_tmp ? "yes" : "")
+                    << std::setw(6) << (initiative_tmp ? "yes" : "")
                     << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
                     << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
                     << std::setw(6) << specialChargeTurn1
@@ -671,20 +671,20 @@ namespace {
 constexpr Player BasePlayers[2] = {
     // プレイヤー1
     {
-        112, 112.0, 133, 133, 107, 107, 76, 76, 43, 40, // 最初のメンバー
-        40, false, false, 0, false, 0, -1,
+        70, 70.0, 62 + 2, 62 + 2, 69, 69, 44, 44, 31, 24, // 最初のメンバー
+        24, false, false, 0, false, 0, -1,
         // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
         8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-        false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1, -1
+        false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1, -1, 7, false
     }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
     // プレイヤー2
     {
-        1256, 1256.0, 110, 110, 90, 90, 36, 36, 0, 32, // 最初のメンバー
-        32, false, false, 0, false, 0, -1,
+        456, 456.0, 56, 56, 58, 58, 54, 54, 0, 255, // 最初のメンバー
+        255, false, false, 0, false, 0, -1,
         // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
         0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-        false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1, -1
+        false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1, -1, 7, false
     } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 };
 
@@ -717,7 +717,7 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x0b023d65;
+    uint64_t time1 = 0x051095e1;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -748,37 +748,10 @@ int main(int argc, char *argv[]) {
     //int32_t gene1[350] = {25, 25, 25, 50, 53, 54, 54, 54, 50, 53, 54, 25, 50, 25, 54, 50, 25, 56, 54, 53, 54, 27,  BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
 
 
 
@@ -823,15 +796,13 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x01b433d8;
+    uint64_t seed = 0x051095e1;
 
     int actions[350] = {
         BattleEmulator::ATTACK_ALLY,
         -1,
     };
     Player Player5[2] = {BasePlayers[0], BasePlayers[1]};
-    Player5[0].atk = 116;
-    Player5[0].defaultATK = 116;
     SearchRequest(Player5, seed, actions, THREAD_COUNT);
 
     std::cout << performanceLogger.rdbuf() << std::endl;

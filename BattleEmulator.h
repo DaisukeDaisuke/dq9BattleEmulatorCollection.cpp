@@ -106,7 +106,11 @@ public:
     static constexpr int COUNTER = 70;
     static constexpr int TIDAL_WAVE = 71; // つなみ
     static constexpr int MASSIVE_SWIPE = 72; // なぎはらい
-
+    static constexpr int VICTIMISER = 73;
+    static constexpr int PUFF_PUFF = 74;
+    static constexpr int CRACK_ENEMY = 75;
+    static constexpr int MANAZASHI = 76;
+    static constexpr int HP_HOOVER = 77;
 
     static void ResetTurnProcessed();
 
@@ -149,7 +153,7 @@ private:
 
     static int ProcessEnemyRandomAction2A(int *position);
 
-    static int ProcessEnemyRandomAction44(int *position);
+    static int ProcessEnemyRandomAction2B(int *position);
 
     static void process7A8(int *position, int baseDamage, Player players[2], int defender);
 };

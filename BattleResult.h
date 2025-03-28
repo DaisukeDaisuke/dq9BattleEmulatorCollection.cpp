@@ -16,7 +16,8 @@ public:
 
     static void
     add(std::optional<BattleResult> &obj1, int action, int damage, bool isEnemy, int turn,
-        bool player0_has_initiative, int ehp, int ahp, uint64_t nowState, int scTurn, int amp) {
+        bool player0_has_initiative, int ehp, int ahp, uint64_t nowState, int scTurn, int amp, int Paralysis1,
+        bool Inactive1) {
         if (obj1.has_value()) {
             BattleResult& obj = obj1.value();
             obj.actions[obj.position] = action;
@@ -29,6 +30,8 @@ public:
             obj.state[obj.position] = nowState;
             obj.scTurn[obj.position] = scTurn;
             obj.amp[obj.position] = amp;
+            obj.Paralysis1[obj.position] = Paralysis1;
+            obj.Inactive1[obj.position] = Inactive1;
             obj.turn = turn;
             obj.position++;
         }
@@ -45,6 +48,8 @@ public:
     int ahp[1000] = {};
     int scTurn[1000] = {};
     int amp[1000] = {};
+    int Paralysis1[1000] = {};
+    bool Inactive1[1000] = {};
     uint64_t state[1000] = {};
 };
 

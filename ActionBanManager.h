@@ -8,7 +8,7 @@
 
 // constexpr関数で固有のビットインデックスを生成（-24して管理）
 constexpr uint64_t action_to_bit(int action) {
-    return static_cast<uint64_t>(1) << (action - 24);
+    return static_cast<uint64_t>(1) << (action - 23);
 }
 
 // 最大350ターン分の管理
@@ -26,8 +26,8 @@ public:
             std::cerr << "Invalid turn value (must be between 0 and " << MAX_TURNS - 1 << ")\n";
             return;
         }
-        if (action < 25 || action > 63) {
-            std::cerr << "Invalid action value (must be between 25 and 51)" << action  << "\n";
+        if (action < 23 || action > 63) {
+            std::cerr << "Invalid action value (must be between 23 and 51)" << action << "\n";
             return;
         }
         ban_actions[turn] |= action_to_bit(action);
@@ -35,8 +35,8 @@ public:
 
     // 指定されたターン範囲内で行動がBANされているかをチェック
     bool is_action_banned(int action, int current_turn, int lookback_turns = 0) const {
-        if (action < 25 || action > 63) {
-            std::cerr << "Invalid action value (must be between 25 and 51): " << action  << "\n";
+        if (action < 23 || action > 63) {
+            std::cerr << "Invalid action value (must be between 23 and 63): " << action << "\n";
             return false;
         }
         if (current_turn < 0 || current_turn >= MAX_TURNS) {
