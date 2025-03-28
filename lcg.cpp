@@ -19,10 +19,7 @@ void lcg::init(uint64_t seed, bool init) {
     now_seed = seed;
 
     if (init) {
-        for (int i = 0; i < ARRAY_SIZE - 1; ++i) {
-            now_seed = lcg_rand(now_seed);
-            precalculatedValues[++nowCounter] = calculatePercent(now_seed) * 0.01;
-        }
+        GenerateifNeed(ARRAY_SIZE - 3);
     }
 }
 

@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v2.0.10";
+    const char *version = "v2.0.13";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -119,7 +119,6 @@ namespace {
                 << std::setw(6) << "amp"
 
                 << std::setw(6) << "ini"
-                << std::setw(6) << "Para"
                 << std::setw(6) << "Sle"
                 << std::setw(6) << "DET"
                 << std::setw(6) << "POT"
@@ -159,20 +158,6 @@ namespace {
                 amp = result.amp[i - 1];
             }
 
-
-            if (state == BattleEmulator::TYPE_2A) {
-                tmpState = "A";
-            } else if (state == BattleEmulator::TYPE_2B) {
-                tmpState = "B";
-            } else if (state == BattleEmulator::TYPE_2C) {
-                tmpState = "C";
-            } else if (state == BattleEmulator::TYPE_2D) {
-                tmpState = "D";
-            }
-            if (state == BattleEmulator::TYPE_2E) {
-                tmpState = "E";
-            }
-
             auto special = gene[turn];
 
             std::string specialAction;
@@ -198,9 +183,6 @@ namespace {
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
                                 << std::setw(6) << (initiative_tmp ? "yes" : "")
-                                << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis")
-                                                        ? "yes"
-                                                        : "")
                                 << std::setw(6) << ((aAction == "Sleeping" || aAction == "Cure Sleeping") ? "yes" : "")
                                 << std::setw(6) << DEFTurn1
                                 << std::setw(6) << poisonTurn1
@@ -285,7 +267,6 @@ namespace {
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
                     << std::setw(6) << (initiative_tmp ? "yes" : "")
-                    << std::setw(6) << ((aAction == "Paralysis" || aAction == "Cure Paralysis") ? "yes" : "")
                     << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
                     << std::setw(6) << DEFTurn1
                     << std::setw(6) << poisonTurn1
@@ -821,7 +802,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-        uint64_t seed = 0x2b316550;
+        uint64_t seed = 0x22d7e800;
 
         int actions[350] = {
             BattleEmulator::ATTACK_ALLY,
