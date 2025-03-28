@@ -804,15 +804,12 @@ int main(int argc, char *argv[]) {
 #ifdef DEBUG3
     uint64_t seed = 0x22d7e800;
 
-    int actions[350] = {
-            BattleEmulator::ATTACK_ALLY,
-            -1,
-        };
-        SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
+    int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
+    SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
 
-        std::cout << performanceLogger.rdbuf() << std::endl;
+    std::cout << performanceLogger.rdbuf() << std::endl;
 
-        return 0;
+    return 0;
 #endif
 
     if (EasterEgg(argc, argv)) {
