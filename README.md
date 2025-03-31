@@ -63,11 +63,10 @@ dq9BattleEmulatorCollection.cppでは、歴史的な理由により、各ブラ�
 - ここから探索アルゴリズムが書き直され、アルゴリズムが組み合わせ最適化を行い、行動を指定してくるという方式になりました。
 - このアルゴリズムはたまたま出来た産物であるにもかかわらず、判断力0、判断力1ではパラメータ設定によってはそこそこ賢いけど完全に不審者な選択肢を提示します。
 - ただし、探索アルゴリズムはまだ最適化の余地はあると考えています。
+- エルギオスバトルエミュは映像認識とセットで操作します。
 -
-
-エルギオスバトルエミュは映像認識とセットで操作します。フロントエンドプログラムはc#の[dq9RTAVideoRecognitions.csharp](https://github.com/DaisukeDaisuke/dq9RTAVideoRecognitions.csharp)
+フロントエンドプログラムはc#の[dq9RTAVideoRecognitions.csharp](https://github.com/DaisukeDaisuke/dq9RTAVideoRecognitions.csharp)
 V2が担当します。
-
 - バックエンドプログラムはこのリポジトリが担当します
 
 ## bilyouma
