@@ -407,22 +407,24 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             if (damages[exCounter] == -1) {
                                 return true;
                             }
-                            if (c == KASAP) {
-                                if (damages[exCounter++] != -3) {
+
+                            if (damages[exCounter] == -3) {
+                                if (c != KASAP) {
                                     return false;
                                 }
-                            } else if (c == DECELERATLE) {
-                                if (damages[exCounter++] != -2) {
+                                exCounter++;
+                            } else if (damages[exCounter] == -2) {
+                                if (c != DECELERATLE) {
                                     return false;
                                 }
-                            } else if (c == SWEET_BREATH) {
-                                if (damages[exCounter++] != -4) {
+                                exCounter++;
+                            } else  if(damages[exCounter] == -4) {
+                                if (c != SWEET_BREATH) {
                                     return false;
                                 }
-                            } else if (damages[exCounter] >= 0) {
-                                if (damages[exCounter++] != basedamage) {
-                                    return false;
-                                }
+                                exCounter++;
+                            } else if (damages[exCounter++] != basedamage) {
+                                return false;
                             }
                         }
                     }

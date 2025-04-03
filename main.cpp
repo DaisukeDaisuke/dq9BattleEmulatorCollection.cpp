@@ -52,7 +52,7 @@ namespace {
     uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                                int aActions[350], int damages[350]);
 
-    void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed);
+    void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed, int turns);
 
     void printHeader(std::stringstream &ss);
 
@@ -400,8 +400,8 @@ namespace {
         return 0;
     }
 
-    void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed) {
-        std::cout << dumpTable(result1, genome.actions, 0) << std::endl;
+    void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed, int turns) {
+        std::cout << dumpTable(result1, genome.actions, turns) << std::endl;
 
         std::cout << "0x" << std::hex << seed << std::dec << ": ";
 
@@ -476,7 +476,12 @@ namespace {
         delete position;
         delete nowState;
 
-        dumpTableMain(result1.value(), genome, seed);
+#ifdef MINGW_BUILD
+        std::cout << turns << std::endl;
+        dumpTableMain(result1.value(), genome, seed, 0);
+#else
+        dumpTableMain(result1.value(), genome, seed, turns - 1);
+#endif
 
 #ifdef DEBUG
         auto t3 = std::chrono::high_resolution_clock::now();
@@ -543,8 +548,12 @@ namespace {
 
         delete position;
         delete nowState;
-
-        dumpTableMain(bestResult, bestGenome, seed);
+#ifdef MINGW_BUILD
+        std::cout << turns << std::endl;
+        dumpTableMain(bestResult, bestGenome, seed, 0);
+#else
+        dumpTableMain(bestResult, bestGenome, seed, turns - 1);
+#endif
 
 #ifdef DEBUG
         auto turnProcessed = BattleEmulator::getTurnProcessed();
@@ -569,7 +578,7 @@ namespace {
             Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
 
 
-            bool resultBool = BattleEmulator::Main(position, turns, gene, players,
+            bool resultBool = BattleEmulator::Main(position,  20, gene, players,
                                                    (std::optional<BattleResult> &) std::nullopt, seed, nullptr, damages,
                                                    maxElement,
                                                    nowState);

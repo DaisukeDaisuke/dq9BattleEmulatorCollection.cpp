@@ -100,7 +100,7 @@ public:
     static constexpr int POISON_ATTACK = 65; // 毒攻撃
     static constexpr int DECELERATLE = 66; //ボミオス
     static constexpr int KASAP = 67; //ルカナン
-    static constexpr int SWEET_BREATH = 68; //ルカナン
+    static constexpr int SWEET_BREATH = 68; //あまいいき
 
     static constexpr int ACROBATSTAR_KAIHI = 69;
     static constexpr int COUNTER = 70;
