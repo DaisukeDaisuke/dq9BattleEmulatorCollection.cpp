@@ -418,7 +418,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                     return false;
                                 }
                                 exCounter++;
-                            } else  if(damages[exCounter] == -4) {
+                            } else if (damages[exCounter] == -4) {
                                 if (c != SWEET_BREATH) {
                                     return false;
                                 }

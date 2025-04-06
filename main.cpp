@@ -578,7 +578,7 @@ namespace {
             Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
 
 
-            bool resultBool = BattleEmulator::Main(position,  20, gene, players,
+            bool resultBool = BattleEmulator::Main(position, 20, gene, players,
                                                    (std::optional<BattleResult> &) std::nullopt, seed, nullptr, damages,
                                                    maxElement,
                                                    nowState);

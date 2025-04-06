@@ -55,12 +55,12 @@ set(SOURCES
 )
 
 # シングルスレッド版（multithreading = OFF）
-add_executable(rbe_single ${SOURCES})
-target_compile_definitions(rbe_single PRIVATE NO_MULTITHREADING)  # `#define NO_MULTITHREADING` を適用
+add_executable(zbe_multi_lv19_tahamane_atk130 ${SOURCES})
+target_compile_definitions(zbe_multi_lv19_tahamane_atk130 PRIVATE MULTITHREADING TAMAHANE)
 
 # マルチスレッド版（multithreading = ON）
-add_executable(rbe_multi ${SOURCES})
-target_compile_definitions(rbe_multi PRIVATE MULTITHREADING)  # `#define MULTITHREADING` を適用
+add_executable(zbe_multi_lv19_hagane_atk113 ${SOURCES})
+target_compile_definitions(zbe_multi_lv19_hagane_atk113 PRIVATE MULTITHREADING HAGANE)
 
 
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d" UTC)
@@ -69,17 +69,17 @@ add_definitions(-DBUILD_DATE="${BUILD_DATE}" -DBUILD_TIME="${BUILD_TIME}")
 
 if(MINGW)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections -fno-inline-small-functions")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections") #-fno-inline-small-functions
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections")
 elseif(MSVC)
-    set_property(TARGET rbe_single PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET rbe_multi PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET zbe_multi_lv19_tahamane_atk130 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET zbe_multi_lv19_hagane_atk113 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-    target_compile_options(rbe_single PRIVATE /W4 /MP)
-    target_compile_options(rbe_multi PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
+    target_compile_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /W4 /MP)
+    target_compile_options(zbe_multi_lv19_hagane_atk113 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
 
-    target_link_options(rbe_single PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(rbe_multi PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(zbe_multi_lv19_hagane_atk113 PRIVATE /INCREMENTAL:NO /DEBUG)
 
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
