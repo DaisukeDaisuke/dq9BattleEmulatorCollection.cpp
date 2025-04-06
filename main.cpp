@@ -64,7 +64,12 @@ namespace {
 
     std::stringstream performanceLogger = std::stringstream();
 
+#ifdef BattleEmulatorLV19
+
     constexpr int THREAD_COUNT = 4;
+#elifdef BattleEmulatorLV13
+    constexpr int THREAD_COUNT = 5;
+#endif
     // `InputBuilder` インスタンス作成
     InputBuilder builder;
 
@@ -82,6 +87,8 @@ namespace {
     const char explanation3[] =
             u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
     const char explanation4[] = u8"Have fun exploring the artists!";
+
+#ifdef BattleEmulatorLV19
 
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
@@ -103,7 +110,29 @@ namespace {
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
+#elifdef BattleEmulatorLV13
 
+    constexpr Player BasePlayers[2] = {
+        // プレイヤー1
+        {
+            79, 79.0, 77, 77, 85, 85, 51, 51, 35, 27, // 最初のメンバー
+            27, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+
+        // プレイヤー2
+        {
+            696, 696.0, 68, 68, 68, 68, 50, 50, 0, 255, // 最初のメンバー
+            255, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
+        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+    };
+
+#endif
     // ヘッダーを出力する関数
     void printHeader(std::stringstream &ss) {
         ss << std::left << std::setw(6) << "turn"
@@ -459,9 +488,13 @@ namespace {
             }
             turns++;
         }
-
+#ifdef BattleEmulatorLV13
         auto [turnProcessed,genome] =
-                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
+                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2500, gene, numThreads);
+#elifdef BattleEmulatorLV19
+        auto [turnProcessed,genome] =
+        ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
+#endif
 
         std::optional<BattleResult> result1;
         result1 = BattleResult();
@@ -740,7 +773,7 @@ int main(int argc, char *argv[]) {
             3840264243
             */
 
-        uint64_t time1 = 0x22e2dbaf;
+        uint64_t time1 = 0x078f0155;
 
         int dummy[100];
         lcg::init(time1, false);
@@ -767,13 +800,15 @@ int main(int argc, char *argv[]) {
         //int32_t gene1[350] = {0};
         //0x22e2dbaf:
 
-        int32_t gene1[350] = {25, 25, 50, 27, 54, 57, 56, 25, 54, 57, 57,  BattleEmulator::ATTACK_ALLY};
+    //0x78f0155: 25, 25, 25, 55, 50, 50, 50, 50, 27, 25, 25, 50, 25, 25, 25, 25, 50, 27, 27, 59, 27, 56, 25, 25, 25, 53, 53, 25, 53,
+        int32_t gene1[350] = {25, 25, 25, 55, 50, 50, 50, 50, 27, 25, 25, 50, 25, 25, 25, 25, 50, 27, 27, 59, 27, 56, 25, 25, 25, 53, 53, 25, 53,   BattleEmulator::ATTACK_ALLY};
         //gene1[19-1] = BattleEmulator::DEFENCE;
         int counter = 0;
         //
-        // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+        // gene1[counter++] = BattleEmulator::ITEM_USE;
+        // gene1[counter++] = BattleEmulator::ITEM_USE;
+        // gene1[counter++] = BattleEmulator::ITEM_USE;
+        // gene1[counter++] = BattleEmulator::ITEM_USE;
         // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
         // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
         // gene1[counter++] = BattleEmulator::CRACKLE;
@@ -811,9 +846,9 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x22d7e800;
+    uint64_t seed = 0x078f0155;
 
-    int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
+    int actions[350] = {BattleEmulator::ATTACK_ALLY,BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
 
     std::cout << performanceLogger.rdbuf() << std::endl;

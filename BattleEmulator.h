@@ -95,6 +95,9 @@ public:
     static constexpr int SPECIAL_ANTIDOTE = 55; //特毒消し草
     static constexpr int ACROBATIC_STAR = 56; //アクロバットスター
     static constexpr int CRACKLE = 57; //ヒャダルコ
+    static constexpr int WOOSH_ALLY = 58;//バギ
+    static constexpr int DRAGON_SLASH = 59;//ドラゴン切り
+    static constexpr int ITEM_USE = 60;//ドラゴン切り
 
     //病魔
     static constexpr int POISON_ATTACK = 65; // 毒攻撃

@@ -95,8 +95,13 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
         int start = i * chunkSize;
         int end = (i == numThreads - 1) ? totalIterations : start + chunkSize;
 
+#ifdef BattleEmulatorLV13
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
-                                     std::cref(players), seed, turns, 1500, actions, start, end));
+                                     std::cref(players), seed, turns, 2000, actions, start, end));
+#elifdef BattleEmulatorLV19
+        futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
+                                             std::cref(players), seed, turns, 1500, actions, start, end));
+#endif
     }
 
     Genome bestGenome = {};
@@ -430,6 +435,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
+#ifdef BattleEmulatorLV19
+
         if (AllyPlayerPre.mp >= 4) {
             if (!Bans.is_action_banned(BattleEmulator::MIRACLE_SLASH, turns)) {
                 action = BattleEmulator::MIRACLE_SLASH;
@@ -462,7 +469,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 que.push(currentGenome);
             }
         }
-
+#endif
         if (!Bans.is_action_banned(BattleEmulator::FLEE_ALLY, turns)) {
             action = BattleEmulator::FLEE_ALLY;
             if (tmpgenomu.Visited >= 1) {
@@ -524,6 +531,99 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
+        if (!Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
+            action = BattleEmulator::WOOSH_ALLY;
+            if (tmpgenomu.Visited >= 1) {
+                currentGenome.fitness = baseFitness; // 固定値に
+                currentGenome.Visited = 0;
+            } else {
+                currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 13);
+            }
+            currentGenome.actions[turns - 1] = action;
+
+            CopedPlayers[0] = tmpgenomu.AllyPlayer;
+            CopedPlayers[1] = tmpgenomu.EnemyPlayer;
+
+            (*position) = tmpgenomu.position;
+            (*nowState) = tmpgenomu.state;
+
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+                                 CopedPlayers,
+                                 (std::optional<BattleResult> &) std::nullopt, seed,
+                                 nullptr, nullptr, -2, nowState.get());
+            currentGenome.position = (*position);
+            currentGenome.state = (*nowState);
+            currentGenome.turn = turns + 1;
+            currentGenome.processed = turns;
+            currentGenome.AllyPlayer = CopedPlayers[0];
+            currentGenome.EnemyPlayer = CopedPlayers[1];
+
+            que.push(currentGenome);
+        }
+
+#ifdef BattleEmulatorLV13
+        if (!Bans.is_action_banned(BattleEmulator::DRAGON_SLASH, turns)) {
+            action = BattleEmulator::DRAGON_SLASH;
+            if (tmpgenomu.Visited >= 1) {
+                currentGenome.fitness = baseFitness; // 固定値に
+                currentGenome.Visited = 0;
+            } else {
+                currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 6);
+            }
+            currentGenome.actions[turns - 1] = action;
+
+            CopedPlayers[0] = tmpgenomu.AllyPlayer;
+            CopedPlayers[1] = tmpgenomu.EnemyPlayer;
+
+            (*position) = tmpgenomu.position;
+            (*nowState) = tmpgenomu.state;
+
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+                                 CopedPlayers,
+                                 (std::optional<BattleResult> &) std::nullopt, seed,
+                                 nullptr, nullptr, -2, nowState.get());
+            currentGenome.position = (*position);
+            currentGenome.state = (*nowState);
+            currentGenome.turn = turns + 1;
+            currentGenome.processed = turns;
+            currentGenome.AllyPlayer = CopedPlayers[0];
+            currentGenome.EnemyPlayer = CopedPlayers[1];
+
+            que.push(currentGenome);
+        }
+        /*if (!Bans.is_action_banned(BattleEmulator::ITEM_USE, turns)) {
+            action = BattleEmulator::ITEM_USE;
+            if (tmpgenomu.Visited >= 1) {
+                currentGenome.fitness = baseFitness; // 固定値に
+                currentGenome.Visited = 0;
+            } else {
+                currentGenome.fitness = baseFitness + 2 + static_cast<int>(rng() % 6);
+            }
+            currentGenome.actions[turns - 1] = action;
+
+            CopedPlayers[0] = tmpgenomu.AllyPlayer;
+            CopedPlayers[1] = tmpgenomu.EnemyPlayer;
+
+            (*position) = tmpgenomu.position;
+            (*nowState) = tmpgenomu.state;
+
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+                                 CopedPlayers,
+                                 (std::optional<BattleResult> &) std::nullopt, seed,
+                                 nullptr, nullptr, -2, nowState.get());
+            currentGenome.position = (*position);
+            currentGenome.state = (*nowState);
+            currentGenome.turn = turns + 1;
+            currentGenome.processed = turns;
+            currentGenome.AllyPlayer = CopedPlayers[0];
+            currentGenome.EnemyPlayer = CopedPlayers[1];
+
+            que.push(currentGenome);
+        }*/
+#endif
+
+#ifdef BattleEmulatorLV19
+
         if (CrackleEnable && AllyPlayerPre.mp >= 8 && !Bans.is_action_banned(BattleEmulator::CRACKLE, turns)) {
             action = BattleEmulator::CRACKLE;
             if (tmpgenomu.Visited >= 1) {
@@ -553,6 +653,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
             que.push(currentGenome);
         }
+#endif
 
         counter++;
     }

@@ -20,6 +20,13 @@ void inline BattleEmulator::resetCombo(uint64_t *NowState) {
     (*NowState) &= ~(0xFFF00000000);
 }
 
+#ifdef BattleEmulatorLV19
+constexpr int kaisinnP = 500;
+#elifdef BattleEmulatorLV13
+constexpr int kaisinnP = 200;
+#endif
+constexpr int DragonSlashKaisinnP = kaisinnP / 2;
+
 double BattleEmulator::processCombo(int32_t Id, double damage, uint64_t *NowState) {
     auto previousAttack = ((*NowState) >> 32) & 0xff;
     auto comboCounter = ((*NowState) >> 40) & 0xf;
@@ -155,6 +162,12 @@ const char *BattleEmulator::getActionName(int actionId) {
             return "Acrobatic Star";
         case BattleEmulator::CRACKLE:
             return "Crackle";
+        case WOOSH_ALLY:
+            return "Woosh";
+        case DRAGON_SLASH:
+            return "Dragon Slash";
+        case ITEM_USE:
+            return "Item Use";
         default:
             return "Unknown Action";
     }
@@ -240,7 +253,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         tmpState = (*NowState);
 
 #ifdef DEBUG2
-        std::cout << "c: "<< counterJ << ", " << (*position) << std::endl;
+        std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
         if ((*position) == 399) {
             std::cout << "!!" << std::endl;
         }
@@ -418,7 +431,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                     return false;
                                 }
                                 exCounter++;
-                            } else  if(damages[exCounter] == -4) {
+                            } else if (damages[exCounter] == -4) {
                                 if (c != SWEET_BREATH) {
                                     return false;
                                 }
@@ -687,6 +700,39 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     auto attackCount = 0;
     bool defenseFlag = false; //防御した場合0x021e81a0のほうが優先度高いらしい。なんで
     switch (Id & 0xffff) {
+        case WOOSH_ALLY:
+            players[attacker].mp -= 3;
+            (*position) += 2;
+            if (lcg::getPercent(position, 0x2710) < DragonSlashKaisinnP) {
+                kaisinn = true;
+            }
+            (*position)++; //関係ない 0x021ec6f8
+            (*position)++; //偽回避 0x02157f58
+            baseDamage = FUN_021e8458_typeD(position, 8, 16);
+            if (kaisinn) {
+                tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
+                baseDamage = static_cast<int>(floor(tmp));
+            }
+            ProcessRage(position, baseDamage, players); // 適当
+            if (kaisinn) {
+                if (!players[1].rage) {
+                    (*position)++; //会心時特殊処理　0x021e54fc
+                    (*position)++; //会心時特殊処理　0x021eb8c8
+                } else {
+                    (*position)++; //会心時特殊処理　既に怒り狂ってる場合は1消費になる
+                }
+            }
+            (*position)++; //0x021e54fc
+            if (!players[0].specialCharge) {
+                if (lcg::getPercent(position, 100) < 1) {
+                    //0x021edaf4
+                    players[attacker].specialCharge = true;
+                    players[attacker].specialChargeTurn = 6;
+                }
+            }
+            tmp = static_cast<double>(baseDamage) * 0.75;
+            baseDamage = static_cast<int>(floor(tmp));
+            break;
         case CRACKLE:
             players[attacker].mp -= 8;
             (*position) += 2;
@@ -770,6 +816,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 if (baseDamage != 0) {
                     //TODO 0ダメージのときの消費を調べる
                     (*position)++; //0x021e54fc
+                }
+            }else if (kaihi) {
+                baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+                if (baseDamage == 0) {
+                    baseDamage = lcg::getPercent(position, 2); // 0x021e81a0
                 }
             }
             process7A8(position, 0, players, defender);
@@ -866,7 +917,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             break;
         case BattleEmulator::COUNTER:
             (*position)++; //0x02158584 会心(無効)
-            if (lcg::getPercent(position, 0x2710) < 500) {
+            if (lcg::getPercent(position, 0x2710) < kaisinnP) {
                 kaisinn = true;
             }
             (*position)++; //みかわし(無効) xxx0x021587b0
@@ -1047,20 +1098,21 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case BattleEmulator::ATTACK_ALLY:
         case BattleEmulator::MERCURIAL_THRUST:
         case BattleEmulator::MIRACLE_SLASH:
+        case DRAGON_SLASH:
+        case ITEM_USE:
             (*position) += 2;
             (*position)++;
         //会心
             percent_tmp = lcg::getPercent(position, 0x2710);
             if (
-                ((Id & 0xffff) == BattleEmulator::ATTACK_ALLY && percent_tmp < 500) ||
-                ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST && percent_tmp < 250) ||
-                ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST && percent_tmp < 125)
+                ((Id & 0xffff) == BattleEmulator::ATTACK_ALLY && percent_tmp < kaisinnP) ||
+                ((Id & 0xffff) == BattleEmulator::DRAGON_SLASH && percent_tmp < DragonSlashKaisinnP)
             ) {
                 kaisinn = true;
             }
 
         //みかわし(相手)
-            if (!players[0].paralysis) {
+            if ((Id & 0xffff) != ITEM_USE && !players[0].paralysis) {
                 // if (lcg::getPercent(position, 100) < -1) {
                 //     kaihi = true;
                 // }
@@ -1072,6 +1124,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             (*position)++; //回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+
+            if ((Id & 0xffff) == ITEM_USE) {
+                baseDamage = 0;
+            }
 
             tmp = static_cast<double>(baseDamage);
 
