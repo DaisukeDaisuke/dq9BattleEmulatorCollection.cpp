@@ -104,6 +104,13 @@ public:
 
     static constexpr int ACROBATSTAR_KAIHI = 69;
     static constexpr int COUNTER = 70;
+    static constexpr int TIDAL_WAVE = 71; // つなみ
+    static constexpr int MASSIVE_SWIPE = 72; // なぎはらい
+    static constexpr int DRAIN_MAGIC = 73; // マホトラ
+    static constexpr int BUFF_ENEMY = 74; //スカラ(敵)
+    static constexpr int LIGHTNING_DAMA = 75; //稲妻(ジャダーマ)
+    static constexpr int WOOSH = 76; //バギ
+    static constexpr int WOOSH_CRITICAL = 77; //バギ(暴走)
 
 
     static void ResetTurnProcessed();
@@ -126,7 +133,7 @@ private:
 
     static void ProcessRage(int *position, int baseDamage, Player players[2]);
 
-    static void RecalculateBuff(Player players[2]);
+    static void RecalculateBuff(Player players[2], int attacker);
 
     static int CalculateMoreHealBase(Player players[2]);
 
@@ -134,9 +141,9 @@ private:
 
     static int FUN_0208aecc(int *position, uint64_t *NowState);
 
-    static void resetCombo(uint64_t *NowState);
+    static constexpr void resetCombo(uint64_t *NowState);
 
-    static double processCombo(int32_t Id, double damage, uint64_t *NowState);
+    static double constexpr processCombo(int32_t Id, double damage, uint64_t *NowState);
 
     static int FUN_0207564c(int *position, int atk, int def);
 
