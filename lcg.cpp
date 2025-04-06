@@ -11,7 +11,7 @@
 const int ARRAY_SIZE = 5000;
 
 double precalculatedValues[ARRAY_SIZE]; // 固定メモリ
-uint64_t seeds[ARRAY_SIZE];             // 固定メモリ
+uint64_t seeds[ARRAY_SIZE]; // 固定メモリ
 int nowCounter = 1;
 uint64_t now_seed;
 
@@ -32,7 +32,7 @@ void lcg::GenerateifNeed(int need) {
     for (int i = nowCounter; i < need+2; ++i) {
         now_seed = lcg_rand(now_seed);
         precalculatedValues[++nowCounter] = calculatePercent(now_seed) * 0.01;
-        seeds[nowCounter] = now_seed >> 32;//これがないとlcgのパフォーマンスが大幅に落ちる
+        seeds[nowCounter] = now_seed >> 32; //これがないとlcgのパフォーマンスが大幅に落ちる
     }
 }
 
