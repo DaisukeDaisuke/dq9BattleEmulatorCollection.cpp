@@ -544,7 +544,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
 #ifdef BattleEmulatorLV13
 
-        if (!Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
+        if (AllyPlayerPre.mp >= 3 && !Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
             action = BattleEmulator::WOOSH_ALLY;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
