@@ -1407,7 +1407,7 @@ void BattleEmulator::RecalculateBuff(Player *players, int attacker) {
     // }
 }
 
-bool BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players, bool kaisinn) {
+void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players, bool kaisinn) {
     auto percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
     if (percent1 < 0.5) {
         double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
@@ -1418,7 +1418,6 @@ bool BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players,
             } else {
                 (*position)++;
             }
-            return true;
         } else {
             if (percent1 < 0.25) {
                 if (percent >= 0.25) {
@@ -1428,12 +1427,10 @@ bool BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players,
                     } else {
                         (*position)++;
                     }
-                    return true;
                 }
             }
         }
     }
-    return false;
 }
 
 int BattleEmulator::ProcessMagicBurst(int *position) {
