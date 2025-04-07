@@ -815,8 +815,11 @@ int main(int argc, char *argv[]) {
 //0x281c5335:
 
 
-//0x2b79118:
-    int32_t gene1[350] = {25, 25, 25, 27, 25, 59, 50, 27, 25, 25, 56, 25, 50, 25, 25, 25, 25, 25, 25, 50, 25, 25,  BattleEmulator::ATTACK_ALLY};
+    //0x2b79118:
+    int32_t gene1[350] = {
+        25, 25, 25, 27, 25, 59, 50, 27, 25, 25, 56, 25, 50, 25, 25, 25, 25, 25, 25, 50, 25, 25,
+        BattleEmulator::ATTACK_ALLY
+    };
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //
