@@ -107,6 +107,27 @@ namespace {
 
 #elifdef TAMAHANE
 
+#elifdef lv13_sp13_hagane_atk101
+    constexpr Player BasePlayers[2] = {
+        // プレイヤー1
+        {
+            84, 84.0, 101, 101, 89, 89, 55, 55, 37, 29, // 最初のメンバー
+            29, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+
+        // プレイヤー2
+        {
+            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
+            255, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
+        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+    };
+
 #endif
 
     // ヘッダーを出力する関数
@@ -745,7 +766,7 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x05002845;
+    uint64_t time1 = 0x281c5335;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -777,13 +798,13 @@ int main(int argc, char *argv[]) {
     int counter = 0;
     //
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::DRAGON_SLASH;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-    gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
@@ -830,7 +851,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x22d7e800;
+    uint64_t seed = 0x281c5335;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);

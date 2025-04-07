@@ -62,6 +62,9 @@ target_compile_definitions(zbe_multi_lv19_tahamane_atk130 PRIVATE MULTITHREADING
 add_executable(zbe_multi_lv19_hagane_atk113 ${SOURCES})
 target_compile_definitions(zbe_multi_lv19_hagane_atk113 PRIVATE MULTITHREADING HAGANE)
 
+add_executable(zbe_multi_lv13_sp13_hagane_atk101 ${SOURCES})
+target_compile_definitions(zbe_multi_lv13_sp13_hagane_atk101 PRIVATE MULTITHREADING lv13_sp13_hagane_atk101)
+
 
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d" UTC)
 string(TIMESTAMP BUILD_TIME "%H:%M:%S" UTC)
@@ -74,12 +77,15 @@ if(MINGW)
 elseif(MSVC)
     set_property(TARGET zbe_multi_lv19_tahamane_atk130 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET zbe_multi_lv19_hagane_atk113 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET lv13_sp13_hagane_atk101 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     target_compile_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /W4 /MP)
     target_compile_options(zbe_multi_lv19_hagane_atk113 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
+    target_compile_options(lv13_sp13_hagane_atk101 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
 
     target_link_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(zbe_multi_lv19_hagane_atk113 PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(lv13_sp13_hagane_atk101 PRIVATE /INCREMENTAL:NO /DEBUG)
 
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
