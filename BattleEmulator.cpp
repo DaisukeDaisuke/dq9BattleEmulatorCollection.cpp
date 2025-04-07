@@ -734,7 +734,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
                 baseDamage = static_cast<int>(floor(tmp));
             }
-            ProcessRage(position, baseDamage, players); // 適当
+            ProcessRage(position, baseDamage, players, kaisinn); // 適当
             if (kaisinn) {
                 if (!players[1].rage) {
                     (*position)++; //会心時特殊処理　0x021e54fc
@@ -768,7 +768,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
                 baseDamage = static_cast<int>(floor(tmp));
             }
-            ProcessRage(position, baseDamage, players); // 適当
+            ProcessRage(position, baseDamage, players, kaisinn); // 適当
             if (kaisinn) {
                 if (!players[1].rage) {
                     (*position)++; //会心時特殊処理　0x021e54fc
@@ -952,7 +952,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = static_cast<int>(floor(tmp));
             }
         //if (!kaihi) {
-            ProcessRage(position, baseDamage, players);
+            ProcessRage(position, baseDamage, players, kaisinn);
         //}
             Player::reduceHp(players[defender], baseDamage);
 
@@ -1170,7 +1170,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = static_cast<int>(floor(tmp));
 
-            ProcessRage(position, baseDamage, players);
+            ProcessRage(position, baseDamage, players, kaisinn);
             (*position)++; //目を覚ました
             (*position)++; //不明
             if (kaisinn) {
@@ -1342,12 +1342,12 @@ void BattleEmulator::RecalculateBuff(Player *players) {
     // }
 }
 
-void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players) {
+void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players, bool kaisinn) {
     auto percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
     if (percent1 < 0.5) {
         double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
         if (percent >= 0.5) {
-            if (!players[1].rage) {
+            if (!players[1].rage && !kaisinn) {
                 (*position)++;
                 (*position)++;
             } else {
@@ -1356,7 +1356,7 @@ void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players)
         } else {
             if (percent1 < 0.25) {
                 if (percent >= 0.25) {
-                    if (!players[1].rage) {
+                    if (!players[1].rage && !kaisinn) {
                         (*position)++;
                         (*position)++;
                     } else {
