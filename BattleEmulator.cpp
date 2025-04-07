@@ -817,7 +817,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     //TODO 0ダメージのときの消費を調べる
                     (*position)++; //0x021e54fc
                 }
-            }else if (kaihi) {
+            } else if (kaihi) {
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
                 if (baseDamage == 0) {
                     baseDamage = lcg::getPercent(position, 2); // 0x021e81a0

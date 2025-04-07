@@ -398,9 +398,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.AllyPlayer = CopedPlayers[0];
             currentGenome.EnemyPlayer = CopedPlayers[1];
 
+#ifdef BattleEmulatorLV13
+            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 45) {
+                currentGenome.fitness += 60;
+            }
+#elifdef BattleEmulatorLV19
             if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 70) {
                 currentGenome.fitness += 30;
             }
+#endif
+
 
             que.push(currentGenome);
         }
@@ -507,7 +514,12 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
+#ifdef BattleEmulatorLV13
                 currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
+#elifdef BattleEmulatorLV19
+                currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
+#endif
+
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -530,6 +542,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
             que.push(currentGenome);
         }
+
+#ifdef BattleEmulatorLV13
 
         if (!Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
             action = BattleEmulator::WOOSH_ALLY;
@@ -560,8 +574,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
             que.push(currentGenome);
         }
-
-#ifdef BattleEmulatorLV13
         if (!Bans.is_action_banned(BattleEmulator::DRAGON_SLASH, turns)) {
             action = BattleEmulator::DRAGON_SLASH;
             if (tmpgenomu.Visited >= 1) {
