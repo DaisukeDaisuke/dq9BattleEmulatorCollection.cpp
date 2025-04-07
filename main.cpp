@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v2.0.13";
+    const char *version = "v5.0.1";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -69,7 +69,7 @@ namespace {
     InputBuilder builder;
 
     const char repoURL[] =
-            u8"Hello Analyzer!, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/bilyouma !branch: bilyouma";
+            u8"Hello Analyzer!, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/zilyadama !branch: zilyadama";
     const char explanation1[] =
             u8"This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
 
@@ -330,14 +330,14 @@ namespace {
         std::string multiThreading = ", multithreading is disabled";
 #endif
 #if defined(OPTIMIZATION_O3_ENABLED)
-        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O3), Build date: " <<
+        std::cout << "dq9 Master of Nu'un battle emulator " << version << " (Optimized for O3), Build date: " <<
                 buildDate
                 << ", " <<
                 buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Master of Nu'un battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Master of Nu'un battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #else
         std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
         << ", " << buildTime << std::endl;
