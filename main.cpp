@@ -517,7 +517,7 @@ namespace {
         ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
 #elifdef BattleEmulatorLV15
         auto [turnProcessed,genome] =
-       ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads);
+                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads);
 #endif
 
         std::optional<BattleResult> result1;
