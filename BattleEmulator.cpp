@@ -1235,7 +1235,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = static_cast<int>(floor(tmp));
 
-            if (!players[attacker].acrobaticStar && kaisinn) {
+            if (!players[attacker].acrobaticStar && !kaisinn) {
                 ProcessRage(position, baseDamage, players, kaisinn);
             }
             (*position)++; //目を覚ました
