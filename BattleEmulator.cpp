@@ -24,6 +24,10 @@ constexpr double ShieldGuardP = 1.0;
 constexpr double mitoreP = 0.0240;
 constexpr double kaisinnP = 200;
 constexpr double ShieldGuardP = 1.0;
+#elifdef lv16_sp22_hagane_atk106
+constexpr double mitoreP = 0.0240;
+constexpr double kaisinnP = 500;
+constexpr double ShieldGuardP = 1.0;
 #endif
 constexpr double DragonSlashKaisinnP = kaisinnP / 2;
 
@@ -278,7 +282,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 558) {
+        if ((*position) == 554) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -670,11 +674,44 @@ double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
     return hp / maxHp;
 }
 
-//コンパイラが毎回コピーするコードを生成するからグローバルスコープに追い出しとく
+// //コンパイラが毎回コピーするコードを生成するからグローバルスコープに追い出しとく
 const int proportionTable2[9] = {90, 90, 64, 32, 16, 8, 4, 2, 1}; //最後の項目を調べるのは手動　P:\lua\isilyudaru\hissatuteki.lua
-const int proportionTable3[9] = {93, 83, 73, 62, 52, 42, 31, 21, 11}; //6ダメージ以下で0% 309 new: 112 103
-// double proportionTable1[9] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2, 0.1};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
-const double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5}; //一部の敵は特殊テンションテーブルを倍率として使う
+// const int proportionTable3[9] = {93, 83, 73, 62, 52, 42, 31, 21, 11}; //6ダメージ以下で0% 309 new: 112 103
+// // double proportionTable1[9] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2, 0.1};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
+ const double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5}; //一部の敵は特殊テンションテーブルを倍率として使う
+
+#include <array>
+#include <iostream>
+
+#ifdef lv16_sp22_hagane_atk106
+
+constexpr int base = 93;
+
+#elifdef lv13_sp13_hagane_atk101
+
+constexpr int base = 84;
+
+#elifdef HAGANE
+
+constexpr int base = 107;
+
+#endif
+
+constexpr std::array<int, 9> makeProportionTable3() {
+    std::array<int, 9> table{};
+    // iを9から1までループし、対応する値を生成する
+    for (int i = 9; i >= 1; --i) {
+        double multiplier = static_cast<double>(i) / 10.0;
+        // base * multiplier の結果は正の数なので、static_cast<int>でfloor相当の効果が得られる
+        int value = static_cast<int>(base * multiplier);
+        table[9 - i] = value + 1;
+    }
+    return table;
+}
+
+constexpr auto proportionTable3 = makeProportionTable3();
+
+
 
 /*
 <?php
@@ -707,6 +744,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     int percent_tmp;
     auto totalDamage = 0;
     auto attackCount = 0;
+    auto hasAnger = false;
     bool defenseFlag = false; //防御した場合0x021e81a0のほうが優先度高いらしい。なんで
     switch (Id & 0xffff) {
         case BattleEmulator::INACTIVE_ALLY:
@@ -831,6 +869,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //0x021ec6f8 不明
             (*position)++; //0x02157f58 偽回避
             baseDamage = FUN_021e8458_typeD(position, 5, 22);
+            tmp = baseDamage * players[defender].defence;
+            baseDamage = static_cast<int>(floor(tmp));
             (*position)++; //不明 0x021e54fc
             process7A8(position, baseDamage, players, defender);
             break;
@@ -847,6 +887,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             } else {
                 baseDamage = FUN_021e8458_typeD(position, 11, 22);
             }
+            tmp = baseDamage * players[defender].defence;
+            baseDamage = static_cast<int>(floor(tmp));
             (*position)++; //0x021e54fc
             process7A8(position, baseDamage, players, defender);
             break;
@@ -1204,10 +1246,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = static_cast<int>(floor(tmp));
 
-            ProcessRage(position, baseDamage, players);
+            hasAnger = ProcessRage(position, baseDamage, players);
             (*position)++; //目を覚ました
             (*position)++; //不明
-            if (kaisinn) {
+            if (!hasAnger && kaisinn) {
                 if (!players[1].rage) {
                     (*position)++; //会心時特殊処理　0x021e54fc
                     (*position)++; //会心時特殊処理　0x021eb8c8
@@ -1376,7 +1418,7 @@ void BattleEmulator::RecalculateBuff(Player *players, int attacker) {
     // }
 }
 
-void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players) {
+bool BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players) {
     auto percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
     if (percent1 < 0.5) {
         double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
@@ -1387,6 +1429,7 @@ void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players)
             } else {
                 (*position)++;
             }
+            return true;
         } else {
             if (percent1 < 0.25) {
                 if (percent >= 0.25) {
@@ -1396,10 +1439,12 @@ void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players)
                     } else {
                         (*position)++;
                     }
+                    return true;
                 }
             }
         }
     }
+    return false;
 }
 
 int BattleEmulator::ProcessMagicBurst(int *position) {

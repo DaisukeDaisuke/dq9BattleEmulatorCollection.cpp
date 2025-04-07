@@ -128,6 +128,26 @@ namespace {
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
+#elifdef lv16_sp22_hagane_atk106
+    constexpr Player BasePlayers[2] = {
+        // プレイヤー1
+        {
+            93, 93.0, 106, 106, 93, 93, 62, 62, 41, 33, // 最初のメンバー
+            33, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+
+        // プレイヤー2
+        {
+            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
+            255, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
+        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+    };
 #endif
 
     // ヘッダーを出力する関数
@@ -487,7 +507,7 @@ namespace {
         }
 
         auto [turnProcessed,genome] =
-                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 3000, gene, numThreads);
+                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads);
 
         std::optional<BattleResult> result1;
         result1 = BattleResult();
@@ -766,7 +786,7 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x281c5335;
+    uint64_t time1 = 0x2b79118;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -794,7 +814,9 @@ int main(int argc, char *argv[]) {
     //0x22e2dbaf:
 //0x281c5335:
 
-    int32_t gene1[350] = {25, 25, 61, 25, 50, 61, 61, 53, 50, 25, 25, 25, 27, 50, 25, 50, 25, 25, 50, 25, 25, 50, 25, 25, 25, 50, 56, 25, 25, 50, 53, 25, 25, 27, BattleEmulator::ATTACK_ALLY};
+
+//0x2b79118:
+    int32_t gene1[350] = {25, 25, 25, 27, 25, 59, 50, 27, 25, 25, 56, 25, 50, 25, 25, 25, 25, 25, 25, 50, 25, 25,  BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //
@@ -852,7 +874,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x27b2f230;
+    uint64_t seed = 0x02b79118;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);

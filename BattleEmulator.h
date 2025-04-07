@@ -136,7 +136,7 @@ public:
 private:
     static int ProcessMagicBurst(int *position);
 
-    static void ProcessRage(int *position, int baseDamage, Player players[2]);
+    static bool ProcessRage(int *position, int baseDamage, Player players[2]);
 
     static void RecalculateBuff(Player players[2], int attacker);
 
