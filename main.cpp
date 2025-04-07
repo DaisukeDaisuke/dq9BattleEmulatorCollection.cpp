@@ -69,6 +69,8 @@ namespace {
     constexpr int THREAD_COUNT = 4;
 #elifdef BattleEmulatorLV13
     constexpr int THREAD_COUNT = 5;
+#elifdef BattleEmulatorLV15
+    constexpr int THREAD_COUNT = 5;
 #endif
     // `InputBuilder` インスタンス作成
     InputBuilder builder;
@@ -131,7 +133,26 @@ namespace {
             false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
+#elifdef BattleEmulatorLV15
+    constexpr Player BasePlayers[2] = {
+        // プレイヤー1
+        {
+            89, 89.0, 82, 82, 90, 90, 58, 58, 39, 31, // 最初のメンバー
+            31, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
+        // プレイヤー2
+        {
+            696, 696.0, 68, 68, 68, 68, 50, 50, 0, 255, // 最初のメンバー
+            255, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
+        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+    };
 #endif
     // ヘッダーを出力する関数
     void printHeader(std::stringstream &ss) {
@@ -494,6 +515,9 @@ namespace {
 #elifdef BattleEmulatorLV19
         auto [turnProcessed,genome] =
         ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
+#elifdef BattleEmulatorLV15
+        auto [turnProcessed,genome] =
+       ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads);
 #endif
 
         std::optional<BattleResult> result1;
@@ -846,7 +870,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x01249f16;
+    uint64_t seed = 0x1731ec50;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY,BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);

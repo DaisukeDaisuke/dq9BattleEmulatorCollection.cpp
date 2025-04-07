@@ -24,6 +24,8 @@ void inline BattleEmulator::resetCombo(uint64_t *NowState) {
 constexpr int kaisinnP = 500;
 #elifdef BattleEmulatorLV13
 constexpr int kaisinnP = 200;
+#elifdef BattleEmulatorLV15
+constexpr int kaisinnP = 500;
 #endif
 constexpr int DragonSlashKaisinnP = kaisinnP / 2;
 
