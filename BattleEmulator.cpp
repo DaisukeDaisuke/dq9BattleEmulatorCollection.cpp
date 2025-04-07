@@ -1235,7 +1235,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = static_cast<int>(floor(tmp));
 
-            ProcessRage(position, baseDamage, players, kaisinn);
+            if (!players[attacker].acrobaticStar && kaisinn) {
+                ProcessRage(position, baseDamage, players, kaisinn);
+            }
             (*position)++; //目を覚ました
             (*position)++; //不明
             if (kaisinn) {
@@ -1408,9 +1410,9 @@ void BattleEmulator::RecalculateBuff(Player *players, int attacker) {
 }
 
 void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players, bool kaisinn) {
-    if (kaisinn) {
-        return;
-    }
+    // if (kaisinn) {
+    //     return;
+    // }
     auto percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
     if (percent1 < 0.5) {
         double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
