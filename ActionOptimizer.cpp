@@ -96,7 +96,7 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
         int end = (i == numThreads - 1) ? totalIterations : start + chunkSize;
 
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
-                                     std::cref(players), seed, turns, 1500, actions, start, end));
+                                     std::cref(players), seed, turns, 2500, actions, start, end));
     }
 
     Genome bestGenome = {};
@@ -224,7 +224,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
 
         counter1 = 0;
-        for (int i = result->position - 3; i < result->position; ++i) {
+        currentGenome.EActions[0] = 0;
+        currentGenome.EActions[1] = 0;
+        auto actioncount = ((result->turn + 1) & 1) + 2;
+        for (int i = std::max(0, result->position - actioncount); i < result->position; ++i) {
             if (result->isEnemy[i]) {
                 //Eactions[counter1] = result->actions[i];
                 //Edamage[counter1] = result->damages[i];
@@ -236,6 +239,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             }
         }
 
+
         if (currentGenome.Visited == 0) {
             updateCompromiseScore(currentGenome);
         }
@@ -243,9 +247,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
         auto backToPast = false;
 
-        if (tmpgenomu.Initialized && currentGenome.AllyPlayer.BuffLevel != 0) {
-            backToPast = true;
-        }
 
         // if (currentGenome.Visited == 1) {
         //     std::cout << std::endl;
@@ -268,6 +269,11 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
 
         auto baseFitness = tmpgenomu.fitness;
+
+        if (currentGenome.EActions[0] == BattleEmulator::BUFF_ENEMY || currentGenome.EActions[1] ==
+            BattleEmulator::BUFF_ENEMY) {
+            baseFitness -= 2;
+        }
 
         if (skip) {
             if (!currentGenome.Initialized) {
@@ -332,6 +338,38 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
+#ifdef lv13_sp13_hagane_atk101
+        if (AllyPlayerPre.mp >= 10 && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
+            action = BattleEmulator::CRACK_ALLY;
+            if (tmpgenomu.Visited >= 1) {
+                currentGenome.fitness = baseFitness; // 固定値に
+                currentGenome.Visited = 0;
+            } else {
+                currentGenome.fitness = baseFitness + 15 + static_cast<int>(rng() % 13);
+            }
+            currentGenome.actions[turns - 1] = action;
+
+            CopedPlayers[0] = tmpgenomu.AllyPlayer;
+            CopedPlayers[1] = tmpgenomu.EnemyPlayer;
+
+            (*position) = tmpgenomu.position;
+            (*nowState) = tmpgenomu.state;
+
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+                                 CopedPlayers,
+                                 (std::optional<BattleResult> &) std::nullopt, seed,
+                                 nullptr, nullptr, -2, nowState.get());
+            currentGenome.position = (*position);
+            currentGenome.state = (*nowState);
+            currentGenome.turn = turns + 1;
+            currentGenome.processed = turns;
+            currentGenome.AllyPlayer = CopedPlayers[0];
+            currentGenome.EnemyPlayer = CopedPlayers[1];
+
+            que.push(currentGenome);
+        }
+#endif
+
         if (!Bans.is_action_banned(BattleEmulator::ATTACK_ALLY, turns)) {
             action = BattleEmulator::ATTACK_ALLY;
             auto visited = tmpgenomu.Visited;
@@ -339,7 +377,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 15 + static_cast<int>(rng() % 6);
+                currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -362,12 +400,13 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.AllyPlayer = CopedPlayers[0];
             currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 70) {
+            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 80) {
                 currentGenome.fitness += 30;
             }
 
             que.push(currentGenome);
         }
+
 
         if (!Bans.is_action_banned(BattleEmulator::DEFENCE, turns)) {
             action = BattleEmulator::DEFENCE;
@@ -375,7 +414,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 6 + static_cast<int>(rng() % 6);
+                currentGenome.fitness = baseFitness + 6 + static_cast<int>(rng() % 13);
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -468,14 +507,14 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-        if (AllyPlayerPre.specialCharge == true && AllyPlayerPre.acrobaticStar == false && !Bans.is_action_banned(
+        if (AllyPlayerPre.specialCharge == true && AllyPlayerPre.specialChargeTurn != 0 && AllyPlayerPre.acrobaticStar == false && !Bans.is_action_banned(
                 BattleEmulator::ACROBATIC_STAR, turns)) {
             action = BattleEmulator::ACROBATIC_STAR;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
+                currentGenome.fitness = baseFitness + 1 + static_cast<int>(rng() % 14);
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -572,7 +611,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 6);
+                currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 10);
             }
             currentGenome.actions[turns - 1] = action;
 

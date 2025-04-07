@@ -487,7 +487,7 @@ namespace {
         }
 
         auto [turnProcessed,genome] =
-                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
+                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 3000, gene, numThreads);
 
         std::optional<BattleResult> result1;
         result1 = BattleResult();
@@ -790,30 +790,31 @@ int main(int argc, char *argv[]) {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
+    //int32_t gene1[350] = {0};
     //0x22e2dbaf:
+//0x281c5335:
 
-    //int32_t gene1[350] = {25, 25, 50, 27, 54, 57, 56, 25, 54, 57, 57,  BattleEmulator::ATTACK_ALLY};
+    int32_t gene1[350] = {25, 25, 61, 25, 50, 61, 61, 53, 50, 25, 25, 25, 27, 50, 25, 50, 25, 25, 50, 25, 25, 50, 25, 25, 25, 50, 56, 25, 25, 50, 53, 25, 25, 27, BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::DRAGON_SLASH;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::DRAGON_SLASH;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::CRACKLE;
@@ -851,7 +852,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x281c5335;
+    uint64_t seed = 0x27b2f230;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);

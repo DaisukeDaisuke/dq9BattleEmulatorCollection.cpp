@@ -98,6 +98,7 @@ public:
     static constexpr int WOOSH_ALLY = 58; //バギ
     static constexpr int DRAGON_SLASH = 59; //ドラゴン切り
     static constexpr int ITEM_USE = 60; //ドラゴン切り
+    static constexpr int CRACK_ALLY = 61; //ドラゴン切り
 
 
     //病魔

@@ -18,11 +18,15 @@ thread_local int preHP[3] = {0, 0, 0};
 
 #ifdef HAGANE
 constexpr double mitoreP = 0.0360;
+constexpr double kaisinnP = 500;
+constexpr double ShieldGuardP = 1.0;
 #elifdef lv13_sp13_hagane_atk101
 constexpr double mitoreP = 0.0240;
 constexpr double kaisinnP = 200;
-constexpr double DragonSlashKaisinnP = kaisinnP / 2;
+constexpr double ShieldGuardP = 1.0;
 #endif
+constexpr double DragonSlashKaisinnP = kaisinnP / 2;
+
 void constexpr inline BattleEmulator::resetCombo(uint64_t *NowState) {
     //(*NowState) &= ~(0xFFF00000000);
 }
@@ -177,6 +181,11 @@ const char *BattleEmulator::getActionName(int actionId) {
             return "Dragon Slash";
         case ITEM_USE:
             return "Item Use";
+        case CRACK_ALLY:
+            return "Crack";
+        case INACTIVE_ENEMY:
+        case INACTIVE_ALLY:
+            return "Inactive";
         default:
             return "Unknown Action";
     }
@@ -332,22 +341,21 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
             int basedamage = 0;
             if ((t == 0 && !player0_has_initiative) || (t == 1 && player0_has_initiative)) {
                 const auto ProcessCount = ((counterJ & 1) + 1);
-                auto counterstore = 0;
+                auto counterstore = -1;
                 while (counter != ProcessCount) {
                     int c = 0;
                     //--------start_FUN_02158dfc-------
-                    if (!counterstore != counter && lcg::getPercent(position, 100) < mitoreP) {
+                    if (counterstore != counter && lcg::getPercent(position, 100) < mitoreP) {
                         //0x021588ec
                         //次の乱数が90%以上(一致含む)なら見惚れないらしい。
                         int mitore = lcg::getPercent(position, 100); //0x02158964
                         if (mitore < 90) {
                             c = INACTIVE_ENEMY;
-
                         } else {
                             goto attack;
                         }
                     } else {
-                        attack:
+                    attack:
                         auto tableind = FUN_0208aecc(position, NowState);
                         if (tableind > 6) {
                             std::cout << tableind << std::endl;
@@ -742,8 +750,40 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[attacker].specialChargeTurn = 6;
                 }
             }
-            tmp = static_cast<double>(baseDamage) * 0.75;
+            tmp = static_cast<double>(baseDamage) * 0.50;
             baseDamage = static_cast<int>(floor(tmp));
+            break;
+        case CRACK_ALLY:
+            players[attacker].mp -= 3;
+            (*position) += 2;
+            (*position)++; //関係ない 0x021ec6f8
+            if (lcg::getPercent(position, 0x2710) < DragonSlashKaisinnP) {
+                kaisinn = true;
+            }
+            (*position)++; //盾 0x021586fc
+            (*position)++; //偽回避 0x02157f58
+            baseDamage = FUN_021e8458_typeD(position, 5, 30);
+            if (kaisinn) {
+                tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
+                baseDamage = static_cast<int>(floor(tmp));
+            }
+            ProcessRage(position, baseDamage, players); // 適当
+            if (kaisinn) {
+                if (!players[1].rage) {
+                    (*position)++; //会心時特殊処理　0x021e54fc
+                    (*position)++; //会心時特殊処理　0x021eb8c8
+                } else {
+                    (*position)++; //会心時特殊処理　既に怒り狂ってる場合は1消費になる
+                }
+            }
+            (*position)++; //0x021e54fc
+            if (!players[0].specialCharge) {
+                if (lcg::getPercent(position, 100) < 1) {
+                    //0x021edaf4
+                    players[attacker].specialCharge = true;
+                    players[attacker].specialChargeTurn = 6;
+                }
+            }
             break;
         case DRAIN_MAGIC:
             (*position) += 2;
@@ -1001,7 +1041,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 if (!players[defender].acrobaticStar && lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
-                if (!kaihi && lcg::getPercent(position, 100) < 0.5000) {
+                if (!kaihi && lcg::getPercent(position, 100) < ShieldGuardP) {
                     tate = true;
                 }
             }
