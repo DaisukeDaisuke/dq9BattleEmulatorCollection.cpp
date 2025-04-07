@@ -1343,9 +1343,10 @@ void BattleEmulator::RecalculateBuff(Player *players) {
 }
 
 void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players, bool kaisinn) {
-    if (kaisinn) {
-        return;
-    }
+    //多分ジャダーマだけ
+    // if (kaisinn) {
+    //     return;
+    // }
     auto percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
     if (percent1 < 0.5) {
         double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
