@@ -7,6 +7,9 @@
 #include <iostream>
 #include <cmath>
 #include "BattleEmulator.h"
+
+#include <array>
+
 #include "lcg.h"
 #include "Player.h"
 #include "camera.h"
@@ -22,12 +25,29 @@ void inline BattleEmulator::resetCombo(uint64_t *NowState) {
 
 #ifdef BattleEmulatorLV19
 constexpr int kaisinnP = 500;
+constexpr int baseHP = 103;
 #elifdef BattleEmulatorLV13
 constexpr int kaisinnP = 200;
+constexpr int baseHP = 79;
 #elifdef BattleEmulatorLV15
 constexpr int kaisinnP = 500;
+constexpr int baseHP = 89;
 #endif
 constexpr int DragonSlashKaisinnP = kaisinnP / 2;
+
+constexpr std::array<int, 9> makeProportionTable3() {
+    std::array<int, 9> table{};
+    // iを9から1までループし、対応する値を生成する
+    for (int i = 9; i >= 1; --i) {
+        double multiplier = static_cast<double>(i) / 10.0;
+        // base * multiplier の結果は正の数なので、static_cast<int>でfloor相当の効果が得られる
+        int value = static_cast<int>(baseHP * multiplier);
+        table[9 - i] = value + 1;
+    }
+    return table;
+}
+
+constexpr auto proportionTable3 = makeProportionTable3();
 
 double BattleEmulator::processCombo(int32_t Id, double damage, uint64_t *NowState) {
     auto previousAttack = ((*NowState) >> 32) & 0xff;
@@ -665,7 +685,6 @@ double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
 
 //コンパイラが毎回コピーするコードを生成するからグローバルスコープに追い出しとく
 const int proportionTable2[9] = {90, 90, 64, 32, 16, 8, 4, 2, 1}; //最後の項目を調べるのは手動　P:\lua\isilyudaru\hissatuteki.lua
-const int proportionTable3[9] = {93, 83, 73, 62, 52, 42, 31, 21, 11}; //6ダメージ以下で0% 309 new: 112 103
 // double proportionTable1[9] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2, 0.1};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
 const double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5}; //一部の敵は特殊テンションテーブルを倍率として使う
 
