@@ -16,17 +16,20 @@
 
 thread_local int preHP[3] = {0, 0, 0};
 
-#ifdef HAGANE
+#if defined(HAGANE)
+
 constexpr double mitoreP = 0.0360;
 constexpr double kaisinnP = 500;
 constexpr double ShieldGuardP = 1.0;
 constexpr int baseHP = 107;
-#elifdef lv13_sp13_hagane_atk101
+#elif defined(lv13_sp13_hagane_atk101)
+
 constexpr double mitoreP = 0.0240;
 constexpr double kaisinnP = 200;
 constexpr double ShieldGuardP = 1.0;
 constexpr int baseHP = 84;
-#elifdef lv16_sp22_hagane_atk106
+#elif defined(lv16_sp22_hagane_atk106)
+
 constexpr double mitoreP = 0.0240;
 constexpr double kaisinnP = 500;
 constexpr double ShieldGuardP = 1.0;
@@ -283,7 +286,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
         tmpState = (*NowState);
 
-#ifdef DEBUG2
+#if defined(DEBUG2)
+
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
         if ((*position) == 146) {
             std::cout << "!!" << std::endl;
@@ -649,7 +653,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         }
         camera::Main(position, actions, NowState, player0_has_initiative, false);
 
-#ifdef DEBUG2
+#if defined(DEBUG2)
+
         //DEBUG_COUT2((*position));
         if ((*position) == 176) {
             //std::cout << "!!" << std::endl;

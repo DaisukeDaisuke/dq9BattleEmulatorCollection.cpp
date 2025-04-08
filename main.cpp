@@ -12,7 +12,8 @@
 #include "ActionOptimizer.h"
 #include "InputBuilder.h"
 
-#ifdef DEBUG
+#if defined(DEBUG)
+
 
 #include <chrono>
 
@@ -22,7 +23,8 @@
 namespace {
     // MinGW/GCC用のnoinline属性
 #ifndef NOINLINE
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
+
 #define NOINLINE __declspec(noinline)
 #else
 #define NOINLINE
@@ -83,7 +85,8 @@ namespace {
             u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
     const char explanation4[] = u8"Have fun exploring the artists!";
 
-#ifdef HAGANE
+#if defined(HAGANE)
+
 
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
@@ -105,9 +108,11 @@ namespace {
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
-#elifdef TAMAHANE
+#elif defined(TAMAHANE)
 
-#elifdef lv13_sp13_hagane_atk101
+
+#elif defined(lv13_sp13_hagane_atk101)
+
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
@@ -128,7 +133,8 @@ namespace {
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
-#elifdef lv16_sp22_hagane_atk106
+#elif defined(lv16_sp22_hagane_atk106)
+
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
@@ -325,13 +331,15 @@ namespace {
     }
 
     void showHeader() {
-#ifdef BUILD_DATE
+#if defined(BUILD_DATE)
+
         const auto buildDate = BUILD_DATE;
 #else
         const std::string buildDate = "Unknown";
 #endif
 
-#ifdef BUILD_TIME
+#if defined(BUILD_TIME)
+
         const auto buildTime = BUILD_TIME;
 #else
         const std::string buildTime = "Unknown";
@@ -487,9 +495,11 @@ namespace {
         return false;
     }
 
-#ifdef MULTITHREADING
+#if defined(MULTITHREADING)
+
     void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads) {
-#ifdef DEBUG
+#if defined(DEBUG)
+
         auto t0 = std::chrono::high_resolution_clock::now();
         BattleEmulator::ResetTurnProcessed();
 #endif
@@ -522,14 +532,16 @@ namespace {
         delete position;
         delete nowState;
 
-#ifdef MINGW_BUILD
+#if defined(MINGW_BUILD)
+
         std::cout << turns << std::endl;
         dumpTableMain(result1.value(), genome, seed, 0);
 #else
         dumpTableMain(result1.value(), genome, seed, turns - 1);
 #endif
 
-#ifdef DEBUG
+#if defined(DEBUG)
+
         auto t3 = std::chrono::high_resolution_clock::now();
         auto elapsed_time1 =
                 std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
@@ -539,7 +551,8 @@ namespace {
 #elif NO_MULTITHREADING
 
     void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads = 1) {
-#ifdef DEBUG
+#if defined(DEBUG)
+
         auto t0 = std::chrono::high_resolution_clock::now();
         BattleEmulator::ResetTurnProcessed();
 #endif
@@ -594,14 +607,16 @@ namespace {
 
         delete position;
         delete nowState;
-#ifdef MINGW_BUILD
+#if defined(MINGW_BUILD)
+
         std::cout << turns << std::endl;
         dumpTableMain(bestResult, bestGenome, seed, 0);
 #else
         dumpTableMain(bestResult, bestGenome, seed, turns - 1);
 #endif
 
-#ifdef DEBUG
+#if defined(DEBUG)
+
         auto turnProcessed = BattleEmulator::getTurnProcessed();
         auto t3 = std::chrono::high_resolution_clock::now();
         auto elapsed_time1 =
@@ -642,7 +657,8 @@ namespace {
     [[nodiscard]] uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds,
                                              int turns,
                                              int aActions[350], int damages[350]) {
-#ifdef DEBUG
+#if defined(DEBUG)
+
         auto t0 = std::chrono::high_resolution_clock::now();
 #endif
 
@@ -693,7 +709,8 @@ namespace {
         std::cout << std::endl << "found: " << foundSeeds << std::endl;
 
         if (foundSeeds == 1) {
-#ifdef DEBUG
+#if defined(DEBUG)
+
             auto turnProcessed = BattleEmulator::getTurnProcessed();
             BattleEmulator::ResetTurnProcessed();
             auto t3 = std::chrono::high_resolution_clock::now();
@@ -760,7 +777,8 @@ namespace {
 
 int main(int argc, char *argv[]) {
     showHeader();
-#ifdef DEBUG
+#if defined(DEBUG)
+
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
 
@@ -769,7 +787,8 @@ int main(int argc, char *argv[]) {
     //std::cin.tie(0)->sync_with_stdio(0);
 
 
-#ifdef DEBUG2
+#if defined(DEBUG2)
+
     //time1 = 0x199114b2;
     //time1 = 0x226d97a6;
     //time1 = 0x1c2a9bda;
@@ -874,7 +893,8 @@ int main(int argc, char *argv[]) {
     return 0;
 #endif
 
-#ifdef DEBUG3
+#if defined(DEBUG3)
+
     uint64_t seed = 0x03719d78;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
@@ -908,7 +928,8 @@ int main(int argc, char *argv[]) {
     ProcessInputBuilder(argc, argv);
     auto exitCode = ProgramMain(hours, minutes, seconds);
     std::cout << performanceLogger.rdbuf();
-#ifdef DEBUG
+#if defined(DEBUG)
+
     auto t1 = std::chrono::high_resolution_clock::now();
     auto elapsed_time =
             std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
