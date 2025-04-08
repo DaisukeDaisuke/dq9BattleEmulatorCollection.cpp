@@ -95,13 +95,13 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
         int start = i * chunkSize;
         int end = (i == numThreads - 1) ? totalIterations : start + chunkSize;
 
-#ifdef BattleEmulatorLV13
+#if defined(BattleEmulatorLV13)
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
                                      std::cref(players), seed, turns, 2000, actions, start, end));
-#elifdef BattleEmulatorLV19
+#elif defined(BattleEmulatorLV19)
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
                                              std::cref(players), seed, turns, 1500, actions, start, end));
-#elifdef BattleEmulatorLV15
+#elif defined(BattleEmulatorLV15)
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
                                      std::cref(players), seed, turns, 1500, actions, start, end));
 #endif
@@ -401,15 +401,15 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.AllyPlayer = CopedPlayers[0];
             currentGenome.EnemyPlayer = CopedPlayers[1];
 
-#ifdef BattleEmulatorLV13
+#if defined(BattleEmulatorLV13)
             if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 45) {
                 currentGenome.fitness += 60;
             }
-#elifdef BattleEmulatorLV19
+#elif defined(BattleEmulatorLV19)
             if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 70) {
                 currentGenome.fitness += 30;
             }
-#elifdef BattleEmulatorLV15
+#elif defined(BattleEmulatorLV15)
             if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 45) {
                 currentGenome.fitness += 60;
             }
@@ -521,11 +521,11 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-#ifdef BattleEmulatorLV13
+#if defined(BattleEmulatorLV13)
                 currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
-#elifdef BattleEmulatorLV19
+#elif defined(BattleEmulatorLV19)
                 currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
-#elifdef BattleEmulatorLV15
+#elif defined(BattleEmulatorLV15)
                 currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
 #endif
             }

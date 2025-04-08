@@ -60,15 +60,15 @@ set(SOURCES
 
 # マルチスレッド版（multithreading = ON）
 add_executable(rbe_multi_lv18_sp34 ${SOURCES})
-target_compile_definitions(rbe_multi_lv18_sp34 PRIVATE MULTITHREADING BattleEmulatorLV19)  # `#define MULTITHREADING` を適用
+target_compile_definitions(rbe_multi_lv18_sp34 PRIVATE MULTITHREADING=1 BattleEmulatorLV19=1)  # `#define MULTITHREADING` を適用
 
 # マルチスレッド版（multithreading = ON）
 add_executable(rbe_multi_lv13_sp13 ${SOURCES})
-target_compile_definitions(rbe_multi_lv13_sp13 PRIVATE MULTITHREADING BattleEmulatorLV13)  # `#define MULTITHREADING` を適用
+target_compile_definitions(rbe_multi_lv13_sp13 PRIVATE MULTITHREADING=1 BattleEmulatorLV13=1)  # `#define MULTITHREADING` を適用
 
 # マルチスレッド版（multithreading = ON）
 add_executable(rbe_multi_lv15_sp22 ${SOURCES})
-target_compile_definitions(rbe_multi_lv15_sp22 PRIVATE MULTITHREADING BattleEmulatorLV15)  # `#define MULTITHREADING` を適用
+target_compile_definitions(rbe_multi_lv15_sp22 PRIVATE MULTITHREADING=1 BattleEmulatorLV15=1)  # `#define MULTITHREADING` を適用
 
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d" UTC)
 string(TIMESTAMP BUILD_TIME "%H:%M:%S" UTC)

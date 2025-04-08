@@ -23,13 +23,13 @@ void inline BattleEmulator::resetCombo(uint64_t *NowState) {
     (*NowState) &= ~(0xFFF00000000);
 }
 
-#ifdef BattleEmulatorLV19
+#if defined(BattleEmulatorLV19)
 constexpr int kaisinnP = 500;
 constexpr int baseHP = 103;
-#elifdef BattleEmulatorLV13
+#elif defined(BattleEmulatorLV13)
 constexpr int kaisinnP = 200;
 constexpr int baseHP = 79;
-#elifdef BattleEmulatorLV15
+#elif defined(BattleEmulatorLV15)
 constexpr int kaisinnP = 500;
 constexpr int baseHP = 89;
 #endif

@@ -65,12 +65,11 @@ namespace {
 
     std::stringstream performanceLogger = std::stringstream();
 
-#ifdef BattleEmulatorLV19
-
+#if defined(BattleEmulatorLV19)
     constexpr int THREAD_COUNT = 4;
-#elifdef BattleEmulatorLV13
+#elif defined(BattleEmulatorLV13)
     constexpr int THREAD_COUNT = 5;
-#elifdef BattleEmulatorLV15
+#elif defined(BattleEmulatorLV15)
     constexpr int THREAD_COUNT = 5;
 #endif
     // `InputBuilder` インスタンス作成
@@ -91,7 +90,7 @@ namespace {
             u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
     const char explanation4[] = u8"Have fun exploring the artists!";
 
-#ifdef BattleEmulatorLV19
+#if defined(BattleEmulatorLV19)
 
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
@@ -113,7 +112,7 @@ namespace {
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
-#elifdef BattleEmulatorLV13
+#elif defined(BattleEmulatorLV13)
 
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
@@ -134,7 +133,7 @@ namespace {
             false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
-#elifdef BattleEmulatorLV15
+#elif defined(BattleEmulatorLV15)
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
@@ -540,13 +539,13 @@ namespace {
             }
             turns++;
         }
-#ifdef BattleEmulatorLV13
+#if defined(BattleEmulatorLV13)
         auto [turnProcessed,genome] =
                 ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 3000, gene, numThreads);
-#elifdef BattleEmulatorLV19
+#elif defined(BattleEmulatorLV19)
         auto [turnProcessed,genome] =
         ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
-#elifdef BattleEmulatorLV15
+#elif defined(BattleEmulatorLV15)
         auto [turnProcessed,genome] =
                 ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads);
 #endif

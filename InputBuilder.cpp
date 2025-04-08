@@ -18,7 +18,7 @@ void InputBuilder::push(int damage, const char prefix) {
         entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
     }else
 
-#ifdef BattleEmulatorLV19
+#if defined(BattleEmulatorLV19)
     if (prefix == 'a') {
         if (damage > 30 && damage <= 60) {
             entry.candidates.push_back(BattleEmulator::MIRACLE_SLASH);
@@ -28,7 +28,7 @@ void InputBuilder::push(int damage, const char prefix) {
     } else {
         entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
     }
-#elifdef BattleEmulatorLV15
+#elif defined(BattleEmulatorLV15) || defined(BattleEmulatorLV13)
     if (prefix == 'a') {
         entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
     } else {
