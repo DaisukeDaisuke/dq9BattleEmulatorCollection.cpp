@@ -1328,14 +1328,8 @@ void BattleEmulator::process7A8(int *position, int baseDamage, Player players[2]
     }
     auto percent_tmp = lcg::getPercent(position, 100);
     double tmp = baseDamage;
-    tmp *= players[defender].defence;
 
     auto baseDamage_tmp = static_cast<int>(floor(tmp));
-    if (proportionTable3[8] >= baseDamage_tmp && percent_tmp == 0) {
-        players[defender].specialCharge = true;
-        players[defender].specialChargeTurn = 6;
-        return;
-    }
     for (int i = 0; i < 9; ++i) {
         if (baseDamage_tmp >= proportionTable3[i]) {
             if (percent_tmp < proportionTable2[i]) {
