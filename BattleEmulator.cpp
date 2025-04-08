@@ -1262,7 +1262,6 @@ void BattleEmulator::process7A8(int *position, int baseDamage, Player players[2]
     }
     auto percent_tmp = lcg::getPercent(position, 100);
     double tmp = baseDamage;
-    tmp *= players[defender].defence;
 
     auto baseDamage_tmp = static_cast<int>(floor(tmp));
     for (int i = 0; i < 9; ++i) {
