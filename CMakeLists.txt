@@ -55,12 +55,12 @@ set(SOURCES
 )
 
 # シングルスレッド版（multithreading = OFF）
-add_executable(rbe_single ${SOURCES})
-target_compile_definitions(rbe_single PRIVATE NO_MULTITHREADING BattleEmulatorLV19)  # `#define NO_MULTITHREADING` を適用
+#add_executable(rbe_single ${SOURCES})
+#target_compile_definitions(rbe_single PRIVATE NO_MULTITHREADING BattleEmulatorLV19)  # `#define NO_MULTITHREADING` を適用
 
 # マルチスレッド版（multithreading = ON）
-add_executable(rbe_multi ${SOURCES})
-target_compile_definitions(rbe_multi PRIVATE MULTITHREADING BattleEmulatorLV19)  # `#define MULTITHREADING` を適用
+add_executable(rbe_multi_lv18_sp34 ${SOURCES})
+target_compile_definitions(rbe_multi_lv18_sp34 PRIVATE MULTITHREADING BattleEmulatorLV19)  # `#define MULTITHREADING` を適用
 
 # マルチスレッド版（multithreading = ON）
 add_executable(rbe_multi_lv13_sp13 ${SOURCES})
@@ -79,18 +79,18 @@ if(MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections -fno-inline-small-functions")
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections")
 elseif(MSVC)
-    set_property(TARGET rbe_single PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET rbe_multi PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    #set_property(TARGET rbe_single PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET rbe_multi_lv18_sp34 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET rbe_multi_lv13_sp13 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET rbe_multi_lv15_sp22 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-    target_compile_options(rbe_single PRIVATE /W4 /MP)
-    target_compile_options(rbe_multi PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
+    #target_compile_options(rbe_single PRIVATE /W4 /MP)
+    target_compile_options(rbe_multi_lv18_sp34 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(rbe_multi_lv13_sp13 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(rbe_multi_lv15_sp22 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
 
-    target_link_options(rbe_single PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(rbe_multi PRIVATE /INCREMENTAL:NO /DEBUG)
+    #target_link_options(rbe_single PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(rbe_multi_lv18_sp34 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(rbe_multi_lv13_sp13 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(rbe_multi_lv15_sp22 PRIVATE /INCREMENTAL:NO /DEBUG)
 

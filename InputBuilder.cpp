@@ -2,45 +2,39 @@
 
 #include "BattleEmulator.h"
 
-void InputBuilder::push(int damage) {
+void InputBuilder::push(int damage, const char prefix) {
     InputEntry entry;
     entry.damage = damage;
 
     if (damage == -5) {
         entry.candidates.push_back(BattleEmulator::SPECIAL_MEDICINE);
-    }
-
-    if (damage == -2) {
+    }else if (damage == -2) {
         entry.candidates.push_back(BattleEmulator::DECELERATLE);
-    }
-
-    if (damage == -3) {
+    }else if (damage == -3) {
         entry.candidates.push_back(BattleEmulator::KASAP);
-    }
-
-    if (damage == -4) {
+    }else if (damage == -4) {
         entry.candidates.push_back(BattleEmulator::SWEET_BREATH);
-    }
+    }else if (damage == 0) {
+        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
+    }else
 
-    if (damage == 0)
+#ifdef BattleEmulatorLV19
+    if (prefix == 'a') {
+        if (damage > 30 && damage <= 60) {
+            entry.candidates.push_back(BattleEmulator::MIRACLE_SLASH);
+        } else {
+            entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
+        }
+    } else {
         entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-
-    if (damage >= 8 && damage <= 12)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-    if (damage >= 19 && damage < 24)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-    if (damage == 24) {
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-        entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
     }
-    if (damage > 24 && damage < 30)
+#elifdef BattleEmulatorLV15
+    if (prefix == 'a') {
         entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-    if (damage == 30) {
-        entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-        entry.candidates.push_back(BattleEmulator::MIRACLE_SLASH);
+    } else {
+        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
     }
-    if (damage > 30 && damage <= 37)
-        entry.candidates.push_back(BattleEmulator::MIRACLE_SLASH);
+#endif
 
     if (entry.candidates.empty()) {
         std::cerr << "WARNING: A damage value of 0 " << damage << " has no applicable range\n";
@@ -86,4 +80,3 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
         generateCombinations(index + 1, next, results);
     }
 }
-

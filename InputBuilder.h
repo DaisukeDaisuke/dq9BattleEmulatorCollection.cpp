@@ -15,7 +15,7 @@
 
 class InputBuilder {
 public:
-    void push(int damage);
+    void push(int damage, char prefix);
 
     std::vector<ResultStructure> makeStructure();
 

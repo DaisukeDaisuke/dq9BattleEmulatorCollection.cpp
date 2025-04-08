@@ -55,6 +55,7 @@ namespace {
     void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed, int turns);
 
     void printHeader(std::stringstream &ss);
+    std::pair<char, int> toABCint(const char *str);
 
     int foundSeeds = 0;
 
@@ -368,6 +369,23 @@ namespace {
 #endif
     }
 
+    // ヘッダー出力関数
+    NOINLINE void printShortcutTableHeader() {
+        std::cout << std::left << std::setw(5) << "Key"
+                  << std::left << std::setw(18) << "Action"
+                  << std::endl;
+
+        std::cout << std::string(3, '-') << " "
+                  << std::string(18, '-') << std::endl;
+    }
+
+    // 各行の出力関数
+    NOINLINE void printShortcutEntry(const char* shortcutKey, const char* name) {
+        std::cout << std::left << std::setw(5) << shortcutKey
+                  << std::left << std::setw(18) << name
+                  << std::endl;
+    }
+
     void help(const char *program_name) {
         std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
         std::cout << "tables" << std::endl;
@@ -376,35 +394,48 @@ namespace {
         std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
-        std::cout << "example: " << program_name << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
-        std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
+        std::cout << "example: " << program_name << " 0 3 54 a85 9 a a26 10 10 10 b a26" << std::endl;
+        // std::cout << "example: " << program_name << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
+        // std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
+
+        printShortcutTableHeader();
+        printShortcutEntry("A", "Attack Ally");
+        printShortcutEntry("A", BattleEmulator::getActionName(BattleEmulator::MIRACLE_SLASH));
+
+
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
 
     NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
         // 4番目以降の引数を `push()` に入れる
         for (int i = 4; i < argc; ++i) {
-            if (isMatchStrWithTrim(argv[i], "h")) {
-                builder.push(-5);
+            if (isMatchStrWithTrim(argv[i], "h")  || isMatchStrWithTrim(argv[i], "ah")) {
+                builder.push(-5, 'n');
                 continue;
             }
             if (isMatchStrWithTrim(argv[i], "a") || isMatchStrWithTrim(argv[i], "s")) {
-                builder.push(-4);
+                builder.push(-4, 'n');
                 continue;
             }
             if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "d")) {
-                builder.push(-2);
+                builder.push(-2, 'n');
                 continue;
             }
             if (isMatchStrWithTrim(argv[i], "r") || isMatchStrWithTrim(argv[i], "k")) {
-                builder.push(-3);
+                builder.push(-3, 'n');
                 continue;
             }
-            int damage = toint(argv[i]);
-            if (damage >= 0) {
-                builder.push(damage);
-            } else {
-                std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
+            try{
+                auto [prefix, damage] = toABCint(argv[i]);
+                if (damage >= 0) {
+                    builder.push(damage, prefix);
+                } else {
+                    std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
+                    return false;
+                }
+            } catch (const std::exception& e) {
+                std::cout << "Invalid Input!: " << (argv[i] == nullptr ? "null" : argv[i])
+                          << " => Exception: " << e.what() << std::endl;
                 return false;
             }
         }
@@ -738,6 +769,40 @@ namespace {
         }
     }
 
+    NOINLINE std::pair<char, int> toABCint(const char *str) {
+        if (str == nullptr) throw std::invalid_argument("Input is null");
+
+        size_t len = std::strlen(str);
+        if (len > 4) throw std::length_error("Input exceeds maximum allowed length (4)");
+
+        // 先頭がアルファベットの場合
+        if (len >= 2 && std::isalpha(static_cast<unsigned char>(str[0]))) {
+            char prefix = static_cast<char>(std::tolower(static_cast<unsigned char>(str[0])));
+            int value = 0;
+
+            for (size_t i = 1; i < len; ++i) {
+                if (!std::isdigit(static_cast<unsigned char>(str[i]))) {
+                    throw std::invalid_argument("Invalid character in numeric portion");
+                }
+                value = value * 10 + (str[i] - '0');
+            }
+
+            return std::make_pair(prefix, value);
+        }
+
+        // 通常の整数として扱う（先頭が数字の場合）
+        try {
+            int number = std::stoi(str);
+            return std::make_pair('\0', number);
+        } catch (const std::invalid_argument &e) {
+            std::cerr << "Invalid argument: " << e.what() << std::endl;
+            return std::make_pair('\0', -1);
+        } catch (const std::out_of_range &e) {
+            std::cerr << "Out of range: " << e.what() << std::endl;
+            return std::make_pair('\0', -1);
+        }
+    }
+
 
     // 左側の空白をトリム
     NOINLINE std::string ltrim(const std::string &s) {
@@ -900,7 +965,9 @@ int main(int argc, char *argv[]) {
     }
 
 
-    ProcessInputBuilder(argc, argv);
+    if (!ProcessInputBuilder(argc, argv)) {
+        return 1;
+    }
     auto exitCode = ProgramMain(hours, minutes, seconds);
     std::cout << performanceLogger.rdbuf();
 #ifdef DEBUG

@@ -127,7 +127,7 @@ public:
 private:
     static int ProcessMagicBurst(int *position);
 
-    static void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players, bool kaisinn);
+    static void ProcessRage(int *position, int baseDamage, Player *players, bool kaisinn);
 
     static void RecalculateBuff(Player players[2]);
 
