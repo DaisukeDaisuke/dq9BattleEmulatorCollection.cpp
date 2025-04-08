@@ -860,6 +860,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //0x02157f58 偽回避
             baseDamage = FUN_021e8458_typeD(position, 5, 22);
             tmp = baseDamage * players[defender].defence;
+            //tmp *= 0.8;
             baseDamage = static_cast<int>(floor(tmp));
             (*position)++; //不明 0x021e54fc
             process7A8(position, baseDamage, players, defender);
