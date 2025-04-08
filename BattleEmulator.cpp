@@ -285,7 +285,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 554) {
+        if ((*position) == 146) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -358,6 +358,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         int mitore = lcg::getPercent(position, 100); //0x02158964
                         if (mitore < 90) {
                             c = INACTIVE_ENEMY;
+                            (*position)++; //0x02158964 ?
                         } else {
                             goto attack;
                         }
@@ -1330,6 +1331,11 @@ void BattleEmulator::process7A8(int *position, int baseDamage, Player players[2]
     tmp *= players[defender].defence;
 
     auto baseDamage_tmp = static_cast<int>(floor(tmp));
+    if (proportionTable3[8] >= baseDamage_tmp && percent_tmp == 0) {
+        players[defender].specialCharge = true;
+        players[defender].specialChargeTurn = 6;
+        return;
+    }
     for (int i = 0; i < 9; ++i) {
         if (baseDamage_tmp >= proportionTable3[i]) {
             if (percent_tmp < proportionTable2[i]) {

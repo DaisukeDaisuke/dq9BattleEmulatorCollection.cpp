@@ -786,7 +786,7 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x2b79118;
+    uint64_t time1 = 0x3719d77;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -811,13 +811,11 @@ int main(int argc, char *argv[]) {
 
     Player players1[2];
     //int32_t gene1[350] = {0};
-    //0x22e2dbaf:
-//0x281c5335:
-
+    //0x3719d77: 25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
 
     //0x2b79118:
     int32_t gene1[350] = {
-        25, 25, 25, 27, 25, 59, 50, 27, 25, 25, 56, 25, 50, 25, 25, 25, 25, 25, 25, 50, 25, 25,
+        25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
         BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;
@@ -877,7 +875,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x02b79118;
+    uint64_t seed = 0x03719d77;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
