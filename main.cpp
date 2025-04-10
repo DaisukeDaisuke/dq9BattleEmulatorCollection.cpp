@@ -394,7 +394,7 @@ namespace {
         std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
         std::cout << "example: " << program_name << " 0 3 54 a85 9 a a26 10 10 10 b a26" << std::endl;
-        // std::cout << "example: " << program_name << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
+        std::cout << "example: " << program_name << " 0 3 19 a21 11 14 a84 a 12" << std::endl;
         // std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
 
         printShortcutTableHeader();
