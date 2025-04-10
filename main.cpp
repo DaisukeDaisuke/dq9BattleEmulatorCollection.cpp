@@ -33,6 +33,8 @@ namespace {
 
     int toint(char *string);
 
+    NOINLINE std::pair<char, int> toABCint(const char *str);
+
     //void processResult(const Player *copiedPlayers, const uint64_t seed, std::string input);
 
     std::string ltrim(const std::string &s);
@@ -139,6 +141,26 @@ namespace {
         // プレイヤー1
         {
             93, 93.0, 106, 106, 93, 93, 62, 62, 41, 33, // 最初のメンバー
+            33, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+
+        // プレイヤー2
+        {
+            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
+            255, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
+        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+    };
+#elif defined(lv16_sp22_hagane_atk106_def86)
+    constexpr Player BasePlayers[2] = {
+        // プレイヤー1
+        {
+            93, 93.0, 106, 106, 86, 86, 62, 62, 41, 33, // 最初のメンバー
             33, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
@@ -380,8 +402,8 @@ namespace {
         std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
-        std::cout << "example: " << program_name << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
-        std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
+        // std::cout << "example: " << program_name << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
+        // std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
 
@@ -389,24 +411,24 @@ namespace {
         // 4番目以降の引数を `push()` に入れる
         for (int i = 4; i < argc; ++i) {
             if (isMatchStrWithTrim(argv[i], "h")) {
-                builder.push(-5);
+                builder.push(-5, 'n');
                 continue;
             }
             if (isMatchStrWithTrim(argv[i], "a") || isMatchStrWithTrim(argv[i], "s")) {
-                builder.push(-4);
+                builder.push(-4, 'n');
                 continue;
             }
             if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "d")) {
-                builder.push(-2);
+                builder.push(-2, 'n');
                 continue;
             }
             if (isMatchStrWithTrim(argv[i], "r") || isMatchStrWithTrim(argv[i], "k")) {
-                builder.push(-3);
+                builder.push(-3, 'n');
                 continue;
             }
-            int damage = toint(argv[i]);
+            auto [prefix, damage] = toABCint(argv[i]);
             if (damage >= 0) {
-                builder.push(damage);
+                builder.push(damage, prefix);
             } else {
                 std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
                 return false;
@@ -772,6 +794,41 @@ namespace {
 
     NOINLINE bool isMatchStrWithTrim(const char *s1, const char *s2) {
         return trim(s1) == trim(s2);
+    }
+
+
+    NOINLINE std::pair<char, int> toABCint(const char *str) {
+        if (str == nullptr) throw std::invalid_argument("Input is null");
+
+        size_t len = std::strlen(str);
+        if (len > 4) throw std::length_error("Input exceeds maximum allowed length (4)");
+
+        // 先頭がアルファベットの場合
+        if (len >= 2 && std::isalpha(static_cast<unsigned char>(str[0]))) {
+            char prefix = static_cast<char>(std::tolower(static_cast<unsigned char>(str[0])));
+            int value = 0;
+
+            for (size_t i = 1; i < len; ++i) {
+                if (!std::isdigit(static_cast<unsigned char>(str[i]))) {
+                    throw std::invalid_argument("Invalid character in numeric portion");
+                }
+                value = value * 10 + (str[i] - '0');
+            }
+
+            return std::make_pair(prefix, value);
+        }
+
+        // 通常の整数として扱う（先頭が数字の場合）
+        try {
+            int number = std::stoi(str);
+            return std::make_pair('\0', number);
+        } catch (const std::invalid_argument &e) {
+            std::cerr << "Invalid argument: " << e.what() << std::endl;
+            return std::make_pair('\0', -1);
+        } catch (const std::out_of_range &e) {
+            std::cerr << "Out of range: " << e.what() << std::endl;
+            return std::make_pair('\0', -1);
+        }
     }
 }
 

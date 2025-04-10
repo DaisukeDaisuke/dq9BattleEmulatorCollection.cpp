@@ -2,7 +2,7 @@
 
 #include "BattleEmulator.h"
 
-void InputBuilder::push(int damage) {
+void InputBuilder::push(int damage, const char prefix) {
     InputEntry entry;
     entry.damage = damage;
 
