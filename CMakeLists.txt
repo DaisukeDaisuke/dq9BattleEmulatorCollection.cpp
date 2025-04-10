@@ -59,8 +59,8 @@ set(SOURCES
 #target_compile_definitions(rbe_single PRIVATE NO_MULTITHREADING BattleEmulatorLV19)  # `#define NO_MULTITHREADING` を適用
 
 # マルチスレッド版（multithreading = ON）
-add_executable(rbe_multi_lv18_sp34 ${SOURCES})
-target_compile_definitions(rbe_multi_lv18_sp34 PRIVATE MULTITHREADING=1 BattleEmulatorLV19=1)  # `#define MULTITHREADING` を適用
+add_executable(rbe_multi_lv18_sp35 ${SOURCES})
+target_compile_definitions(rbe_multi_lv18_sp35 PRIVATE MULTITHREADING=1 BattleEmulatorLV19=1)  # `#define MULTITHREADING` を適用
 
 # マルチスレッド版（multithreading = ON）
 add_executable(rbe_multi_lv13_sp13 ${SOURCES})
@@ -80,17 +80,17 @@ if(MINGW)
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections")
 elseif(MSVC)
     #set_property(TARGET rbe_single PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET rbe_multi_lv18_sp34 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET rbe_multi_lv18_sp35 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET rbe_multi_lv13_sp13 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET rbe_multi_lv15_sp22 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     #target_compile_options(rbe_single PRIVATE /W4 /MP)
-    target_compile_options(rbe_multi_lv18_sp34 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
+    target_compile_options(rbe_multi_lv18_sp35 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(rbe_multi_lv13_sp13 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(rbe_multi_lv15_sp22 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
 
     #target_link_options(rbe_single PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(rbe_multi_lv18_sp34 PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(rbe_multi_lv18_sp35 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(rbe_multi_lv13_sp13 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(rbe_multi_lv15_sp22 PRIVATE /INCREMENTAL:NO /DEBUG)
 

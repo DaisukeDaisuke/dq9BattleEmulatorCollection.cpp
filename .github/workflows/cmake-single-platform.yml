@@ -28,15 +28,15 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Build rbe_multi_lv18_sp34
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rbe_multi_lv18_sp34
+    - name: Build rbe_multi_lv18_sp35
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rbe_multi_lv18_sp35
     - name: Build rbe_multi_lv13_sp13
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rbe_multi_lv13_sp13
     - name: Build rbe_multi_lv15_sp22
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rbe_multi_lv15_sp22
 
-    - name: echo SHA256 rbe_multi_lv18_sp34
-      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv18_sp34.exe"
+    - name: echo SHA256 rbe_multi_lv18_sp35
+      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv18_sp35.exe"
     - name: echo SHA256 rbe_multi_lv13_sp13
       run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv13_sp13.exe"
     - name: echo SHA256 rbe_multi_lv15_sp22
@@ -57,10 +57,10 @@ jobs:
         # Artifact name
         name: rbe
         path: |
-          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv18_sp34.exe
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv18_sp35.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv13_sp13.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv15_sp22.exe
-          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv18_sp34.pdb
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv18_sp35.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv13_sp13.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv15_sp22.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/LICENSE
