@@ -45,6 +45,12 @@ jobs:
     - name: Copy License file
       run: Copy-Item -Path "${{github.workspace}}/LICENSE" -Destination "${{github.workspace}}/build/${{env.BUILD_TYPE}}/"
 
+    - name: Copy image folder
+      run: |
+        Copy-Item -Path "${{github.workspace}}/image" `
+                  -Destination "${{github.workspace}}/build/${{env.BUILD_TYPE}}/image" `
+                  -Recurse
+
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -58,3 +64,4 @@ jobs:
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv13_sp13.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv15_sp22.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/LICENSE
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/image/**
