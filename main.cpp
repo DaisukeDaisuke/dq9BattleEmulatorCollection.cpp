@@ -410,7 +410,7 @@ namespace {
     NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
         // 4番目以降の引数を `push()` に入れる
         for (int i = 4; i < argc; ++i) {
-            if (isMatchStrWithTrim(argv[i], "h")) {
+            if (isMatchStrWithTrim(argv[i], "h") || isMatchStrWithTrim(argv[i], "ah")) {
                 builder.push(-5, 'h');
                 continue;
             }

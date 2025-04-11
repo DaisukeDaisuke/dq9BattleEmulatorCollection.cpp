@@ -55,7 +55,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         # Artifact name
-        name: rbe
+        name: zbe
         path: |
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_hagane_atk106_def86.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv13_sp13_hagane_atk101.exe
