@@ -176,6 +176,27 @@ namespace {
             false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
+
+#elif defined(lv16_sp22_tamahagane_atk123_def86)
+    constexpr Player BasePlayers[2] = {
+        // プレイヤー1
+        {
+            93, 93.0, 123, 123, 86, 86, 62, 62, 41, 33, // 最初のメンバー
+            33, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+
+        // プレイヤー2
+        {
+            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
+            255, false, false, 0, false, 0, -1,
+            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
+            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
+        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
+    };
 #endif
 
     // ヘッダーを出力する関数
@@ -951,7 +972,7 @@ int main(int argc, char *argv[]) {
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x043a5afa;
+    uint64_t seed = 0x027f5679;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);

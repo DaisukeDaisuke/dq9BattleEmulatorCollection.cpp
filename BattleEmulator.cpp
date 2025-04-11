@@ -40,6 +40,11 @@ constexpr double mitoreP = 0.0240;
 constexpr double kaisinnP = 500;
 constexpr double ShieldGuardP = 1.0;
 constexpr int baseHP = 93;
+#elif defined(lv16_sp22_tamahagane_atk123_def86)
+constexpr double mitoreP = 0.0240;
+constexpr double kaisinnP = 500;
+constexpr double ShieldGuardP = 1.0;
+constexpr int baseHP = 93;
 #endif
 constexpr double DragonSlashKaisinnP = kaisinnP / 2;
 
@@ -869,7 +874,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //0x02157f58 偽回避
             baseDamage = FUN_021e8458_typeD(position, 5, 22);
             tmp = baseDamage * players[defender].defence;
-#if defined(lv16_sp22_hagane_atk106_def86)
+#if defined(lv16_sp22_hagane_atk106_def86) || defined(lv16_sp22_tamahagane_atk123_def86)
             tmp *= 0.8;
 #endif
             baseDamage = static_cast<int>(floor(tmp));

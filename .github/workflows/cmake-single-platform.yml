@@ -34,6 +34,8 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target zbe_multi_lv13_sp13_hagane_atk101
     - name: Build zbe_multi_lv16_sp22_hagane_atk106_def93
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target zbe_multi_lv16_sp22_hagane_atk106_def93
+    - name: Build zbe_multi_lv16_sp22_tamahagane_atk123_def86
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target zbe_multi_lv16_sp22_tamahagane_atk123_def86
 
     - name: echo SHA256 zbe_multi_lv16_sp22_hagane_atk106_def86
       run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_hagane_atk106_def86.exe"
@@ -41,6 +43,8 @@ jobs:
       run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv13_sp13_hagane_atk101.exe"
     - name: echo SHA256 zbe_multi_lv16_sp22_hagane_atk106_def93
       run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_hagane_atk106_def93.exe"
+    - name: echo SHA256 zbe_multi_lv16_sp22_tamahagane_atk123_def86
+      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_tamahagane_atk123_def86.exe"
 
     - name: Copy License file
       run: Copy-Item -Path "${{github.workspace}}/LICENSE" -Destination "${{github.workspace}}/build/${{env.BUILD_TYPE}}/"
@@ -60,8 +64,10 @@ jobs:
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_hagane_atk106_def86.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv13_sp13_hagane_atk101.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_hagane_atk106_def93.exe
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_tamahagane_atk123_def86.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_hagane_atk106_def86.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv13_sp13_hagane_atk101.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_hagane_atk106_def93.pdb
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/zbe_multi_lv16_sp22_tamahagane_atk123_def86.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/LICENSE
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/image/**

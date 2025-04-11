@@ -579,7 +579,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 #endif
 
 
-#if defined(lv13_sp13_hagane_atk101) || defined(lv16_sp22_hagane_atk106) || defined(lv16_sp22_hagane_atk106_def86)
+#if defined(lv13_sp13_hagane_atk101) || defined(lv16_sp22_hagane_atk106) || defined(lv16_sp22_hagane_atk106_def86) || defined(lv16_sp22_tamahagane_atk123_def86)
 
         if (AllyPlayerPre.mp >= 11 && !Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
             action = BattleEmulator::WOOSH_ALLY;
