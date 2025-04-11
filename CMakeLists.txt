@@ -84,19 +84,19 @@ if(MINGW)
 elseif(MSVC)
     set_property(TARGET zbe_multi_lv19_tahamane_atk130 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET zbe_multi_lv19_hagane_atk113 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET lv13_sp13_hagane_atk101 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET zbe_multi_lv13_sp13_hagane_atk101 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET zbe_multi_lv16_sp22_hagane_atk106_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET zbe_multi_lv16_sp22_hagane_atk106_def86 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     target_compile_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /W4 /MP)
     target_compile_options(zbe_multi_lv19_hagane_atk113 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
-    target_compile_options(lv13_sp13_hagane_atk101 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
+    target_compile_options(zbe_multi_lv13_sp13_hagane_atk101 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(zbe_multi_lv16_sp22_hagane_atk106_def93 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(zbe_multi_lv16_sp22_hagane_atk106_def86 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
 
     target_link_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(zbe_multi_lv19_hagane_atk113 PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(lv13_sp13_hagane_atk101 PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(zbe_multi_lv13_sp13_hagane_atk101 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(zbe_multi_lv16_sp22_hagane_atk106_def93 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(zbe_multi_lv16_sp22_hagane_atk106_def86 PRIVATE /INCREMENTAL:NO /DEBUG)
 
