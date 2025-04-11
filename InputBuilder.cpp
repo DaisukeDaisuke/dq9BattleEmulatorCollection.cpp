@@ -6,44 +6,22 @@ void InputBuilder::push(int damage, const char prefix) {
     InputEntry entry;
     entry.damage = damage;
 
-    if (damage == -5) {
-        entry.candidates.push_back(BattleEmulator::SPECIAL_MEDICINE);
-    }
-
     if (damage == -2) {
-        entry.candidates.push_back(BattleEmulator::DECELERATLE);
-    }
-
-    if (damage == -3) {
-        entry.candidates.push_back(BattleEmulator::KASAP);
-    }
-
-    if (damage == -4) {
-        entry.candidates.push_back(BattleEmulator::SWEET_BREATH);
-    }
-
-    if (damage == 0)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-
-    if (damage >= 8 && damage <= 12)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-    if (damage >= 19 && damage < 24)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-    if (damage == 24) {
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
+        entry.candidates.push_back(BattleEmulator::DRAIN_MAGIC);
+    }else if (damage == -3) {
+        entry.candidates.push_back(BattleEmulator::BUFF_ENEMY);
+    }else if (prefix == 'h') {
+        entry.candidates.push_back(BattleEmulator::SPECIAL_MEDICINE);
+    }else if (prefix == 'a') {
         entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
+    }else if (prefix == 't') {
+        entry.candidates.push_back(-6); //攻撃フォローアップ
+    }else if (prefix == 'n') {
+        entry.candidates.push_back(BattleEmulator::UNKNOWN_ACTION); //不明
     }
-    if (damage > 24 && damage < 30)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-    if (damage == 30) {
-        entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-        entry.candidates.push_back(BattleEmulator::MIRACLE_SLASH);
-    }
-    if (damage > 30 && damage <= 37)
-        entry.candidates.push_back(BattleEmulator::MIRACLE_SLASH);
 
     if (entry.candidates.empty()) {
-        std::cerr << "WARNING: A damage value of 0 " << damage << " has no applicable range\n";
+        std::cerr << "WARNING: A damage value of " << damage << " has no applicable range\n";
     }
     inputs.push_back(entry);
 }
@@ -76,8 +54,11 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
     const InputEntry &entry = inputs[index];
     for (int candidate: entry.candidates) {
         ResultStructure next = current; // 既にAII_damageが追加済み
-        if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::KASAP || candidate ==
-            BattleEmulator::DECELERATLE || candidate == BattleEmulator::SWEET_BREATH) {
+        if (candidate == -6) {
+
+        }else
+        if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::DRAIN_MAGIC || candidate ==
+            BattleEmulator::BUFF_ENEMY || candidate == BattleEmulator::UNKNOWN_ACTION) {
             next.Edamage[next.EdamageCounter++] = entry.damage;
         } else {
             next.Aactions[next.AactionsCounter++] = candidate;

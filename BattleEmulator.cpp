@@ -452,31 +452,27 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     } else if (mode != -1 && mode != -2) {
                         if (
                             c == ATTACK_ENEMY ||
-                            c == POISON_ATTACK ||
-                            c == KASAP ||
-                            c == DECELERATLE ||
-                            c == SWEET_BREATH
+                            c == DRAIN_MAGIC ||
+                            c == BUFF_ENEMY ||
+                            c == LIGHTNING_DAMA ||
+                            c == WOOSH ||
+                            c == WOOSH_CRITICAL
                         ) {
                             if (damages[exCounter] == -1) {
                                 return true;
                             }
 
-                            if (damages[exCounter] == -3) {
-                                if (c != KASAP) {
+                            if (damages[exCounter] == -2) {
+                                if (c != DRAIN_MAGIC) {
                                     return false;
                                 }
                                 exCounter++;
-                            } else if (damages[exCounter] == -2) {
-                                if (c != DECELERATLE) {
+                            } else if (damages[exCounter] == -3) {
+                                if (c != BUFF_ENEMY) {
                                     return false;
                                 }
                                 exCounter++;
-                            } else if (damages[exCounter] == -4) {
-                                if (c != SWEET_BREATH) {
-                                    return false;
-                                }
-                                exCounter++;
-                            } else if (damages[exCounter++] != basedamage) {
+                            }else if (damages[exCounter++] != basedamage) {
                                 return false;
                             }
                         }
@@ -588,7 +584,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 if (damages[exCounter] == -1) {
                                     return true;
                                 }
-                                //int need = ;
+                                if (damages[exCounter++] != -6) {
+                                    return false;
+                                }
                                 if (damages[exCounter++] != basedamage) {
                                     return false;
                                 }

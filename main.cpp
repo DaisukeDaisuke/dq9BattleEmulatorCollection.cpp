@@ -64,7 +64,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v5.0.1";
+    const char *version = "v6.0.1";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -397,7 +397,7 @@ namespace {
     void help(const char *program_name) {
         std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
         std::cout << "tables" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::KASAP) << R"(:   "r" or "k")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::BUFF) << R"(:   "s" or "b")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::SPECIAL_MEDICINE) << R"(:   "h")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
@@ -411,23 +411,22 @@ namespace {
         // 4番目以降の引数を `push()` に入れる
         for (int i = 4; i < argc; ++i) {
             if (isMatchStrWithTrim(argv[i], "h")) {
-                builder.push(-5, 'n');
+                builder.push(-5, 'h');
                 continue;
             }
-            if (isMatchStrWithTrim(argv[i], "a") || isMatchStrWithTrim(argv[i], "s")) {
-                builder.push(-4, 'n');
-                continue;
-            }
-            if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "d")) {
+            if (isMatchStrWithTrim(argv[i], "m")) {
                 builder.push(-2, 'n');
                 continue;
             }
-            if (isMatchStrWithTrim(argv[i], "r") || isMatchStrWithTrim(argv[i], "k")) {
+            if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "s")) {
                 builder.push(-3, 'n');
                 continue;
             }
             auto [prefix, damage] = toABCint(argv[i]);
             if (damage >= 0) {
+                if (prefix == 'a') {
+                    builder.push(-6, 't'); //攻撃フォローアップ
+                }
                 builder.push(damage, prefix);
             } else {
                 std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
@@ -821,13 +820,13 @@ namespace {
         // 通常の整数として扱う（先頭が数字の場合）
         try {
             int number = std::stoi(str);
-            return std::make_pair('\0', number);
+            return std::make_pair('n', number);
         } catch (const std::invalid_argument &e) {
             std::cerr << "Invalid argument: " << e.what() << std::endl;
-            return std::make_pair('\0', -1);
+            return std::make_pair('n', -1);
         } catch (const std::out_of_range &e) {
             std::cerr << "Out of range: " << e.what() << std::endl;
-            return std::make_pair('\0', -1);
+            return std::make_pair('n', -1);
         }
     }
 }
@@ -952,7 +951,7 @@ int main(int argc, char *argv[]) {
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x03719d78;
+    uint64_t seed = 0x043a5afa;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
