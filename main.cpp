@@ -64,7 +64,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v6.0.1";
+    const char *version = "v7.0.1";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -210,6 +210,7 @@ namespace {
                 << std::setw(6) << "ahp"
                 << std::setw(6) << "ehp"
                 << std::setw(6) << "amp"
+                << std::setw(6) << "ini"
                 << std::setw(6) << "Sct" << "\n";
         ss << std::string(90, '-') << "\n"; // 区切り線を出力
     }
@@ -264,6 +265,7 @@ namespace {
                                 << std::setw(6) << ahp2
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
+                                << std::setw(6) << (initiative_tmp == 1 ? "yes" : "")
                                 << std::setw(6) << specialChargeTurn1
                                 << std::setw(11) << "" << "\n";
                     }
@@ -331,6 +333,7 @@ namespace {
                     << std::setw(6) << ahp2
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
+                    << std::setw(6) << (initiative_tmp == 1 ? "yes" : "")
                     << std::setw(6) << specialChargeTurn1
                     << std::setw(11) << "" << "\n";
         }
@@ -373,7 +376,8 @@ namespace {
 #elif defined(OPTIMIZATION_O2_ENABLED)
         std::cout << "dq9 Lleviathan battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Lleviathan battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Lleviathan battle emulator " << version << " (No optimization), Build date: " << buildDate <<
+                ", " << buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #else
         std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
         << ", " << buildTime << std::endl;
@@ -832,7 +836,7 @@ int main(int argc, char *argv[]) {
     //0x305b52f: 25, 25, 50, 53, 57, 50, 25, 50, 53, 50, 25, 50, 25, 27, 50, 58, 50, 25, 50, 25, 56, 58, 53, 58, 25, 57, 53, 25,
     //0x305b52f: 25, 25, 50, 57, 53, 50, 25, 50, 25, 50, 57, 50, 56, 57, 25, 25, 57, 50, 25, 50, 50, 25, 56, 53, 53, 25, 25, 25,
     //0x305b52f: 25, 25, 50, 53, 57, 50, 25, 50, 53, 50, 25, 50, 25, 27, 50, 58, 50, 25, 50, 25, 56, 58, 53, 57, 53, 57, 59, 59,
-    uint64_t time1 = 0x305b52f;
+    uint64_t time1 = 0x3054ea5;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -857,8 +861,9 @@ int main(int argc, char *argv[]) {
 
     Player players1[2];
     //int32_t gene1[350] = {0};
+    //0x3054ea5: 25, 59, 50, 59, 50, 25, 50, 25, 50, 25, 25, 50, 58, 25, 50, 56, 25, 58, 25, 53, 53, 50, 25, 56, 59, 25, 59,
     int32_t gene1[350] = {
-        25, 25, 50, 53, 57, 50, 25, 50, 53, 50, 25, 50, 25, 27, 50, 58, 50, 25, 50, 25, 56, 58, 53, 58, 25, 57, 53, 25,
+        25, 59, 50, 59, 50, 25, 50, 25, 50, 25, 25, 50, 58, 25, 50, 56, 25, 58, 25, 53, 53, 50, 25, 56, 59, 25, 59,
         BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;
@@ -919,9 +924,9 @@ int main(int argc, char *argv[]) {
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x02df3e22;
+    uint64_t seed = 0x03054ea5;
 
-    int actions[350] = {BattleEmulator::ATTACK_ALLY,BattleEmulator::ATTACK_ALLY, -1,};
+    int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
 
     std::cout << performanceLogger.rdbuf() << std::endl;

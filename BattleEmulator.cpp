@@ -304,7 +304,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 827) {
+        if ((*position) == 372) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -399,8 +399,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 } else {
                 attack:
                     c = enemyAction;
+                    (*position)++;
                 }
-                (*position)++;
+
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(c, position, players, 1, 0, NowState);
                 actions[actionsPosition++] = c;
@@ -566,17 +567,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         }
     }
 
-    if
-    (mode
-     !=
-     -
-     1
-     &&
-     mode
-     !=
-     -
-     2
-    ) {
+    if (mode != -1 && mode != -2) {
         return true;
     } else {
         return false;
@@ -948,7 +939,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             Player::reduceHp(players[defender], baseDamage);
 
 #if defined(DEBUG2)
-std::cout << "counter: " << baseDamage << std::endl;
+            std::cout << "counter: " << baseDamage << std::endl;
 #endif
 
             baseDamage = 0;
