@@ -64,7 +64,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v6.0.2";
+    const char *version = "v6.0.3";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -418,12 +418,11 @@ namespace {
     void help(const char *program_name) {
         std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
         std::cout << "tables" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::BUFF) << R"(:   "s" or "b")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SPECIAL_MEDICINE) << R"(:   "h")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::BUFF_ENEMY) << R"(:   "s" or "b")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::DRAIN_MAGIC) << R"(: "m")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::ATTACK_ENEMY) << R"(: "a30")" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
-        // std::cout << "example: " << program_name << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
+        std::cout << "example: " << program_name << " 0 6 2 a31 m 18 9 a31 a34 b 16 25 a23" << std::endl;
         // std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
