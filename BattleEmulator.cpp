@@ -34,6 +34,7 @@ constexpr int kaisinnP = 500;
 constexpr int baseHP = 89;
 #endif
 constexpr int DragonSlashKaisinnP = kaisinnP / 2;
+constexpr int WooshSlashKaisinnP = kaisinnP / 5;
 
 constexpr std::array<int, 9> makeProportionTable3() {
     std::array<int, 9> table{};
@@ -724,7 +725,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case WOOSH_ALLY:
             players[attacker].mp -= 3;
             (*position) += 2;
-            if (lcg::getPercent(position, 0x2710) < DragonSlashKaisinnP) {
+            if (lcg::getPercent(position, 0x2710) < WooshSlashKaisinnP) {
                 kaisinn = true;
             }
             (*position)++; //関係ない 0x021ec6f8
