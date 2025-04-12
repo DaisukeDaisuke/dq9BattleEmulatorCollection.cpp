@@ -605,7 +605,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
             que.push(currentGenome);
         }
-        if (AllyPlayerPre.mp >= 3z && !Bans.is_action_banned(BattleEmulator::DRAGON_SLASH, turns)) {
+        if (AllyPlayerPre.mp >= 3 && !Bans.is_action_banned(BattleEmulator::DRAGON_SLASH, turns)) {
             action = BattleEmulator::DRAGON_SLASH;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
