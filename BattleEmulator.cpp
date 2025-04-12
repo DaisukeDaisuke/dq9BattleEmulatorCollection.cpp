@@ -47,6 +47,7 @@ constexpr double ShieldGuardP = 1.0;
 constexpr int baseHP = 93;
 #endif
 constexpr double DragonSlashKaisinnP = kaisinnP / 2;
+constexpr int WooshSlashKaisinnP = kaisinnP / 5;
 
 void constexpr inline BattleEmulator::resetCombo(uint64_t *NowState) {
     //(*NowState) &= ~(0xFFF00000000);
@@ -765,7 +766,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case WOOSH_ALLY:
             players[attacker].mp -= 3;
             (*position) += 2;
-            if (lcg::getPercent(position, 0x2710) < DragonSlashKaisinnP) {
+            if (lcg::getPercent(position, 0x2710) < WooshSlashKaisinnP) {
                 kaisinn = true;
             }
             (*position)++; //関係ない 0x021ec6f8
@@ -799,7 +800,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             players[attacker].mp -= 3;
             (*position) += 2;
             (*position)++; //関係ない 0x021ec6f8
-            if (lcg::getPercent(position, 0x2710) < DragonSlashKaisinnP) {
+            if (lcg::getPercent(position, 0x2710) < WooshSlashKaisinnP) {
                 kaisinn = true;
             }
             (*position)++; //盾 0x021586fc
