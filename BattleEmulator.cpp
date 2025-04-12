@@ -304,7 +304,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 590) {
+        if ((*position) == 827) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -326,6 +326,13 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         }
 
         auto counter = 0;
+
+        if (players[1].rage) {
+            players[1].rageTurns--;
+            if (players[1].rageTurns <= 0) {
+                players[1].rage = false;
+            }
+        }
 
         int enemyAction = ProcessEnemyRandomAction44(position);
         int32_t actionTable = -1;
@@ -392,12 +399,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 } else {
                 attack:
                     c = enemyAction;
-                }
-                if (players[0].rage) {
-                    players[0].rageTurns--;
-                    if (players[0].rageTurns <= 0) {
-                        players[0].rage = false;
-                    }
                 }
                 (*position)++;
                 //--------end_FUN_02158dfc-------
@@ -946,6 +947,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         //}
             Player::reduceHp(players[defender], baseDamage);
 
+#if defined(DEBUG2)
+std::cout << "counter: " << baseDamage << std::endl;
+#endif
+
             baseDamage = 0;
             break;
         case BattleEmulator::ACROBATSTAR_KAIHI:
@@ -980,7 +985,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case BattleEmulator::POISON_ATTACK:
         case BattleEmulator::MASSIVE_SWIPE:
             (*position) += 2;
-            if (players[0].acrobaticStar && (Id & 0xffff) == MASSIVE_SWIPE) {
+            if (players[0].acrobaticStar && (Id & 0xffff) == MASSIVE_SWIPE && !players[1].rage) {
                 //アクロバットスターで、カウンターできない攻撃を回避したときは、めちゃくちゃ特殊な消費になる？？？
                 /*
                 --------start_FUN_02158dfc-------
@@ -1013,7 +1018,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     }
                     return 0;
                 }
-            } else if (players[0].acrobaticStar) {
+            } else if (players[0].acrobaticStar && (Id & 0xffff) != MASSIVE_SWIPE) {
                 percent_tmp = lcg::getPercent(position, 100);
                 if (percent_tmp >= 0 && percent_tmp <= 49) {
                     return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender, NowState);
@@ -1194,11 +1199,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = static_cast<int>(floor(tmp));
 
-            if (players[attacker].acrobaticStar && kaisinn) {
-                //nope
-            } else {
-                ProcessRage(position, baseDamage, players, kaisinn);
-            }
+            ProcessRage(position, baseDamage, players, kaisinn);
             (*position)++; //目を覚ました
             (*position)++; //不明
             if (kaisinn) {
@@ -1376,7 +1377,7 @@ void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players,
     auto percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
     if (percent1 < 0.5) {
         double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
-        if (percent >= 0.5) {
+        if (percent > 0.5) {
             if (!players[1].rage) {
                 (*position)++;
                 players[1].rage = true;
@@ -1386,7 +1387,7 @@ void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players,
             }
         } else {
             if (percent1 < 0.25) {
-                if (percent >= 0.25) {
+                if (percent > 0.25) {
                     if (!players[1].rage) {
                         (*position)++;
                         (*position)++;
