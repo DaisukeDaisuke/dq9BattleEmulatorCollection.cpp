@@ -387,9 +387,9 @@ namespace {
     void help(const char *program_name) {
         std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
         std::cout << "tables" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::DRAIN_MAGIC) << R"(:   "m")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SPECIAL_MEDICINE) << R"(:   "h")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::BUFF_ENEMY) << R"(: "s" or "b")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::ATTACK_ENEMY) << R"(:   "10")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::MASSIVE_SWIPE) << R"(:   "n30")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::DISRUPTIVE_WAVE) << R"(: "t30")" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
         std::cout << "example: " << program_name << " 0 6 2 a31 m 18 9 a31 a34 b 16 25 a23" << std::endl;
         // std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
@@ -403,18 +403,19 @@ namespace {
                 builder.push(-5, 'h');
                 continue;
             }
-            if (isMatchStrWithTrim(argv[i], "m")) {
-                builder.push(-2, 'n');
-                continue;
-            }
-            if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "s")) {
-                builder.push(-3, 'n');
-                continue;
-            }
             auto [prefix, damage] = toABCint(argv[i]);
             if (damage >= 0) {
                 if (prefix == 'a') {
                     builder.push(-6, 't'); //攻撃フォローアップ
+                }
+                if (prefix == 't') {
+                    builder.push(-7, 'w'); //つなみフォローアップ
+                }
+                if (prefix == 'n') {
+                    builder.push(-8, 'm'); //なぎはらいフォローアップ
+                }
+                if (prefix == '\0') {
+                    builder.push(-9, 'j'); //敵攻撃フォローアップ
                 }
                 builder.push(damage, prefix);
             } else {
@@ -809,13 +810,13 @@ namespace {
         // 通常の整数として扱う（先頭が数字の場合）
         try {
             int number = std::stoi(str);
-            return std::make_pair('n', number);
+            return std::make_pair('\0', number);
         } catch (const std::invalid_argument &e) {
             std::cerr << "Invalid argument: " << e.what() << std::endl;
-            return std::make_pair('n', -1);
+            return std::make_pair('\0', -1);
         } catch (const std::out_of_range &e) {
             std::cerr << "Out of range: " << e.what() << std::endl;
-            return std::make_pair('n', -1);
+            return std::make_pair('\0', -1);
         }
     }
 }
@@ -833,10 +834,9 @@ int main(int argc, char *argv[]) {
 
 
 #if defined(DEBUG2)
-    //0x305b52f: 25, 25, 50, 53, 57, 50, 25, 50, 53, 50, 25, 50, 25, 27, 50, 58, 50, 25, 50, 25, 56, 58, 53, 58, 25, 57, 53, 25,
-    //0x305b52f: 25, 25, 50, 57, 53, 50, 25, 50, 25, 50, 57, 50, 56, 57, 25, 25, 57, 50, 25, 50, 50, 25, 56, 53, 53, 25, 25, 25,
-    //0x305b52f: 25, 25, 50, 53, 57, 50, 25, 50, 53, 50, 25, 50, 25, 27, 50, 58, 50, 25, 50, 25, 56, 58, 53, 57, 53, 57, 59, 59,
-    uint64_t time1 = 0x3054ea5;
+    //0x3054ea5: 25, 57, 57, 50, 57, 50, 53, 50, 25, 25, 50, 25, 53, 50, 56, 25, 57, 25, 25, 50, 25, 53, 50, 53, 27, 56, 27, 53, 53, 25,
+    //0x10ee370b: 25, 25, 50, 25, 50, 25, 50, 25, 50, 25, 57, 25, 50, 56, 57, 25, 25, 25, 25, 50, 27, 27, 50, 27, 50, 25, 59, 56, 25, 25, 57,
+    uint64_t time1 = 0x10ee370b;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -863,7 +863,7 @@ int main(int argc, char *argv[]) {
     //int32_t gene1[350] = {0};
     //0x3054ea5: 25, 59, 50, 59, 50, 25, 50, 25, 50, 25, 25, 50, 58, 25, 50, 56, 25, 58, 25, 53, 53, 50, 25, 56, 59, 25, 59,
     int32_t gene1[350] = {
-        25, 59, 50, 59, 50, 25, 50, 25, 50, 25, 25, 50, 58, 25, 50, 56, 25, 58, 25, 53, 53, 50, 25, 56, 59, 25, 59,
+        25, 25, 50, 25, 50, 25, 50, 25, 50, 25, 57, 25, 50, 56, 57, 25, 25, 25, 25, 50, 27, 27, 50, 27, 50, 25, 59, 56, 25, 25, 57,
         BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;
@@ -924,7 +924,7 @@ int main(int argc, char *argv[]) {
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x03054ea5;
+    uint64_t seed = 0x02552456;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);

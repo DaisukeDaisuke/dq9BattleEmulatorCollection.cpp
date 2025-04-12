@@ -16,7 +16,13 @@ void InputBuilder::push(int damage, const char prefix) {
         entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
     }else if (prefix == 't') {
         entry.candidates.push_back(-6); //攻撃フォローアップ
-    }else if (prefix == 'n') {
+    }else if (prefix == 'w') {
+        entry.candidates.push_back(-7);
+    }else if (prefix == 'm') {
+        entry.candidates.push_back(-8);
+    }else if (prefix == 'j') {
+        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY); //不明
+    }else if (prefix == '\0') {
         entry.candidates.push_back(BattleEmulator::UNKNOWN_ACTION); //不明
     }
 
@@ -54,7 +60,7 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
     const InputEntry &entry = inputs[index];
     for (int candidate: entry.candidates) {
         ResultStructure next = current; // 既にAII_damageが追加済み
-        if (candidate == -6) {
+        if (candidate <= -6) {
 
         }else
         if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::DRAIN_MAGIC || candidate ==

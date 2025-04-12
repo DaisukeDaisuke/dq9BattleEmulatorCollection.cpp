@@ -304,7 +304,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 372) {
+        if ((*position) == 349) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -414,28 +414,38 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 } else if (mode != -1 && mode != -2) {
                     if (
                         c == ATTACK_ENEMY ||
-                        c == DRAIN_MAGIC ||
-                        c == BUFF_ENEMY ||
-                        c == LIGHTNING_DAMA ||
-                        c == WOOSH ||
-                        c == WOOSH_CRITICAL
+                        c == TIDAL_WAVE ||
+                        c == MASSIVE_SWIPE
                     ) {
                         if (damages[exCounter] == -1) {
                             return true;
                         }
 
-                        if (damages[exCounter] == -2) {
-                            if (c != DRAIN_MAGIC) {
+                        if (damages[exCounter] == -7) {
+                            if (c != TIDAL_WAVE) {
                                 return false;
                             }
                             exCounter++;
-                        } else if (damages[exCounter] == -3) {
-                            if (c != BUFF_ENEMY) {
+                            if (damages[exCounter++] != basedamage) {
+                                return false;
+                            }
+                        } else if (damages[exCounter] == -8) {
+                            if (c != MASSIVE_SWIPE) {
                                 return false;
                             }
                             exCounter++;
-                        } else if (damages[exCounter++] != basedamage) {
-                            return false;
+                            if (damages[exCounter++] != basedamage) {
+                                return false;
+                            }
+                            exCounter++;
+                        } else {
+                            if (c != ATTACK_ENEMY) {
+                                return false;
+                            }
+                            exCounter++;
+                            if (damages[exCounter++] != basedamage) {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -1009,12 +1019,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     }
                     return 0;
                 }
-            } else if (players[0].acrobaticStar && (Id & 0xffff) != MASSIVE_SWIPE) {
+            } else if (players[0].acrobaticStar) {
                 percent_tmp = lcg::getPercent(position, 100);
                 if (percent_tmp >= 0 && percent_tmp <= 49) {
                     return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender, NowState);
                 }
-                if (percent_tmp >= 50 && percent_tmp < 75) {
+                if (percent_tmp >= 50 && percent_tmp < 75 && (Id & 0xffff) != MASSIVE_SWIPE) {
                     return callAttackFun(COUNTER, position, players, defender, attacker, NowState);
                 }
             } else {
@@ -1175,7 +1185,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (kaisinn) {
                 //0x020759ec
                 if ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST || (Id & 0xffff) ==
-                    BattleEmulator::MIRACLE_SLASH) {
+                    BattleEmulator::MIRACLE_SLASH || (Id & 0xffff) == DRAGON_SLASH) {
                     tmp *= lcg::floatRand(position, 1.5, 2.0);
                 } else {
                     tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
