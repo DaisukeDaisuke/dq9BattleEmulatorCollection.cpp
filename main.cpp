@@ -64,7 +64,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v7.0.2";
+    const char *version = "v7.0.3";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -73,7 +73,7 @@ namespace {
     InputBuilder builder;
 
     const char repoURL[] =
-            u8"Hello Analyzer!, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/zilyadama !branch: zilyadama";
+            u8"Hello Analyzer!, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/nusisama1_v2 !branch: nusisama1_v2";
     const char explanation1[] =
             u8"This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
 
