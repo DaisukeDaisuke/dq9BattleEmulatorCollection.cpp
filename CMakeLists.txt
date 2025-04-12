@@ -54,16 +54,9 @@ set(SOURCES
         ResultStructure.h
 )
 
-# シングルスレッド版（multithreading = OFF）
-add_executable(zbe_multi_lv19_tahamane_atk130 ${SOURCES})
-target_compile_definitions(zbe_multi_lv19_tahamane_atk130 PRIVATE MULTITHREADING TAMAHANE)
 
-# マルチスレッド版（multithreading = ON）
-add_executable(zbe_multi_lv19_hagane_atk113 ${SOURCES})
-target_compile_definitions(zbe_multi_lv19_hagane_atk113 PRIVATE MULTITHREADING HAGANE)
-
-add_executable(zbe_multi_lv16_sp22_tamahagane_atk123_def86 ${SOURCES})
-target_compile_definitions(zbe_multi_lv16_sp22_tamahagane_atk123_def86 PRIVATE MULTITHREADING lv16_sp22_tamahagane_atk123_def86)
+add_executable(nbe_multi_lv17_sp22_tamahane_atk125_def93 ${SOURCES})
+target_compile_definitions(nbe_multi_lv17_sp22_tamahane_atk125_def93 PRIVATE MULTITHREADING lv17_sp22_tamahane_atk125_def93)
 
 add_executable(zbe_multi_lv13_sp13_hagane_atk101 ${SOURCES})
 target_compile_definitions(zbe_multi_lv13_sp13_hagane_atk101 PRIVATE MULTITHREADING lv13_sp13_hagane_atk101)
@@ -81,27 +74,21 @@ string(TIMESTAMP BUILD_TIME "%H:%M:%S" UTC)
 add_definitions(-DBUILD_DATE="${BUILD_DATE}" -DBUILD_TIME="${BUILD_TIME}")
 
 if(MINGW)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections") #-fno-inline-small-functions
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections") #-fno-inline-small-functions
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections")
 elseif(MSVC)
-    set_property(TARGET zbe_multi_lv19_tahamane_atk130 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET zbe_multi_lv19_hagane_atk113 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET zbe_multi_lv13_sp13_hagane_atk101 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET nbe_multi_lv17_sp22_tamahane_atk125_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET zbe_multi_lv16_sp22_hagane_atk106_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET zbe_multi_lv16_sp22_hagane_atk106_def86 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set_property(TARGET zbe_multi_lv16_sp22_tamahagane_atk123_def86 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-    target_compile_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /W4 /MP)
-    target_compile_options(zbe_multi_lv19_hagane_atk113 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
-    target_compile_options(zbe_multi_lv13_sp13_hagane_atk101 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
+    target_compile_options(nbe_multi_lv17_sp22_tamahane_atk125_def93 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(zbe_multi_lv16_sp22_hagane_atk106_def93 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(zbe_multi_lv16_sp22_hagane_atk106_def86 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(zbe_multi_lv16_sp22_tamahagane_atk123_def86 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
 
-    target_link_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(zbe_multi_lv19_hagane_atk113 PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(zbe_multi_lv13_sp13_hagane_atk101 PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(nbe_multi_lv17_sp22_tamahane_atk125_def93 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(zbe_multi_lv16_sp22_hagane_atk106_def93 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(zbe_multi_lv16_sp22_hagane_atk106_def86 PRIVATE /INCREMENTAL:NO /DEBUG)
     target_link_options(zbe_multi_lv16_sp22_tamahagane_atk123_def86 PRIVATE /INCREMENTAL:NO /DEBUG)

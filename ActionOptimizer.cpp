@@ -517,7 +517,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 1 + static_cast<int>(rng() % 14);
+                currentGenome.fitness = baseFitness + 20 + static_cast<int>(rng() % 30);
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -541,10 +541,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-#if defined(HAGANE)
-
-#if defined(TAMAHANE)
-
+#if defined(lv17_sp22_tamahane_atk125_def93)
 
         if (CrackleEnable && AllyPlayerPre.mp >= 8 && !Bans.is_action_banned(BattleEmulator::CRACKLE, turns)) {
             action = BattleEmulator::CRACKLE;
@@ -576,12 +573,10 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 #endif
-#endif
 
+#if defined(lv17_sp22_tamahane_atk125_def93)
 
-#if defined(lv13_sp13_hagane_atk101) || defined(lv16_sp22_hagane_atk106) || defined(lv16_sp22_hagane_atk106_def86) || defined(lv16_sp22_tamahagane_atk123_def86)
-
-        if (AllyPlayerPre.mp >= 11 && !Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
+        if (AllyPlayerPre.mp >= 8 && !Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
             action = BattleEmulator::WOOSH_ALLY;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
@@ -610,7 +605,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
             que.push(currentGenome);
         }
-        if (AllyPlayerPre.mp >= 8 && !Bans.is_action_banned(BattleEmulator::DRAGON_SLASH, turns)) {
+        if (AllyPlayerPre.mp >= 3z && !Bans.is_action_banned(BattleEmulator::DRAGON_SLASH, turns)) {
             action = BattleEmulator::DRAGON_SLASH;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に

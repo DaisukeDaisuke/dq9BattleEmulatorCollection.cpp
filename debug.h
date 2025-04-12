@@ -26,7 +26,7 @@
 #define DEBUG_COUT1(x)
 #endif
 
-//#define DEBUG2 1
+#define DEBUG2 1
 
 #if defined(DEBUG2)
 

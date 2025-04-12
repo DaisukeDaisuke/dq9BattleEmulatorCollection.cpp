@@ -113,13 +113,13 @@ namespace {
 #elif defined(TAMAHANE)
 
 
-#elif defined(lv13_sp13_hagane_atk101)
+#elif defined(lv17_sp22_tamahane_atk125_def93)
 
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
-            84, 84.0, 101, 101, 89, 89, 55, 55, 37, 29, // 最初のメンバー
-            29, false, false, 0, false, 0, -1,
+            98, 98.0, 125, 125, 93, 93, 65, 65, 38, 34, // 最初のメンバー
+            34, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
@@ -127,7 +127,7 @@ namespace {
 
         // プレイヤー2
         {
-            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
+            1256, 1256.0, 110, 110, 90, 90, 36, 36, 0, 255, // 最初のメンバー
             255, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
@@ -205,21 +205,13 @@ namespace {
                 << std::setw(18) << "sp"
                 << std::setw(18) << "aAct"
                 << std::setw(18) << "eAct1"
-                << std::setw(18) << "eAct2"
                 << std::setw(6) << "aD"
                 << std::setw(6) << "eD1"
-                << std::setw(6) << "eD2"
                 << std::setw(6) << "ahp"
                 << std::setw(6) << "ehp"
                 << std::setw(6) << "amp"
-
-                << std::setw(6) << "ini"
-                << std::setw(6) << "Sle"
-                << std::setw(6) << "DET"
-                << std::setw(6) << "POT"
-                << std::setw(6) << "BOT"
                 << std::setw(6) << "Sct" << "\n";
-        ss << std::string(153, '-') << "\n"; // 区切り線を出力
+        ss << std::string(90, '-') << "\n"; // 区切り線を出力
     }
 
     std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns);
@@ -238,7 +230,6 @@ namespace {
         for (int i = 0; i < result.position; ++i) {
             auto action = result.actions[i];
             auto damage = result.damages[i];
-            auto DEFTurn = result.BuffTurnss[i];
             auto turn = result.turns[i];
             auto initiative = result.initiative[i];
             auto ehp1 = result.ehp[i];
@@ -246,8 +237,6 @@ namespace {
             auto isEnemy = result.isEnemy[i];
             auto state = result.state[i] & 0xf;
             auto specialChargeTurn = result.scTurn[i];
-            auto poisonTurn = result.PoisonTurns[i];
-            auto SpeedTurn = result.SpeedTurn[i];
             int amp = -1;
             if (i >= 1) {
                 amp = result.amp[i - 1];
@@ -270,18 +259,11 @@ namespace {
                                 << std::setw(18) << sp
                                 << std::setw(18) << aAction
                                 << std::setw(18) << eAction[0]
-                                << std::setw(18) << eAction[1]
                                 << std::setw(6) << aDamage
                                 << std::setw(6) << eDamage[0]
-                                << std::setw(6) << eDamage[1]
                                 << std::setw(6) << ahp2
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
-                                << std::setw(6) << (initiative_tmp ? "yes" : "")
-                                << std::setw(6) << ((aAction == "Sleeping" || aAction == "Cure Sleeping") ? "yes" : "")
-                                << std::setw(6) << DEFTurn1
-                                << std::setw(6) << poisonTurn1
-                                << std::setw(6) << SpeedTurn1
                                 << std::setw(6) << specialChargeTurn1
                                 << std::setw(11) << "" << "\n";
                     }
@@ -316,16 +298,6 @@ namespace {
                 amp2 = std::to_string(amp);
                 aAction = BattleEmulator::getActionName(action);
                 aDamage = damage;
-                if (DEFTurn >= 0) {
-                    DEFTurn1 = std::to_string(DEFTurn);
-                }
-                if (poisonTurn >= 0) {
-                    poisonTurn1 = std::to_string(poisonTurn);
-                }
-
-                if (SpeedTurn >= 0) {
-                    SpeedTurn1 = std::to_string(SpeedTurn);
-                }
                 if (specialChargeTurn > 0) {
                     specialChargeTurn1 = std::to_string(specialChargeTurn);
                 }
@@ -354,18 +326,11 @@ namespace {
                     << std::setw(18) << sp
                     << std::setw(18) << aAction
                     << std::setw(18) << eAction[0]
-                    << std::setw(18) << eAction[1]
                     << std::setw(6) << aDamage
                     << std::setw(6) << eDamage[0]
-                    << std::setw(6) << eDamage[1]
                     << std::setw(6) << ahp2
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
-                    << std::setw(6) << (initiative_tmp ? "yes" : "")
-                    << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
-                    << std::setw(6) << DEFTurn1
-                    << std::setw(6) << poisonTurn1
-                    << std::setw(6) << SpeedTurn1
                     << std::setw(6) << specialChargeTurn1
                     << std::setw(11) << "" << "\n";
         }
@@ -401,14 +366,14 @@ namespace {
         std::string multiThreading = ", multithreading is disabled";
 #endif
 #if defined(OPTIMIZATION_O3_ENABLED)
-        std::cout << "dq9 Master of Nu'un battle emulator " << version << " (Optimized for O3), Build date: " <<
+        std::cout << "dq9 Lleviathan battle emulator " << version << " (Optimized for O3), Build date: " <<
                 buildDate
                 << ", " <<
                 buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Master of Nu'un battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Lleviathan battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Master of Nu'un battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Lleviathan battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #else
         std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
         << ", " << buildTime << std::endl;
@@ -418,12 +383,11 @@ namespace {
     void help(const char *program_name) {
         std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
         std::cout << "tables" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::BUFF) << R"(:   "s" or "b")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::DRAIN_MAGIC) << R"(:   "m")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::SPECIAL_MEDICINE) << R"(:   "h")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::BUFF_ENEMY) << R"(: "s" or "b")" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
-        // std::cout << "example: " << program_name << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
+        std::cout << "example: " << program_name << " 0 6 2 a31 m 18 9 a31 a34 b 16 25 a23" << std::endl;
         // std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
@@ -882,7 +846,8 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x3719d77;
+    //0x3e98f8c: 25, 25, 50, 53, 50, 25, 50, 27, 50, 25, 56, 25, 53, 25, 25, 25, 50, 25, 25, 50, 27, 50, 50, 25, 56, 53, 25, 53, 25, 53, 25, 25,
+    uint64_t time1 = 0x305b52f;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -907,11 +872,14 @@ int main(int argc, char *argv[]) {
 
     Player players1[2];
     //int32_t gene1[350] = {0};
+    //0x305b52f: 25, 25, 50, 57, 53, 50, 25, 50, 25, 50, 25, 59, 50, 58, 56, 25, 53, 58, 50, 25, 57, 56, 25, 57, 25, 50, 25, 25, 25,
+    //0x305b52f: 25, 25, 50, 25, 27, 50, 57, 50, 25, 56, 50, 59, 25, 58, 50, 25, 56, 25, 25, 25, 50, 57, 56, 25, 25, 25, 53, 57, 59,
     //0x3719d77: 25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
-
+    //0x305b52f: 25, 25, 50, 57, 53, 50, 25, 50, 25, 50, 57, 50, 56, 27, 25, 57, 25, 59, 50, 25, 50, 56, 57, 53, 53, 25, 25,
     //0x2b79118:
+    //0x305b52f: 25, 25, 50, 57, 53, 50, 25, 50, 25, 50, 25, 59, 50, 57, 50, 57, 50, 27, 50, 25, 56, 25, 53, 53, 53, 25, 25, 59, 53,
     int32_t gene1[350] = {
-        25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
+         25, 25, 50, 57, 53, 50, 25, 50, 25, 50, 25, 59, 50, 58, 56, 25, 53, 58, 50, 25, 57, 56, 25, 57, 25, 50, 25, 25, 25,
         BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;
@@ -972,9 +940,9 @@ int main(int argc, char *argv[]) {
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x027f5679;
+    uint64_t seed = 0x0305b52f;
 
-    int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
+    int actions[350] = {BattleEmulator::ATTACK_ALLY,BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
 
     std::cout << performanceLogger.rdbuf() << std::endl;
