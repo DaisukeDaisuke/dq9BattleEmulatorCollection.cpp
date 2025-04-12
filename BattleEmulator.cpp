@@ -1239,7 +1239,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (kaisinn) {
                 //0x020759ec
                 if ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST || (Id & 0xffff) ==
-                    BattleEmulator::MIRACLE_SLASH) {
+                    BattleEmulator::MIRACLE_SLASH || (Id & 0xffff) == DRAGON_SLASH) {
                     tmp *= lcg::floatRand(position, 1.5, 2.0);
                 } else {
                     tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
