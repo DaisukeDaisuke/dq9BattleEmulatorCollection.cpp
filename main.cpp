@@ -418,7 +418,7 @@ namespace {
     void help(const char *program_name) {
         std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
         std::cout << "tables" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::BUFF_ENEMY) << R"(:   "s" or "b")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::BUFF_ENEMY) << R"(: "s" or "b")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::DRAIN_MAGIC) << R"(: "m")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::ATTACK_ENEMY) << R"(: "a30")" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
