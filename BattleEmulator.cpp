@@ -21,12 +21,12 @@ constexpr double mitoreP = 0.0020;
 constexpr double kaisinnP = 500;
 constexpr double ShieldGuardP = 1.0;
 constexpr int baseHP = 98;
-#elif defined(lv13_sp13_hagane_atk101)
+#elif defined(lv17_sp22_hagane_atk108_def93)
 
-constexpr double mitoreP = 0.0240;
-constexpr double kaisinnP = 200;
+constexpr double mitoreP = 0.0020;
+constexpr double kaisinnP = 500;
 constexpr double ShieldGuardP = 1.0;
-constexpr int baseHP = 84;
+constexpr int baseHP = 98;
 #elif defined(lv16_sp22_hagane_atk106)
 
 constexpr double mitoreP = 0.0240;

@@ -541,7 +541,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-#if defined(lv17_sp22_tamahane_atk125_def93)
+#if defined(lv17_sp22_tamahane_atk125_def93) || defined(lv17_sp22_hagane_atk108_def93)
 
         if (CrackleEnable && AllyPlayerPre.mp >= 8 && !Bans.is_action_banned(BattleEmulator::CRACKLE, turns)) {
             action = BattleEmulator::CRACKLE;
@@ -574,7 +574,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
 #endif
 
-#if defined(lv17_sp22_tamahane_atk125_def93)
+#if defined(lv17_sp22_tamahane_atk125_def93) || defined(lv17_sp22_hagane_atk108_def93)
 
         if (AllyPlayerPre.mp >= 8 && !Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
             action = BattleEmulator::WOOSH_ALLY;

@@ -64,7 +64,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v7.0.1";
+    const char *version = "v7.0.2";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -135,13 +135,12 @@ namespace {
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 
-#elif defined(lv16_sp22_hagane_atk106)
-
+#elif defined(lv17_sp22_hagane_atk108_def93)
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
-            93, 93.0, 106, 106, 93, 93, 62, 62, 41, 33, // 最初のメンバー
-            33, false, false, 0, false, 0, -1,
+            98, 98.0, 108, 108, 93, 93, 65, 65, 38, 34, // 最初のメンバー
+            34, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
@@ -149,48 +148,7 @@ namespace {
 
         // プレイヤー2
         {
-            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
-#elif defined(lv16_sp22_hagane_atk106_def86)
-    constexpr Player BasePlayers[2] = {
-        // プレイヤー1
-        {
-            93, 93.0, 106, 106, 86, 86, 62, 62, 41, 33, // 最初のメンバー
-            33, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
-
-#elif defined(lv16_sp22_tamahagane_atk123_def86)
-    constexpr Player BasePlayers[2] = {
-        // プレイヤー1
-        {
-            93, 93.0, 123, 123, 86, 86, 62, 62, 41, 33, // 最初のメンバー
-            33, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
+            1256, 1256.0, 110, 110, 90, 90, 36, 36, 0, 255, // 最初のメンバー
             255, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
@@ -387,11 +345,11 @@ namespace {
     void help(const char *program_name) {
         std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
         std::cout << "tables" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::ATTACK_ENEMY) << R"(:   "10")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::MASSIVE_SWIPE) << R"(:   "n30")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::ATTACK_ENEMY) << R"(: "10")" << std::endl;
+        std::cout << BattleEmulator::getActionName(BattleEmulator::MASSIVE_SWIPE) << R"(: "n30")" << std::endl;
         std::cout << BattleEmulator::getActionName(BattleEmulator::DISRUPTIVE_WAVE) << R"(: "t30")" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
-        std::cout << "example: " << program_name << " 0 6 2 a31 m 18 9 a31 a34 b 16 25 a23" << std::endl;
+        std::cout << "example: " << program_name << " 0 9 17 a42 30 a38 30 h t36 a42 32 h 31" << std::endl;
         // std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
@@ -924,7 +882,7 @@ int main(int argc, char *argv[]) {
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x02552456;
+    uint64_t seed = 0x022fe0f0;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
