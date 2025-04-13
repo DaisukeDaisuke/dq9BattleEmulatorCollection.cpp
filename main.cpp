@@ -434,6 +434,7 @@ namespace {
     void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed, int turns) {
         std::cout << dumpTable(result1, genome.actions, turns) << std::endl;
 
+        std::cout << "ver: "<< version << ", seed: ";
         std::cout << "0x" << std::hex << seed << std::dec << ": ";
 
         for (auto i = 0; i < 100; ++i) {
