@@ -22,6 +22,8 @@ void InputBuilder::push(int damage, const char prefix) {
         entry.candidates.push_back(-8);
     }else if (prefix == 'j') {
         entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY); //不明
+    }else if (prefix == 'n') {
+        entry.candidates.push_back(BattleEmulator::MASSIVE_SWIPE); //不明
     }else if (prefix == '\0') {
         entry.candidates.push_back(BattleEmulator::UNKNOWN_ACTION); //不明
     }
@@ -64,7 +66,7 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
 
         }else
         if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::DRAIN_MAGIC || candidate ==
-            BattleEmulator::BUFF_ENEMY || candidate == BattleEmulator::UNKNOWN_ACTION) {
+            BattleEmulator::BUFF_ENEMY || candidate == BattleEmulator::UNKNOWN_ACTION || candidate == BattleEmulator::MASSIVE_SWIPE) {
             next.Edamage[next.EdamageCounter++] = entry.damage;
         } else {
             next.Aactions[next.AactionsCounter++] = candidate;

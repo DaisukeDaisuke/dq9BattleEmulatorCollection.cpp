@@ -437,7 +437,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             if (damages[exCounter++] != basedamage) {
                                 return false;
                             }
-                            exCounter++;
                         } else {
                             if (c != ATTACK_ENEMY) {
                                 return false;
