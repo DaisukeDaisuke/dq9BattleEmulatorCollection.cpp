@@ -68,7 +68,15 @@ namespace {
 
     std::stringstream performanceLogger = std::stringstream();
 
+#if defined(lv17_sp22_tamahane_atk125_def93)
+
     constexpr int THREAD_COUNT = 4;
+
+#elif defined(lv17_sp22_hagane_atk108_def93)
+
+    constexpr int THREAD_COUNT = 5;
+
+#endif
     // `InputBuilder` インスタンス作成
     InputBuilder builder;
 
@@ -794,7 +802,8 @@ int main(int argc, char *argv[]) {
 #if defined(DEBUG2)
     //0x3054ea5: 25, 57, 57, 50, 57, 50, 53, 50, 25, 25, 50, 25, 53, 50, 56, 25, 57, 25, 25, 50, 25, 53, 50, 53, 27, 56, 27, 53, 53, 25,
     //0x10ee370b: 25, 25, 50, 25, 50, 25, 50, 25, 50, 25, 57, 25, 50, 56, 57, 25, 25, 25, 25, 50, 27, 27, 50, 27, 50, 25, 59, 56, 25, 25, 57,
-    uint64_t time1 = 0x10ee370b;
+    //0x4e9cd27: 25, 25, 50, 25, 50, 25, 50, 57, 50, 27, 27, 50, 25, 50, 57, 56, 53, 25, 27, 50, 25, 25, 50, 25, 56, 53, 53, 53, 25, 53, 53, 59, 25, 59,
+    uint64_t time1 = 0x4e9cd27;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -821,7 +830,7 @@ int main(int argc, char *argv[]) {
     //int32_t gene1[350] = {0};
     //0x3054ea5: 25, 59, 50, 59, 50, 25, 50, 25, 50, 25, 25, 50, 58, 25, 50, 56, 25, 58, 25, 53, 53, 50, 25, 56, 59, 25, 59,
     int32_t gene1[350] = {
-        25, 25, 50, 25, 50, 25, 50, 25, 50, 25, 57, 25, 50, 56, 57, 25, 25, 25, 25, 50, 27, 27, 50, 27, 50, 25, 59, 56, 25, 25, 57,
+        25, 25, 50, 25, 50, 25, 50, 57, 50, 27, 27, 50, 25, 50, 57, 56, 53, 25, 27, 50, 25, 25, 50, 25, 56, 53, 53, 53, 25, 53, 53, 59, 25, 59,
         BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;

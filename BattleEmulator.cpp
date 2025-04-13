@@ -15,6 +15,7 @@
 
 
 thread_local int preHP[3] = {0, 0, 0};
+thread_local bool isFlee = false;
 
 #if defined(lv17_sp22_tamahane_atk125_def93)
 constexpr double mitoreP = 0.0020;
@@ -51,6 +52,7 @@ constexpr double WooshSlashKaisinnP = kaisinnP / 5;
 void constexpr inline BattleEmulator::resetCombo(uint64_t *NowState) {
     //(*NowState) &= ~(0xFFF00000000);
 }
+
 
 double constexpr BattleEmulator::processCombo(int32_t Id, double damage, uint64_t *NowState) {
     // auto previousAttack = ((*NowState) >> 32) & 0xff;
@@ -304,7 +306,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 349) {
+        if ((*position) == 1058) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -362,6 +364,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         } else {
             actionTable = ATTACK_ALLY;
         }
+
+
+        isFlee = actionTable == FLEE_ALLY;
 
 
         //途中で解除してもいいように2回チェックする
@@ -637,6 +642,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     for (int j = 0; j < 2; ++j) {
         preHP[j] = players[j].hp;
     }
+#if defined(DEBUG2)
+    int test = isFlee;
+#endif
     int baseDamage = 0;
     double tmp = 0;
     bool kaisinn = false;
@@ -984,9 +992,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case BattleEmulator::SKY_ATTACK:
         case BattleEmulator::POISON_ATTACK:
         case BattleEmulator::MASSIVE_SWIPE:
+            if ((Id & 0xffff) == MASSIVE_SWIPE) {
+                (*position)++; //会心
+            }
             (*position) += 2;
-            if (players[0].acrobaticStar && (Id & 0xffff) == MASSIVE_SWIPE && !players[1].rage) {
-                //アクロバットスターで、カウンターできない攻撃を回避したときは、めちゃくちゃ特殊な消費になる？？？
+        //0x021ec6f8 アクロバットスター
+            if (players[0].acrobaticStar && (Id & 0xffff) == MASSIVE_SWIPE && isFlee) {
+                //アクロバットスターで、逃げた時だけ特殊な挙動をする
                 /*
                 --------start_FUN_02158dfc-------
                 0x021588ec 0x00000064 454
@@ -1008,7 +1020,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 0x02159d40 0x00000064 464
                 --------end_FUN_021594bc-------
                  */
-                (*position)++; //0x021ec6f8 不明
                 percent_tmp = lcg::getPercent(position, 100); //0x02157f58
                 if (percent_tmp >= 0 && percent_tmp <= 49) {
                     (*position)++; //回避
@@ -1030,8 +1041,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 (*position)++;
             }
 
-
-            (*position)++; //会心
+            if ((Id & 0xffff) != MASSIVE_SWIPE) {
+                (*position)++; //会心
+            }
             if (!players[0].paralysis && !players[0].sleeping) {
                 if (!players[defender].acrobaticStar && lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
