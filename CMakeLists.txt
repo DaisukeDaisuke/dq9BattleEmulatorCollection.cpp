@@ -55,57 +55,21 @@ set(SOURCES
 )
 
 # シングルスレッド版（multithreading = OFF）
-add_executable(zbe_multi_lv19_tahamane_atk130 ${SOURCES})
-target_compile_definitions(zbe_multi_lv19_tahamane_atk130 PRIVATE MULTITHREADING TAMAHANE)
-
-# マルチスレッド版（multithreading = ON）
-add_executable(zbe_multi_lv19_hagane_atk113 ${SOURCES})
-target_compile_definitions(zbe_multi_lv19_hagane_atk113 PRIVATE MULTITHREADING HAGANE)
-
-add_executable(zbe_multi_lv16_sp22_tamahagane_atk123_def86 ${SOURCES})
-target_compile_definitions(zbe_multi_lv16_sp22_tamahagane_atk123_def86 PRIVATE MULTITHREADING lv16_sp22_tamahagane_atk123_def86)
-
-add_executable(zbe_multi_lv13_sp13_hagane_atk101 ${SOURCES})
-target_compile_definitions(zbe_multi_lv13_sp13_hagane_atk101 PRIVATE MULTITHREADING lv13_sp13_hagane_atk101)
-
-add_executable(zbe_multi_lv16_sp22_hagane_atk106_def93 ${SOURCES})
-target_compile_definitions(zbe_multi_lv16_sp22_hagane_atk106_def93 PRIVATE MULTITHREADING lv16_sp22_hagane_atk106)
-
-add_executable(zbe_multi_lv16_sp22_hagane_atk106_def86 ${SOURCES})
-target_compile_definitions(zbe_multi_lv16_sp22_hagane_atk106_def86 PRIVATE MULTITHREADING lv16_sp22_hagane_atk106_def86)
-
-
+add_executable(kbe_multi ${SOURCES})
+target_compile_definitions(kbe_multi PRIVATE MULTITHREADING kbe_multi_Normal)
 
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d" UTC)
 string(TIMESTAMP BUILD_TIME "%H:%M:%S" UTC)
 add_definitions(-DBUILD_DATE="${BUILD_DATE}" -DBUILD_TIME="${BUILD_TIME}")
 
 if(MINGW)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections") #-fno-inline-small-functions
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections") #-fno-inline-small-functions
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections")
 elseif(MSVC)
-    set_property(TARGET zbe_multi_lv19_tahamane_atk130 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET zbe_multi_lv19_hagane_atk113 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET zbe_multi_lv13_sp13_hagane_atk101 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET zbe_multi_lv16_sp22_hagane_atk106_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET zbe_multi_lv16_sp22_hagane_atk106_def86 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET zbe_multi_lv16_sp22_tamahagane_atk123_def86 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
-    target_compile_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /W4 /MP)
-    target_compile_options(zbe_multi_lv19_hagane_atk113 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
-    target_compile_options(zbe_multi_lv13_sp13_hagane_atk101 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
-    target_compile_options(zbe_multi_lv16_sp22_hagane_atk106_def93 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
-    target_compile_options(zbe_multi_lv16_sp22_hagane_atk106_def86 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
-    target_compile_options(zbe_multi_lv16_sp22_tamahagane_atk123_def86 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
-
-    target_link_options(zbe_multi_lv19_tahamane_atk130 PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(zbe_multi_lv19_hagane_atk113 PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(zbe_multi_lv13_sp13_hagane_atk101 PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(zbe_multi_lv16_sp22_hagane_atk106_def93 PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(zbe_multi_lv16_sp22_hagane_atk106_def86 PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(zbe_multi_lv16_sp22_tamahagane_atk123_def86 PRIVATE /INCREMENTAL:NO /DEBUG)
-
+    set_property(TARGET kbe_multi PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    target_compile_options(kbe_multi PRIVATE /W4 /MP)
+    target_link_options(kbe_multi PRIVATE /INCREMENTAL:NO /DEBUG)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 endif()

@@ -64,7 +64,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v6.0.3";
+    const char *version = "v8.0.1";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -87,39 +87,12 @@ namespace {
             u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
     const char explanation4[] = u8"Have fun exploring the artists!";
 
-#if defined(HAGANE)
-
-
+#if defined(kbe_multi_Normal)
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
-            107, 107.0, 113, 113, 100, 100, 72, 72, 46, 38, // 最初のメンバー
-            38, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
-
-#elif defined(TAMAHANE)
-
-
-#elif defined(lv13_sp13_hagane_atk101)
-
-    constexpr Player BasePlayers[2] = {
-        // プレイヤー1
-        {
-            84, 84.0, 101, 101, 89, 89, 55, 55, 37, 29, // 最初のメンバー
-            29, false, false, 0, false, 0, -1,
+            65, 65.0, 51, 51, 61, 61, 40, 40, 29, 22, // 最初のメンバー
+            22, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
@@ -127,70 +100,7 @@ namespace {
 
         // プレイヤー2
         {
-            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
-
-#elif defined(lv16_sp22_hagane_atk106)
-
-    constexpr Player BasePlayers[2] = {
-        // プレイヤー1
-        {
-            93, 93.0, 106, 106, 93, 93, 62, 62, 41, 33, // 最初のメンバー
-            33, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
-#elif defined(lv16_sp22_hagane_atk106_def86)
-    constexpr Player BasePlayers[2] = {
-        // プレイヤー1
-        {
-            93, 93.0, 106, 106, 86, 86, 62, 62, 41, 33, // 最初のメンバー
-            33, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
-
-#elif defined(lv16_sp22_tamahagane_atk123_def86)
-    constexpr Player BasePlayers[2] = {
-        // プレイヤー1
-        {
-            93, 93.0, 123, 123, 86, 86, 62, 62, 41, 33, // 最初のメンバー
-            33, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            796, 796.0, 80, 80, 78, 78, 56, 56, 0, 255, // 最初のメンバー
+            296, 796.0, 53, 53, 50, 50, 45, 45, 0, 255, // 最初のメンバー
             255, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
@@ -212,12 +122,7 @@ namespace {
                 << std::setw(6) << "ahp"
                 << std::setw(6) << "ehp"
                 << std::setw(6) << "amp"
-
                 << std::setw(6) << "ini"
-                << std::setw(6) << "Sle"
-                << std::setw(6) << "DET"
-                << std::setw(6) << "POT"
-                << std::setw(6) << "BOT"
                 << std::setw(6) << "Sct" << "\n";
         ss << std::string(153, '-') << "\n"; // 区切り線を出力
     }
@@ -238,7 +143,6 @@ namespace {
         for (int i = 0; i < result.position; ++i) {
             auto action = result.actions[i];
             auto damage = result.damages[i];
-            auto DEFTurn = result.BuffTurnss[i];
             auto turn = result.turns[i];
             auto initiative = result.initiative[i];
             auto ehp1 = result.ehp[i];
@@ -246,8 +150,6 @@ namespace {
             auto isEnemy = result.isEnemy[i];
             auto state = result.state[i] & 0xf;
             auto specialChargeTurn = result.scTurn[i];
-            auto poisonTurn = result.PoisonTurns[i];
-            auto SpeedTurn = result.SpeedTurn[i];
             int amp = -1;
             if (i >= 1) {
                 amp = result.amp[i - 1];
@@ -278,10 +180,6 @@ namespace {
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
                                 << std::setw(6) << (initiative_tmp ? "yes" : "")
-                                << std::setw(6) << ((aAction == "Sleeping" || aAction == "Cure Sleeping") ? "yes" : "")
-                                << std::setw(6) << DEFTurn1
-                                << std::setw(6) << poisonTurn1
-                                << std::setw(6) << SpeedTurn1
                                 << std::setw(6) << specialChargeTurn1
                                 << std::setw(11) << "" << "\n";
                     }
@@ -316,16 +214,6 @@ namespace {
                 amp2 = std::to_string(amp);
                 aAction = BattleEmulator::getActionName(action);
                 aDamage = damage;
-                if (DEFTurn >= 0) {
-                    DEFTurn1 = std::to_string(DEFTurn);
-                }
-                if (poisonTurn >= 0) {
-                    poisonTurn1 = std::to_string(poisonTurn);
-                }
-
-                if (SpeedTurn >= 0) {
-                    SpeedTurn1 = std::to_string(SpeedTurn);
-                }
                 if (specialChargeTurn > 0) {
                     specialChargeTurn1 = std::to_string(specialChargeTurn);
                 }
@@ -362,10 +250,6 @@ namespace {
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
                     << std::setw(6) << (initiative_tmp ? "yes" : "")
-                    << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
-                    << std::setw(6) << DEFTurn1
-                    << std::setw(6) << poisonTurn1
-                    << std::setw(6) << SpeedTurn1
                     << std::setw(6) << specialChargeTurn1
                     << std::setw(11) << "" << "\n";
         }
@@ -401,14 +285,14 @@ namespace {
         std::string multiThreading = ", multithreading is disabled";
 #endif
 #if defined(OPTIMIZATION_O3_ENABLED)
-        std::cout << "dq9 Master of Nu'un battle emulator " << version << " (Optimized for O3), Build date: " <<
+        std::cout << "dq9 Wight Knight battle emulator " << version << " (Optimized for O3), Build date: " <<
                 buildDate
                 << ", " <<
                 buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Master of Nu'un battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Wight Knight battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Master of Nu'un battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Wight Knight battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #else
         std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
         << ", " << buildTime << std::endl;
@@ -882,7 +766,7 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x3719d77;
+    uint64_t time1 = 0x037428c9;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -906,18 +790,27 @@ int main(int argc, char *argv[]) {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    //int32_t gene1[350] = {0};
+    int32_t gene1[350] = {0};
     //0x3719d77: 25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
 
     //0x2b79118:
-    int32_t gene1[350] = {
-        25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
-        BattleEmulator::ATTACK_ALLY
-    };
+    // int32_t gene1[350] = {
+    //     25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
+    //     BattleEmulator::ATTACK_ALLY
+    // };
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //
-    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::MEDICINAL_HERBS;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::HEAL;
+    gene1[counter++] = BattleEmulator::HEAL;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::DRAGON_SLASH;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
@@ -972,7 +865,7 @@ int main(int argc, char *argv[]) {
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x027f5679;
+    uint64_t seed = 0x037428c9;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);

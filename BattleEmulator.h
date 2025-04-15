@@ -53,7 +53,6 @@ public:
 
     static constexpr int INACTIVE_ENEMY = 21;
     static constexpr int INACTIVE_ALLY = 22;
-    static constexpr int MEDICINAL_HERBS = 23;
     static constexpr int PARALYSIS = 24;
     static constexpr int ATTACK_ALLY = 25;
     static constexpr int HEAL = 26;
@@ -101,6 +100,7 @@ public:
     static constexpr int DRAGON_SLASH = 59; //ドラゴン切り
     static constexpr int ITEM_USE = 60; //ドラゴン切り
     static constexpr int CRACK_ALLY = 61; //ドラゴン切り
+    static constexpr int MEDICINAL_HERBS = 62;
 
 
     //病魔
@@ -118,6 +118,10 @@ public:
     static constexpr int LIGHTNING_DAMA = 75; //稲妻(ジャダーマ)
     static constexpr int WOOSH = 76; //バギ
     static constexpr int WOOSH_CRITICAL = 77; //バギ(暴走)
+    static constexpr int BOLT_CUTTER = 78; //いなずまづき
+    static constexpr int HEAL_ENEMY = 79; //ホイミ(敵)
+    static constexpr int MULTITHRUST_ENEMY = 80; //さみだれづき(敵)
+
 
 
     static void ResetTurnProcessed();
