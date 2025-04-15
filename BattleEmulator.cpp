@@ -12,7 +12,7 @@
 #include "camera.h"
 #include "debug.h"
 #include "BattleResult.h"
-
+#include <array>
 
 thread_local int preHP[3] = {0, 0, 0};
 
@@ -388,27 +388,31 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 } else if (mode != -1 && mode != -2) {
                     if (
                         c == ATTACK_ENEMY ||
-                        c == DRAIN_MAGIC ||
-                        c == BUFF_ENEMY ||
-                        c == LIGHTNING_DAMA ||
-                        c == WOOSH ||
-                        c == WOOSH_CRITICAL
+                        c == MULTITHRUST_ENEMY ||
+                        c == BOLT_CUTTER ||
+                        c == HEAL_ENEMY
                     ) {
                         if (damages[exCounter] == -1) {
                             return true;
                         }
 
-                        if (damages[exCounter] == -2) {
-                            if (c != DRAIN_MAGIC) {
+                       if (damages[exCounter] == -10) {
+                            if (c != MULTITHRUST_ENEMY) {
                                 return false;
                             }
                             exCounter++;
-                        } else if (damages[exCounter] == -3) {
-                            if (c != BUFF_ENEMY) {
+                           if (damages[exCounter++] != basedamage) {
+                               return false;
+                           }
+                        } else if (damages[exCounter] == -12) {
+                            if (c != BOLT_CUTTER) {
                                 return false;
                             }
                             exCounter++;
-                        } else if (damages[exCounter++] != basedamage) {
+                            if (damages[exCounter++] != basedamage) {
+                                return false;
+                            }
+                        }else if (damages[exCounter++] != basedamage) {
                             return false;
                         }
                     }
@@ -558,8 +562,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
     }
 }
 
-double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
-    auto hp = static_cast<double>(baseHp);
+double BattleEmulator::FUN_021dbc04(int baseHp1, double maxHp) {
+    auto hp = static_cast<double>(baseHp1);
     if (hp == 0) {
         return 0;
     }
@@ -571,9 +575,6 @@ const int proportionTable2[9] = {90, 90, 64, 32, 16, 8, 4, 2, 1}; //最後の項
 // const int proportionTable3[9] = {93, 83, 73, 62, 52, 42, 31, 21, 11}; //6ダメージ以下で0% 309 new: 112 103
 // // double proportionTable1[9] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2, 0.1};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
 const double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5}; //一部の敵は特殊テンションテーブルを倍率として使う
-
-#include <array>
-#include <iostream>
 
 
 constexpr std::array<int, 9> makeProportionTable3() {

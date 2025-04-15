@@ -73,7 +73,7 @@ namespace {
     InputBuilder builder;
 
     const char repoURL[] =
-            u8"Hello Analyzer!, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/zilyadama !branch: zilyadama";
+            u8"Hello Analyzer!, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/reokonn !branch: reokonn";
     const char explanation1[] =
             u8"This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
 
@@ -318,19 +318,12 @@ namespace {
                 builder.push(-5, 'h');
                 continue;
             }
-            if (isMatchStrWithTrim(argv[i], "m")) {
-                builder.push(-2, 'n');
-                continue;
-            }
-            if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "s")) {
-                builder.push(-3, 'n');
+            if (isMatchStrWithTrim(argv[i], "d") || isMatchStrWithTrim(argv[i], "b")) {
+                builder.push(-11, 'd');
                 continue;
             }
             auto [prefix, damage] = toABCint(argv[i]);
             if (damage >= 0) {
-                if (prefix == 'a') {
-                    builder.push(-6, 't'); //攻撃フォローアップ
-                }
                 builder.push(damage, prefix);
             } else {
                 std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
