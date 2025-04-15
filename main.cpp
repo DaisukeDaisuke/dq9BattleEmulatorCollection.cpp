@@ -869,7 +869,7 @@ BattleEmulator::ATTACK_ALLY
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x06cc478c;
+    uint64_t seed = 0x046febf1;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
