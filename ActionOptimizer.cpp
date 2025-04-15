@@ -121,7 +121,8 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
                                      int actions[350], int seedOffset) {
     std::mt19937 rng(seed + seedOffset);
-    bool CrackleEnable = (rng() % 2) == 0;
+    bool heal = (rng() % 8);
+    //auto heal = 0;
     std::unique_ptr<int> position = std::make_unique<int>(1);
     std::unique_ptr<uint64_t> nowState = std::make_unique<uint64_t>(0);
     auto counter = 0;
@@ -317,7 +318,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
+                currentGenome.fitness = baseFitness + 7 + static_cast<int>(rng() % 13);
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -341,7 +342,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-        /*if (AllyPlayerPre.mp >= 2 && !Bans.is_action_banned(BattleEmulator::HEAL, turns)) {
+        if (AllyPlayerPre.medicinal_herbs_count == 0 && AllyPlayerPre.mp >= 2 && !Bans.is_action_banned(BattleEmulator::HEAL, turns)) {
             action = BattleEmulator::HEAL;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
@@ -369,9 +370,9 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.EnemyPlayer = CopedPlayers[1];
 
             que.push(currentGenome);
-        }*/
+        }
 
-        if (AllyPlayerPre.mp >= 3 && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
+        if (AllyPlayerPre.mp >= heal && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
             action = BattleEmulator::CRACK_ALLY;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
@@ -431,8 +432,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.AllyPlayer = CopedPlayers[0];
             currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 80) {
-                currentGenome.fitness += 30;
+            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 30) {
+                currentGenome.fitness += 15;
             }
 
             que.push(currentGenome);
@@ -475,7 +476,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 13);
+                currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 6);
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -536,7 +537,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 5 + static_cast<int>(rng() % 10);
+                currentGenome.fitness = baseFitness + 15 + static_cast<int>(rng() % 13);
             }
             currentGenome.actions[turns - 1] = action;
 

@@ -91,7 +91,7 @@ namespace {
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
-            65, 65.0, 51, 51, 61, 61, 40, 40, 29, 22, // 最初のメンバー
+            65, 65.0, 61, 61, 61, 61, 40, 40, 29, 22, // 最初のメンバー
             22, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
@@ -100,7 +100,7 @@ namespace {
 
         // プレイヤー2
         {
-            296, 796.0, 53, 53, 50, 50, 45, 45, 0, 255, // 最初のメンバー
+            296, 296.0, 53, 53, 50, 50, 45, 45, 0, 255, // 最初のメンバー
             255, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
@@ -115,16 +115,16 @@ namespace {
                 << std::setw(18) << "sp"
                 << std::setw(18) << "aAct"
                 << std::setw(18) << "eAct1"
-                << std::setw(18) << "eAct2"
+               // << std::setw(18) << "eAct2"
                 << std::setw(6) << "aD"
                 << std::setw(6) << "eD1"
-                << std::setw(6) << "eD2"
+               // << std::setw(6) << "eD2"
                 << std::setw(6) << "ahp"
                 << std::setw(6) << "ehp"
                 << std::setw(6) << "amp"
                 << std::setw(6) << "ini"
                 << std::setw(6) << "Sct" << "\n";
-        ss << std::string(153, '-') << "\n"; // 区切り線を出力
+        ss << std::string(100, '-') << "\n"; // 区切り線を出力
     }
 
     std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns);
@@ -172,10 +172,10 @@ namespace {
                                 << std::setw(18) << sp
                                 << std::setw(18) << aAction
                                 << std::setw(18) << eAction[0]
-                                << std::setw(18) << eAction[1]
+                                //<< std::setw(18) << eAction[1]
                                 << std::setw(6) << aDamage
                                 << std::setw(6) << eDamage[0]
-                                << std::setw(6) << eDamage[1]
+                                //<< std::setw(6) << eDamage[1]
                                 << std::setw(6) << ahp2
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
@@ -242,10 +242,10 @@ namespace {
                     << std::setw(18) << sp
                     << std::setw(18) << aAction
                     << std::setw(18) << eAction[0]
-                    << std::setw(18) << eAction[1]
+                    //<< std::setw(18) << eAction[1]
                     << std::setw(6) << aDamage
                     << std::setw(6) << eDamage[0]
-                    << std::setw(6) << eDamage[1]
+                    //<< std::setw(6) << eDamage[1]
                     << std::setw(6) << ahp2
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
@@ -766,7 +766,9 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x037428c9;
+    //ver: v8.0.1, atk: 51, def: 61, seed: 0x6cc478c, actions: 25, 59, 59, 61, 61, 62, 59, 62, 59, 61, 27, 61, 62, 25, 62, 25, 59, 62, 59, 27, 62, 59, 62, 25, 25, 59, 62, 61, 26, 56, 61,
+
+    uint64_t time1 = 0x6cc478c;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -790,27 +792,29 @@ int main(int argc, char *argv[]) {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
+    //int32_t gene1[350] = {0};
     //0x3719d77: 25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
+//ver: v8.0.1, atk: 51, def: 61, seed: 0x35ddb6d, actions: 25, 61, 61, 62, 62, 61, 25, 61, 62, 61, 61, 62, 27, 27, 62, 61, 27, 62, 25, 62, 62, 25, 25, 53, 25, 27, 56, 25,
+//ver: v8.0.1, atk: 51, def: 61, seed: 0x6cc478c, actions: 25, 62, 61, 61, 25, 61, 61, 62, 61, 27, 62, 25, 62, 25, 62, 25, 62, 25, 25, 62, 25, 25, 62, 25, 26, 25, 25, 25, 27, 25,
 
     //0x2b79118:
-    // int32_t gene1[350] = {
-    //     25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
-    //     BattleEmulator::ATTACK_ALLY
-    // };
+    int32_t gene1[350] = {
+        25, 59, 59, 61, 61, 62, 59, 62, 59, 61, 27, 61, 62, 25, 62, 25, 59, 62, 59, 27, 62, 59, 62, 25, 25, 59, 62, 61, 26, 56, 61,
+BattleEmulator::ATTACK_ALLY
+    };
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::MEDICINAL_HERBS;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::HEAL;
-    gene1[counter++] = BattleEmulator::HEAL;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::MEDICINAL_HERBS;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::HEAL;
+    // gene1[counter++] = BattleEmulator::HEAL;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::DRAGON_SLASH;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
@@ -865,7 +869,7 @@ int main(int argc, char *argv[]) {
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x037428c9;
+    uint64_t seed = 0x06cc478c;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);

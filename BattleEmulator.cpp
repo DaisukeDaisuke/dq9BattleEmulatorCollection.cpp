@@ -19,12 +19,12 @@ thread_local int preHP[3] = {0, 0, 0};
 #if defined(kbe_multi_Normal)
 
 constexpr double mitoreP = -0.0150;
-constexpr double kaisinnP = 200;
+constexpr double kaisinnP = 100;
 constexpr double ShieldGuardP = 0.5;
 constexpr int baseHP = 65;
 #endif
 constexpr double DragonSlashKaisinnP = kaisinnP / 2;
-constexpr int WooshSlashKaisinnP = kaisinnP / 5;
+constexpr int WooshSlashKaisinnP = 100;
 
 void constexpr inline BattleEmulator::resetCombo(uint64_t *NowState) {
     //(*NowState) &= ~(0xFFF00000000);
@@ -282,7 +282,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 371) {
+        if ((*position) == 241) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -514,7 +514,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             //3ec00000
                         }
                     }
-                } else {
+                } else if (mode == -1) {
                     BattleResult::add(result, action, 0, false, counterJ - 1,
                                       player0_has_initiative, ehp, ahp,
                                       tmpState, players[0].specialChargeTurn, players[0].mp);
@@ -630,7 +630,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //0x021ec6f8
             (*position)++; //0x02158584 会心
             (*position)++; //偽回避 0x02157f58
-            baseDamage = FUN_021e8458_typeD(position, 5.0, 30.0);
+            baseDamage = FUN_021e8458_typeD(position, 5.0, 35.0);
             (*position)++; //0x021e54fc
             break;
         case BattleEmulator::MEDICINAL_HERBS:
@@ -664,6 +664,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                         percent_tmp = lcg::getPercent(position, 100);
                         if (percent_tmp >= 0 && percent_tmp <= 49) {
                             //return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender, NowState);
+                            (*position)++;//会心 0x02158584
+                            (*position)++;//偽回避 0x02157f58
+                            baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+                            baseDamage = 0;
+                            goto jmp1;
                         }
                     } else {
                         (*position)++;
@@ -716,6 +721,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                             players[0].sleepingTurn = -1;
                         }
 
+                        jmp1:
                         //hp0時特殊消費
                         if (preHP[defender] > (totalDamage + baseDamage)) {
                             process7A8(position, baseDamage, players, defender);
@@ -1250,11 +1256,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = static_cast<int>(floor(tmp));
 
-            if (players[attacker].acrobaticStar && kaisinn) {
-                //nope
-            } else {
-                ProcessRage(position, baseDamage, players, kaisinn);
-            }
+            ProcessRage(position, baseDamage, players, kaisinn);
+
             (*position)++; //目を覚ました
             (*position)++; //不明
             if (kaisinn) {
@@ -1429,9 +1432,9 @@ void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players,
     // if (kaisinn) {
     //     return;
     // }
-    auto percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
+    auto percent1 = FUN_021dbc04(players[1].hp - baseDamage, players[1].maxHp);
     if (percent1 < 0.5) {
-        double percent = FUN_021dbc04(preHP[1], players[1].maxHp);
+        double percent = FUN_021dbc04(players[1].hp, players[1].maxHp);
         if (percent >= 0.5) {
             if (!players[1].rage) {
                 (*position)++;
