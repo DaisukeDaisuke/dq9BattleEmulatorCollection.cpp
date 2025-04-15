@@ -230,6 +230,26 @@ inline void BattleEmulator::processTurn() {
 //#endif
 
 
+// C++17以降のinline変数対応も利用可能ですが、ここではシンプルに inline 関数としています。
+inline int check_hp(int max_hp, int curr_hp, int rec, int actRec) {
+    // 実際の回復量で上限に達しているか？
+    if (curr_hp + actRec >= max_hp) {
+        // 回復量を使用した結果も上限に達していれば「成功」と判定
+        // ※ここでは「>=」で判定します
+        if (curr_hp + rec >= max_hp)
+            return 0;
+        else
+            return 1; // 任意の非0値（ルール不一致：失敗）
+    } else {
+        // HPが上限に達していない場合は、正確な数値が出ていると仮定し、直接比較
+        if (rec == actRec)
+            return 0;
+        else
+            return 2; // こちらも任意の非0値（失敗）
+    }
+}
+
+
 constexpr int EnemyTable[6] = {
     BattleEmulator::BOLT_CUTTER, BattleEmulator::ATTACK_ENEMY,
     BattleEmulator::MULTITHRUST_ENEMY, BattleEmulator::HEAL_ENEMY,
@@ -396,14 +416,14 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             return true;
                         }
 
-                       if (damages[exCounter] == -10) {
+                        if (damages[exCounter] == -10) {
                             if (c != MULTITHRUST_ENEMY) {
                                 return false;
                             }
                             exCounter++;
-                           if (damages[exCounter++] != basedamage) {
-                               return false;
-                           }
+                            if (damages[exCounter++] != basedamage) {
+                                return false;
+                            }
                         } else if (damages[exCounter] == -12) {
                             if (c != BOLT_CUTTER) {
                                 return false;
@@ -412,7 +432,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             if (damages[exCounter++] != basedamage) {
                                 return false;
                             }
-                        }else if (damages[exCounter++] != basedamage) {
+                        } else if (damages[exCounter++] != basedamage) {
                             return false;
                         }
                     }
@@ -478,10 +498,14 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         action == FULLHEAL || action == SPECIAL_MEDICINE || action == GOSPEL_SONG || action ==
                         SPECIAL_ANTIDOTE || action == MEDICINAL_HERBS) {
                         Player::heal(players[0], basedamage);
-                        if (action == SPECIAL_MEDICINE || action == SPECIAL_ANTIDOTE) {
+                        if (action == HEAL || action == MEDICINAL_HERBS) {
                             if (mode != -1 && mode != -2) {
-                                if (damages[exCounter] == -5) {
-                                    exCounter++;
+                                if (damages[exCounter] != -5 && damages[exCounter] != -15) {
+                                    return false;
+                                }
+                                exCounter++;
+                                if (check_hp(static_cast<int>(players[0].maxHp), players[0].hp, damages[exCounter++], basedamage) != 0) {
+                                    return false;
                                 }
                             }
                         }
@@ -665,8 +689,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                         percent_tmp = lcg::getPercent(position, 100);
                         if (percent_tmp >= 0 && percent_tmp <= 49) {
                             //return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender, NowState);
-                            (*position)++;//会心 0x02158584
-                            (*position)++;//偽回避 0x02157f58
+                            (*position)++; //会心 0x02158584
+                            (*position)++; //偽回避 0x02157f58
                             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
                             baseDamage = 0;
                             goto jmp1;
@@ -722,7 +746,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                             players[0].sleepingTurn = -1;
                         }
 
-                        jmp1:
+                    jmp1:
                         //hp0時特殊消費
                         if (preHP[defender] > (totalDamage + baseDamage)) {
                             process7A8(position, baseDamage, players, defender);

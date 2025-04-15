@@ -9,8 +9,10 @@ void InputBuilder::push(int damage, const char prefix) {
     if (prefix == 'd') {
         entry.candidates.push_back(BattleEmulator::DEFENCE);
     }else if (prefix == 'h') {
+        push(-5, 'n');
         entry.candidates.push_back(BattleEmulator::HEAL);
     }else if (prefix == 'y') {
+        push(-15, 'n');
         entry.candidates.push_back(BattleEmulator::MEDICINAL_HERBS);
     }else if (prefix == 'a') {
         push(-6, 'n'); //攻撃フォローアップ
@@ -54,7 +56,7 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
     }
 
     // 入力の順番情報を保持するため、各入力のダメージを1度だけ追加
-    if (!(inputs[index].damage == -11 || inputs[index].damage == -5)) {
+    if (!(inputs[index].damage == -11)) {
         current.AII_damage[current.AII_damageCounter++] = inputs[index].damage;
     }
 
