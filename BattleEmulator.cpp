@@ -245,7 +245,7 @@ inline int check_hp(int max_hp, int curr_hp, int rec, int actRec) {
         if (rec == actRec)
             return 0;
         else
-            return 2; // こちらも任意の非0値（失敗）
+            return 1; // こちらも任意の非0値（失敗）
     }
 }
 
@@ -302,7 +302,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 241) {
+        if ((*position) == 475) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -439,6 +439,17 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 }
 
                 if (c == HEAL_ENEMY) {
+                    if (mode != -1 && mode != -2) {
+                        if (damages[exCounter] != -5 && damages[exCounter] != -15) {
+                            return false;
+                        }
+                        exCounter++;
+                        if (check_hp(static_cast<int>(players[1].maxHp), players[1].hp, damages[exCounter++],
+                                     basedamage) != 0) {
+                            return false;
+                        }
+                    }
+
                     Player::heal(players[1], basedamage);
                 } else {
                     Player::reduceHp(players[0], basedamage);
@@ -504,7 +515,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                     return false;
                                 }
                                 exCounter++;
-                                if (check_hp(static_cast<int>(players[0].maxHp), players[0].hp, damages[exCounter++], basedamage) != 0) {
+                                if (check_hp(static_cast<int>(players[0].maxHp), players[0].hp, damages[exCounter++],
+                                             basedamage) != 0) {
                                     return false;
                                 }
                             }
@@ -579,7 +591,18 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
             return false;
         }
     }
-    if (mode != -1 && mode != -2) {
+
+    if
+    (mode
+     !=
+     -
+     1
+     &&
+     mode
+     !=
+     -
+     2
+    ) {
         return true;
     } else {
         return false;
@@ -1239,7 +1262,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
         //みかわし(相手)
             if ((Id & 0xffff) != ITEM_USE && !players[0].paralysis) {
-                if (!players[0].acrobaticStar && lcg::getPercent(position, 100) < 2) {
+                if (lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
                 if (!kaihi) {

@@ -760,8 +760,8 @@ int main(int argc, char *argv[]) {
         */
 
     //ver: v8.0.1, atk: 51, def: 61, seed: 0x6cc478c, actions: 25, 59, 59, 61, 61, 62, 59, 62, 59, 61, 27, 61, 62, 25, 62, 25, 59, 62, 59, 27, 62, 59, 62, 25, 25, 59, 62, 61, 26, 56, 61,
-
-    uint64_t time1 = 0x6cc478c;
+    //ver: v8.0.1, atk: 61, def: 61, seed: 0x693bdce9, actions: 27, 25, 25, 26, 25, 26, 25, 25, 56, 59, 25, 25, 53, 53,
+    uint64_t time1 = 0x693bdce9;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -792,7 +792,7 @@ int main(int argc, char *argv[]) {
 
     //0x2b79118:
     int32_t gene1[350] = {
-        25, 59, 59, 61, 61, 62, 59, 62, 59, 61, 27, 61, 62, 25, 62, 25, 59, 62, 59, 27, 62, 59, 62, 25, 25, 59, 62, 61, 26, 56, 61,
+        27, 25, 25, 26, 25, 26, 25, 25, 56, 59, 25, 25, 53, 53,
 BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;
