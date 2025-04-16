@@ -306,8 +306,8 @@ namespace {
         std::cout  << R"(a13 = Ally Attack 13 damage)" << std::endl;
         std::cout  << R"(h35 = Ally Heal 35)" << std::endl;
         std::cout  << R"(35 = Enemy Heal 35)" << std::endl;
+        std::cout  << R"(0 = Enemy Heal 0 or Enemy 0 Damage)" << std::endl;
         std::cout  << R"(b or d = Defense)" << std::endl;
-        std::cout  << R"(0 = Enemy 0 Damage Attack(kbe only))" << std::endl;
         std::cout  << R"(other = Enemy Any Attack)" << std::endl;
         std::cout << "===========" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
