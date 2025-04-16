@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         # Artifact name
-        name: zbe
+        name: kbe
         path: |
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/kbe_multi.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/kbe_multi.pdb
