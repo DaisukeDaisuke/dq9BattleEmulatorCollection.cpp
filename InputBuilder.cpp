@@ -8,23 +8,31 @@ void InputBuilder::push(int damage, const char prefix) {
 
     if (prefix == 'd') {
         entry.candidates.push_back(BattleEmulator::DEFENCE);
-    }else if (prefix == 'h') {
-        push(-5, 'n');
-        entry.candidates.push_back(BattleEmulator::HEAL);
-    }else if (prefix == 'y') {
+    } else if (prefix == 'h') {
+        if (damage == 0) {
+            push(-17, 'n'); //さみだれづきフォローアップ
+            entry.candidates.push_back(BattleEmulator::HEAL_ENEMY);
+        } else {
+            push(-5, 'n');
+            entry.candidates.push_back(BattleEmulator::HEAL);
+        }
+    } else if (prefix == 'y') {
         push(-15, 'n');
         entry.candidates.push_back(BattleEmulator::MEDICINAL_HERBS);
-    }else if (prefix == 'a') {
+    } else if (prefix == 'a' || ((prefix == 'n' || prefix == '\0') && damage == 0)) {
         push(-6, 'n'); //攻撃フォローアップ
         entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-    }else if (prefix == 'n' || prefix == '\0') {
+    } else if (prefix == 'n' || prefix == '\0') {
         entry.candidates.push_back(BattleEmulator::UNKNOWN_ACTION); //不明
-    }else if (prefix == 's' || prefix == 'm') {
+    } else if (prefix == 's' || prefix == 'm') {
         push(-10, 'n'); //さみだれづきフォローアップ
         entry.candidates.push_back(BattleEmulator::MULTITHRUST_ENEMY);
-    }else if (prefix == 'i' || prefix == 'c') {
+    } else if (prefix == 'i' || prefix == 'c') {
         push(-12, 'n'); //さみだれづきフォローアップ
         entry.candidates.push_back(BattleEmulator::BOLT_CUTTER);
+    } else if (damage >= 28) {
+        push(-17, 'n'); //さみだれづきフォローアップ
+        entry.candidates.push_back(BattleEmulator::HEAL_ENEMY);
     }
 
     if (entry.candidates.empty()) {
@@ -64,9 +72,10 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
     for (int candidate: entry.candidates) {
         ResultStructure next = current; // 既にAII_damageが追加済み
         if (candidate <= -6) {
-
-        }else if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::DRAIN_MAGIC || candidate ==
-            BattleEmulator::BUFF_ENEMY || candidate == BattleEmulator::UNKNOWN_ACTION || candidate == BattleEmulator::MULTITHRUST_ENEMY || candidate == BattleEmulator::BOLT_CUTTER) {
+        } else if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::DRAIN_MAGIC || candidate ==
+                   BattleEmulator::BUFF_ENEMY || candidate == BattleEmulator::UNKNOWN_ACTION || candidate ==
+                   BattleEmulator::MULTITHRUST_ENEMY || candidate == BattleEmulator::BOLT_CUTTER || candidate ==
+                   BattleEmulator::HEAL_ENEMY) {
             next.Edamage[next.EdamageCounter++] = entry.damage;
         } else {
             next.Aactions[next.AactionsCounter++] = candidate;
@@ -75,4 +84,3 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
         generateCombinations(index + 1, next, results);
     }
 }
-
