@@ -419,7 +419,12 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 return false;
                             }
                             exCounter++;
-                            if (check_hp(static_cast<int>(players[1].maxHp), preHP[1], damages[exCounter++],
+                            if (damages[exCounter] == -1) {
+                                return true;
+                            }
+                            if (damages[exCounter] < 29) {
+                                exCounter++;
+                            }else if (check_hp(static_cast<int>(players[1].maxHp), preHP[1], damages[exCounter++],
                                          basedamage) != 0) {
                                 return false;
                             }
@@ -428,6 +433,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 return false;
                             }
                             exCounter++;
+                            if (damages[exCounter] == -1) {
+                                return true;
+                            }
                             if (damages[exCounter++] != basedamage) {
                                 return false;
                             }
@@ -436,11 +444,20 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 return false;
                             }
                             exCounter++;
+                            if (damages[exCounter] == -1) {
+                                return true;
+                            }
                             if (damages[exCounter++] != basedamage) {
                                 return false;
                             }
                         } else if (damages[exCounter++] != basedamage) {
-                            return false;
+                            if (c == HEAL_ENEMY) {
+                                if ((static_cast<int>(players[1].maxHp) - players[1].hp) != damages[exCounter - 1]) {
+                                    return false;
+                                }
+                            }else{
+                                return false;
+                            }
                         }
                     }
                 }
@@ -504,21 +521,24 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     if (action == HEAL || action == MORE_HEAL || action == MIDHEAL ||
                         action == FULLHEAL || action == SPECIAL_MEDICINE || action == GOSPEL_SONG || action ==
                         SPECIAL_ANTIDOTE || action == MEDICINAL_HERBS) {
-                        Player::heal(players[0], basedamage);
                         if (action == HEAL || action == MEDICINAL_HERBS) {
                             if (mode != -1 && mode != -2) {
                                 if (damages[exCounter] != -5 && damages[exCounter] != -15) {
                                     return false;
                                 }
                                 exCounter++;
+                                if (damages[exCounter] == -1) {
+                                    return true;
+                                }
                                 if (damages[exCounter] == -5) {
                                     exCounter++;
-                                }else if (check_hp(static_cast<int>(players[0].maxHp), preHP[0], damages[exCounter++],
+                                }else if (check_hp(static_cast<int>(players[0].maxHp), players[0].hp, damages[exCounter++],
                                              basedamage) != 0) {
                                     return false;
                                 }
                             }
                         }
+                        Player::heal(players[0], basedamage);
                     } else {
                         Player::reduceHp(players[1], basedamage);
 
