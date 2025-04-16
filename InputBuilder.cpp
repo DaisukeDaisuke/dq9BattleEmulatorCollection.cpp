@@ -19,11 +19,9 @@ void InputBuilder::push(int damage, const char prefix) {
     } else if (prefix == 'y') {
         push(-15, 'n');
         entry.candidates.push_back(BattleEmulator::MEDICINAL_HERBS);
-    } else if (prefix == 'a' || ((prefix == 'n' || prefix == '\0') && damage == 0)) {
+    } else if (prefix == 'a') {
         push(-6, 'n'); //攻撃フォローアップ
         entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-    } else if (prefix == 'n' || prefix == '\0') {
-        entry.candidates.push_back(BattleEmulator::UNKNOWN_ACTION); //不明
     } else if (prefix == 's' || prefix == 'm') {
         push(-10, 'n'); //さみだれづきフォローアップ
         entry.candidates.push_back(BattleEmulator::MULTITHRUST_ENEMY);
@@ -33,6 +31,8 @@ void InputBuilder::push(int damage, const char prefix) {
     } else if (damage >= 28) {
         push(-17, 'n'); //さみだれづきフォローアップ
         entry.candidates.push_back(BattleEmulator::HEAL_ENEMY);
+    } else if (prefix == 'n' || prefix == '\0') {
+        entry.candidates.push_back(BattleEmulator::UNKNOWN_ACTION); //不明
     }
 
     if (entry.candidates.empty()) {
