@@ -882,7 +882,7 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x3719d77;
+    uint64_t time1 = 0xb78af895;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -911,7 +911,7 @@ int main(int argc, char *argv[]) {
 
     //0x2b79118:
     int32_t gene1[350] = {
-        25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
+        25, 25, 25, 25, 27, 27, 27, 50, 25, 53, 53, 25, 25, 50, 25, 25, 50, 53, 25,
         BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;

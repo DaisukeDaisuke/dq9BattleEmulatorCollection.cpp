@@ -301,7 +301,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 146) {
+        if ((*position) == 235) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -759,7 +759,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //関係ない
             (*position)++; //会心
             (*position)++; //回避
-            FUN_0207564c(position, players[attacker].defaultATK, players[defender].def);
+            FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
             (*position)++; //不明
             break;
 
