@@ -459,6 +459,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 return false;
                             }
                         }
+                        if (damages[exCounter] == -1) {
+                            return true;
+                        }
                     }
                 }
 
