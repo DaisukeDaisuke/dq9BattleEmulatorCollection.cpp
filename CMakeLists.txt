@@ -71,8 +71,8 @@ if (MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections") #-fno-inline-small-functions
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections")
 elseif (MSVC)
-    set_property(TARGET nbe_multi_lv17_sp22_tamahane_atk125_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET nbe_multi_lv17_sp22_hagane_atk108_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#    set_property(TARGET nbe_multi_lv17_sp22_tamahane_atk125_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#    set_property(TARGET nbe_multi_lv17_sp22_hagane_atk108_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     target_compile_options(nbe_multi_lv17_sp22_tamahane_atk125_def93 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
     target_compile_options(nbe_multi_lv17_sp22_hagane_atk108_def93 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
