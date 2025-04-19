@@ -80,9 +80,9 @@ if(MINGW)
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections")
 elseif(MSVC)
     #set_property(TARGET rbe_single PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET rbe_multi_lv18_sp35 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET rbe_multi_lv13_sp13 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET rbe_multi_lv15_sp22 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    #set_property(TARGET rbe_multi_lv18_sp35 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    #set_property(TARGET rbe_multi_lv13_sp13 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    #set_property(TARGET rbe_multi_lv15_sp22 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     #target_compile_options(rbe_single PRIVATE /W4 /MP)
     target_compile_options(rbe_multi_lv18_sp35 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル

@@ -566,7 +566,7 @@ namespace {
 
 #ifdef MINGW_BUILD
         std::cout << turns << std::endl;
-        dumpTableMain(result1.value(), genome, seed, turns - 1);
+        dumpTableMain(result1.value(), genome, seed, 0);
 #else
         dumpTableMain(result1.value(), genome, seed, turns - 1);
 #endif
