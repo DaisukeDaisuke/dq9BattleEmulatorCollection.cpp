@@ -55,11 +55,11 @@ set(SOURCES
 )
 
 
-add_executable(nbe_multi_lv17_sp22_tamahane_atk125_def93 ${SOURCES})
-target_compile_definitions(nbe_multi_lv17_sp22_tamahane_atk125_def93 PRIVATE MULTITHREADING lv17_sp22_tamahane_atk125_def93)
+add_executable(nbe_lv17_sp22_tamahane_atk125_def93_v2 ${SOURCES})
+target_compile_definitions(nbe_lv17_sp22_tamahane_atk125_def93_v2 PRIVATE MULTITHREADING lv17_sp22_tamahane_atk125_def93)
 
-add_executable(nbe_multi_lv17_sp22_hagane_atk108_def93 ${SOURCES})
-target_compile_definitions(nbe_multi_lv17_sp22_hagane_atk108_def93 PRIVATE MULTITHREADING lv17_sp22_hagane_atk108_def93)
+add_executable(nbe_lv17_sp22_hagane_atk108_def93_v2 ${SOURCES})
+target_compile_definitions(nbe_lv17_sp22_hagane_atk108_def93_v2 PRIVATE MULTITHREADING lv17_sp22_hagane_atk108_def93)
 
 
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d" UTC)
@@ -71,14 +71,14 @@ if (MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections") #-fno-inline-small-functions
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections")
 elseif (MSVC)
-#    set_property(TARGET nbe_multi_lv17_sp22_tamahane_atk125_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-#    set_property(TARGET nbe_multi_lv17_sp22_hagane_atk108_def93 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#    set_property(TARGET nbe_lv17_sp22_tamahane_atk125_def93_v2 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#    set_property(TARGET nbe_lv17_sp22_hagane_atk108_def93_v2 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-    target_compile_options(nbe_multi_lv17_sp22_tamahane_atk125_def93 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
-    target_compile_options(nbe_multi_lv17_sp22_hagane_atk108_def93 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
+    target_compile_options(nbe_lv17_sp22_tamahane_atk125_def93_v2 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
+    target_compile_options(nbe_lv17_sp22_hagane_atk108_def93_v2 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
 
-    target_link_options(nbe_multi_lv17_sp22_tamahane_atk125_def93 PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(nbe_multi_lv17_sp22_hagane_atk108_def93 PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(nbe_lv17_sp22_tamahane_atk125_def93_v2 PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(nbe_lv17_sp22_hagane_atk108_def93_v2 PRIVATE /INCREMENTAL:NO /DEBUG)
 
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
