@@ -8,8 +8,6 @@
 
 #include <iostream>
 #include <vector>
-#include <stdexcept>
-
 
 #include "ResultStructure.h"
 
