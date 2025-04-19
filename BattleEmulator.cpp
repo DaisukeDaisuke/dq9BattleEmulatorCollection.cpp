@@ -308,28 +308,39 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
             // };
             enemyAction[counter] = ProcessEnemyRandomAction44(position);
 
-            if (counter == 1 && enemyAction[0] == enemyAction[1]) {
-                if (enemyAction[1] == POISON_ATTACK) {
-                    enemyAction[1] = ATTACK_ENEMY;
-                } else if (enemyAction[1] == KASAP) {
-                    enemyAction[1] = DECELERATLE;
-                } else if (enemyAction[1] == DECELERATLE) {
-                    enemyAction[1] = ATTACK_ENEMY;
-                } else if (enemyAction[1] == SWEET_BREATH) {
-                    enemyAction[1] = KASAP;
+
+            do {
+                auto ActionChanged = false;
+                if (counter == 1 && enemyAction[0] == enemyAction[1]) {
+                    if (enemyAction[1] == POISON_ATTACK) {
+                        enemyAction[1] = ATTACK_ENEMY;
+                    } else if (enemyAction[1] == KASAP) {
+                        enemyAction[1] = DECELERATLE;
+                    } else if (enemyAction[1] == DECELERATLE) {
+                        enemyAction[1] = ATTACK_ENEMY;
+                    } else if (enemyAction[1] == SWEET_BREATH) {
+                        enemyAction[1] = KASAP;
+                    }
                 }
-            }
 
-            if (enemyAction[counter] == SWEET_BREATH && players[0].sleeping == true) {
-                enemyAction[counter] = KASAP;
-            }
+                if (enemyAction[counter] == SWEET_BREATH && players[0].sleeping == true) {
+                    enemyAction[counter] = KASAP;
+                    ActionChanged = true;
+                }
 
-            if (enemyAction[counter] == KASAP && players[0].BuffLevel == -2) {
-                enemyAction[counter] = DECELERATLE;
-            }
-            if (enemyAction[counter] == DECELERATLE && players[0].speedLevel == -2) {
-                enemyAction[counter] = ATTACK_ENEMY;
-            }
+                if (enemyAction[counter] == KASAP && players[0].BuffLevel == -2) {
+                    enemyAction[counter] = DECELERATLE;
+                    ActionChanged = true;
+                }
+                if (enemyAction[counter] == DECELERATLE && players[0].speedLevel == -2) {
+                    enemyAction[counter] = ATTACK_ENEMY;
+                    ActionChanged = true;
+                }
+                if (ActionChanged) {
+                    continue;
+                }
+                break;
+            }while (true);
 
 
             preAction = enemyAction[counter];

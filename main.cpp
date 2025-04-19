@@ -566,7 +566,7 @@ namespace {
 
 #ifdef MINGW_BUILD
         std::cout << turns << std::endl;
-        dumpTableMain(result1.value(), genome, seed, 0);
+        dumpTableMain(result1.value(), genome, seed, turns - 1);
 #else
         dumpTableMain(result1.value(), genome, seed, turns - 1);
 #endif
@@ -862,7 +862,7 @@ int main(int argc, char *argv[]) {
             3840264243
             */
 
-        uint64_t time1 = 0x078f0155;
+        uint64_t time1 = 0x5cac57dc;
 
         int dummy[100];
         lcg::init(time1, false);
@@ -890,7 +890,9 @@ int main(int argc, char *argv[]) {
         //0x22e2dbaf:
 
     //0x78f0155: 25, 25, 25, 55, 50, 50, 50, 50, 27, 25, 25, 50, 25, 25, 25, 25, 50, 27, 27, 59, 27, 56, 25, 25, 25, 53, 53, 25, 53,
-        int32_t gene1[350] = {25, 25, 25, 55, 50, 50, 50, 50, 27, 25, 25, 50, 25, 25, 25, 25, 50, 27, 27, 59, 27, 56, 25, 25, 25, 53, 53, 25, 53,   BattleEmulator::ATTACK_ALLY};
+    //ver: v5.0.4, atk: 82, def: 90, seed: 0x5cac57dc, actions: 25, 25, 50, 50, 53, 50, 50, 50, 25, 50, 59, 53, 25, 56, 25, 58, 25, 59, 25, 56, 53, 25, 25, 53, 58, 59,
+
+        int32_t gene1[350] = {25, 25, 50, 50, 53, 50, 50, 50, 25, 50, 59, 53, 25, 56, 25, 58, 25, 59, 25, 56, 53, 25, 25, 53, 58, 59,    BattleEmulator::ATTACK_ALLY};
         //gene1[19-1] = BattleEmulator::DEFENCE;
         int counter = 0;
         //
