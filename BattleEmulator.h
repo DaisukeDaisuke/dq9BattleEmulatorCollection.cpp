@@ -5,10 +5,6 @@
 #ifndef NEWDIRECTORY_BATTLEEMULATOR_H
 #define NEWDIRECTORY_BATTLEEMULATOR_H
 
-
-#if defined(MULTITHREADING)
-#include <atomic>
-#endif
 #include <cstdint>
 #include <optional>
 #include "Player.h"

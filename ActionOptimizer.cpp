@@ -5,13 +5,10 @@
 #include "ActionOptimizer.h"
 #include <vector>
 #include <random>
-//#include <functional>
 #if defined(MULTITHREADING)
 #include <future>
 #include "lcg.h"
 #endif
-#include <memory>
-//#include <queue>
 #include "BattleEmulator.h"
 #include "Genome.h"
 #include "ActionBanManager.h"
