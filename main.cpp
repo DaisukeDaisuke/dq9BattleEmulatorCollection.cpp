@@ -47,8 +47,6 @@ namespace {
 
     bool isMatchStrWithTrim(const char *s1, const char *s2);
 
-    bool EasterEgg(int argc, char *argv[]);
-
     void help(const char *program_name);
 
     void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
@@ -72,20 +70,6 @@ namespace {
     // `InputBuilder` インスタンス作成
     InputBuilder builder;
 
-    const char repoURL[] =
-            u8"Hello Analyzer!, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/reokonn !branch: reokonn";
-    const char explanation1[] =
-            u8"This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
-
-#if defined(MULTITHREADING)
-    const char explanation2[] =
-            u8"multithreading is enabled, Some functions have been added to ActionOptimizer, and SearchRequest has been modified for multi-threading.";
-#elif defined(NO_MULTITHREADING)
-    const char explanation2[] = u8", multithreading is disabled";
-#endif
-    const char explanation3[] =
-            u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
-    const char explanation4[] = u8"Have fun exploring the artists!";
 
 #if defined(kbe_multi_Normal)
     constexpr Player BasePlayers[2] = {
@@ -405,18 +389,6 @@ namespace {
         }
         performanceLogger << "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
                 "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
-    }
-
-    bool EasterEgg(int argc, char *argv[]) {
-        if (argc > 1 && isMatchStrWithTrim(argv[1], "info2025325")) {
-            std::printf("%s\n", repoURL);
-            std::printf("%s\n", explanation1);
-            std::printf("%s\n", explanation2);
-            std::printf("%s\n", explanation3);
-            std::printf("%s\n", explanation4);
-            return true;
-        }
-        return false;
     }
 
 #if defined(MULTITHREADING)
@@ -876,10 +848,6 @@ BattleEmulator::ATTACK_ALLY
 
     return 0;
 #endif
-
-    if (EasterEgg(argc, argv)) {
-        return 1;
-    }
 
     if (argc < 5) {
         help(argv[0]);
