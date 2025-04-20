@@ -28,11 +28,11 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Build rbe_multi_lv15_sp22
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rbe_multi_lv15_sp22
+    - name: Build rbe_lv15_sp22_v2
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target rbe_lv15_sp22_v2
 
-    - name: echo SHA256 rbe_multi_lv15_sp22
-      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv15_sp22.exe"
+    - name: echo SHA256 rbe_lv15_sp22_v2
+      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_lv15_sp22_v2.exe"
 
     - name: Copy License file
       run: Copy-Item -Path "${{github.workspace}}/LICENSE" -Destination "${{github.workspace}}/build/${{env.BUILD_TYPE}}/"
@@ -47,9 +47,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         # Artifact name
-        name: rbe
+        name: bilyouma_v
         path: |
-          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv15_sp22.exe
-          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_multi_lv15_sp22.pdb
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_lv15_sp22_v2.exe
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/rbe_lv15_sp22_v2.pdb
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/LICENSE
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/image/**
