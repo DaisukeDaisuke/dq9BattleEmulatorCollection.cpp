@@ -16,7 +16,7 @@
 
 thread_local int preHP[3] = {0, 0, 0};
 
-#if defined(kbe_multi_Normal)
+#if defined(kbattle_v2_Normal)
 
 constexpr double mitoreP = -0.0150;
 constexpr double kaisinnP = 100;

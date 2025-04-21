@@ -71,7 +71,7 @@ namespace {
     InputBuilder builder;
 
 
-#if defined(kbe_multi_Normal)
+#if defined(kbattle_v2_Normal)
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
