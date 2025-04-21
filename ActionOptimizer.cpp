@@ -250,7 +250,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
         auto backToPast = false;
 
-        if (tmpgenomu.Initialized && currentGenome.AllyPlayer.BuffLevel != 0) {
+        if (tmpgenomu.Initialized && (currentGenome.EActions[0] == BattleEmulator::KASAP || currentGenome.EActions[1] == BattleEmulator::KASAP) && currentGenome.AllyPlayer.BuffLevel != 0) {
             backToPast = true;
         }
 
