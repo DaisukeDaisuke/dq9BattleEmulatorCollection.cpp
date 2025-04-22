@@ -199,7 +199,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 164) {
+        if ((*position) == 792) {
             std::cout << "!!" << std::endl;
         }
 #endif
