@@ -59,8 +59,8 @@ add_executable(rbe_single ${SOURCES})
 target_compile_definitions(rbe_single PRIVATE NO_MULTITHREADING)  # `#define NO_MULTITHREADING` を適用
 
 # マルチスレッド版（multithreading = ON）
-add_executable(rbe_multi ${SOURCES})
-target_compile_definitions(rbe_multi PRIVATE MULTITHREADING)  # `#define MULTITHREADING` を適用
+add_executable(ybe_v2 ${SOURCES})
+target_compile_definitions(ybe_v2 PRIVATE MULTITHREADING)  # `#define MULTITHREADING` を適用
 
 
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d" UTC)
@@ -68,18 +68,15 @@ string(TIMESTAMP BUILD_TIME "%H:%M:%S" UTC)
 add_definitions(-DBUILD_DATE="${BUILD_DATE}" -DBUILD_TIME="${BUILD_TIME}")
 
 if(MINGW)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections -fno-inline-small-functions")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -march=x86-64 -mtune=generic -ffunction-sections -fdata-sections -fno-inline-small-functions")
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--gc-sections")
 elseif(MSVC)
-    set_property(TARGET rbe_single PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    set_property(TARGET rbe_multi PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
     target_compile_options(rbe_single PRIVATE /W4 /MP)
-    target_compile_options(rbe_multi PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
+    target_compile_options(ybe_v2 PRIVATE /W4 /MP)  # `/MP` で並列コンパイル
 
     target_link_options(rbe_single PRIVATE /INCREMENTAL:NO /DEBUG)
-    target_link_options(rbe_multi PRIVATE /INCREMENTAL:NO /DEBUG)
+    target_link_options(ybe_v2 PRIVATE /INCREMENTAL:NO /DEBUG)
 
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")

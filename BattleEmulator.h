@@ -102,6 +102,10 @@ public:
     static constexpr int KASAP = 67; //ルカナン
     static constexpr int SWEET_BREATH = 68; //ルカナン
 
+    static constexpr int DRAGON_SLASH = 59; //ドラゴン切り
+    static constexpr int ITEM_USE = 60; //ドラゴン切り
+    static constexpr int CRACK_ALLY = 61; //ドラゴン切り
+
     static constexpr int ACROBATSTAR_KAIHI = 69;
     static constexpr int COUNTER = 70;
     static constexpr int TIDAL_WAVE = 71; // つなみ

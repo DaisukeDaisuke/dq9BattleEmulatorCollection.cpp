@@ -50,11 +50,13 @@ namespace {
     void SearchRequest(Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
 
     uint64_t BruteForceRequest(Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
-                               int aActions[350], int damages[350]);
+                               int damages[350], int aActions[350]);
 
     void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed);
 
     void printHeader(std::stringstream &ss);
+
+    std::pair<char, int> toABCint(const char *str);
 
     int foundSeeds = 0;
 
@@ -68,20 +70,6 @@ namespace {
     // `InputBuilder` インスタンス作成
     InputBuilder builder;
 
-    const char repoURL[] =
-            u8"Hello Analyzer!, here is the repository URL: https://github.com/DaisukeDaisuke/dq9BattleEmulatorCollection.cpp/tree/bilyouma !branch: bilyouma";
-    const char explanation1[] =
-            u8"This is part of the dq9 battle emulator and consists of the argument decoder(main and InputBuilder), the brute force attack code (main BruteForceRequest), the action optimization (main::SearchRequest) code, and the battle emulator (BattleEmulator::Main).";
-
-#if defined(MULTITHREADING)
-    const char explanation2[] =
-            u8"multithreading is enabled, Some functions have been added to ActionOptimizer, and SearchRequest has been modified for multi-threading.";
-#elif defined(NO_MULTITHREADING)
-    const char explanation2[] = u8", multithreading is disabled";
-#endif
-    const char explanation3[] =
-            u8"2024-2025 DaisukeDaisuke, For all the dq9 solo runners, MIT License, Open Source Freeware, Good luck to all runners in breaking the 8 hour mark for the dq9 solo travel RTA! (still unachieved as of 3/25/2025)";
-    const char explanation4[] = u8"Have fun exploring the artists!";
     // ヘッダーを出力する関数
     void printHeader(std::stringstream &ss) {
         ss << std::left << std::setw(6) << "turn"
@@ -209,7 +197,8 @@ namespace {
                 sp = specialAction;
 
                 if (eAction[0] != "magic Burst" && eAction[1] != "magic Burst") {
-                    if (!initiative && (action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
+                    if (!initiative && (action == BattleEmulator::INACTIVE_ALLY || action ==
+                                        BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
                                         action == BattleEmulator::SLEEPING)) {
                         sp = "---------------";
                     }
@@ -275,7 +264,8 @@ namespace {
 #elif defined(OPTIMIZATION_O2_ENABLED)
         std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " <<
+                buildDate << ", " << buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #else
         std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
         << ", " << buildTime << std::endl;
@@ -295,71 +285,64 @@ namespace {
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
 
-    NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
-        // 4番目以降の引数を `push()` に入れる
+    NOINLINE int ProgramMain(Player players[2], int hours, int minutes, int seconds, int argc, char *argv[]) {
+        const int MAX = 350;
+        int values[MAX] = {0};
+        int aActions[MAX] = {0};  // 味方の行動情報を格納する
+        int maxElement = 0;
+
+        // ターン進行管理用
+        int turnCount = 0;
+        int enemyConsecutive = 0; // 連続した敵行動の数
+
+        // argv[0]～argv[3]は別の用途として飛ばし、4番目以降が行動コマンドとする
         for (int i = 4; i < argc; ++i) {
-            if (isMatchStrWithTrim(argv[i], "h")) {
-                builder.push(-5);
-                continue;
+            std::string arg = argv[i];
+
+            // 味方の行動の場合（"h"や先頭が'a'の場合）
+            if (arg == "h") {
+                // "h"の場合の処理（例：特定数値へ変換）
+                aActions[turnCount++] = BattleEmulator::HEAL;
+                values[maxElement] = -2;
+                // 味方行動の場合は敵の連続カウントをリセット
+                enemyConsecutive = 0;
             }
-            if (isMatchStrWithTrim(argv[i], "a") || isMatchStrWithTrim(argv[i], "s")) {
-                builder.push(-4);
-                continue;
+            else {
+                // toABCintでprefixと数値部分を抽出
+                auto [prefix, tmp] = toABCint(argv[i]);
+
+                // 味方の行動（aのprefixを持つ場合）
+                if (prefix == 'a') {
+                    aActions[turnCount++] = BattleEmulator::ATTACK_ALLY;
+                    values[maxElement++] = -3;
+                    values[maxElement] = tmp;
+                    enemyConsecutive = 0;        // 味方が行動したら、敵の連続行動カウントはリセット
+                }
+                // 敵の行動の場合：prefixがなく、tmpが有効な数値の場合
+                else {
+                    values[maxElement] = tmp;
+                    enemyConsecutive++;
+                    // 敵行動が連続している場合、1回目以降はターンを進める
+                    if (enemyConsecutive >= 2) {
+                        aActions[turnCount++] = -10;
+                    }
+                    // ※ 1回目の敵行動はそのターンの敵行動と考えるため、すぐはターン進行させない
+                }
             }
-            if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "d")) {
-                builder.push(-2);
-                continue;
-            }
-            if (isMatchStrWithTrim(argv[i], "r") || isMatchStrWithTrim(argv[i], "k")) {
-                builder.push(-3);
-                continue;
-            }
-            int damage = toint(argv[i]);
-            if (damage >= 0) {
-                builder.push(damage);
-            } else {
-                std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
-                return false;
-            }
+
+            maxElement++;
         }
-        return true;
-    }
 
-    NOINLINE int ProgramMain(Player players[2], int hours, int minutes, int seconds) {
-        // 構造体の組み合わせを作成
-        try {
-            auto results = builder.makeStructure();
-            for (const auto &result: results) {
-                result.print(); // 結果の出力
-
-                // スタックを配列に変換
-                int aActions[350] = {0};
-                int damages[350] = {0};
-
-                // Aactions をスタックにコピー
-                for (int i = 0; i < result.AactionsCounter; ++i) {
-                    aActions[i] = result.Aactions[i];
-                }
-                aActions[result.AactionsCounter] = -1;
-
-                // AII_damage をスタックにコピー
-                for (int i = 0; i < result.AII_damageCounter; ++i) {
-                    damages[i] = result.AII_damage[i];
-                }
-                damages[result.AII_damageCounter] = -1;
+        // 最後に区切りとして-1を設定
+        values[maxElement] = -1;
+        aActions[turnCount] = -1;
 
 
-                FoundSeed = 0;
-                foundSeeds = 0;
-                auto seed = BruteForceRequest(players, hours, minutes, seconds, result.AactionsCounter, aActions,
-                                              damages);
-                if (foundSeeds == 1) {
-                    SearchRequest(players, seed, aActions, THREAD_COUNT);
-                }
-            }
-        } catch (const std::runtime_error &e) {
-            std::cerr << e.what() << std::endl;
-            return 1;
+        FoundSeed = 0;
+        foundSeeds = 0;
+        auto seed = BruteForceRequest(players, hours, minutes, seconds, maxElement, values, aActions);
+        if (foundSeeds == 1) {
+            SearchRequest(players, seed, aActions, THREAD_COUNT);
         }
         return 0;
     }
@@ -390,19 +373,8 @@ namespace {
                 static_cast<double>(seeds) / 10000) << " mann), ";
         }
         performanceLogger << "elapsed time: " << double(elapsed_time1) / 1000 << " ms, " <<
-                "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
-    }
-
-    bool EasterEgg(int argc, char *argv[]) {
-        if (argc > 1 && isMatchStrWithTrim(argv[1], "info2025325")) {
-            std::printf("%s\n", repoURL);
-            std::printf("%s\n", explanation1);
-            std::printf("%s\n", explanation2);
-            std::printf("%s\n", explanation3);
-            std::printf("%s\n", explanation4);
-            return true;
-        }
-        return false;
+                "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" <<
+                std::endl;
     }
 
 #ifdef MULTITHREADING
@@ -430,6 +402,8 @@ namespace {
         std::optional<BattleResult> result1;
         result1 = BattleResult();
         Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
+
+        lcg::init(seed);
 
         auto *position = new int(1);
         auto *nowState = new uint64_t(0);
@@ -534,7 +508,8 @@ namespace {
 
 
             bool resultBool = BattleEmulator::Main(position, turns, gene, players,
-                                                   (std::optional<BattleResult> &) std::nullopt, seed, nullptr, damages,
+                                                   (std::optional<BattleResult> &) std::nullopt, seed, nullptr,
+                                                   damages,
                                                    maxElement,
                                                    nowState);
             if (resultBool) {
@@ -549,18 +524,18 @@ namespace {
 
     // ブルートフォースリクエスト関数
     [[nodiscard]] uint64_t BruteForceRequest(Player copiedPlayers[2], int hours, int minutes, int seconds,
-                                             int turns,
-                                             int aActions[350], int damages[350]) {
+                                             int turns, int damages[350], int aActions[350]) {
 #ifdef DEBUG
         auto t0 = std::chrono::high_resolution_clock::now();
 #endif
 
-        std::cout << "BruteForceRequest executed with time " << hours << ":" << minutes << ":" << seconds << std::endl;
+        std::cout << "BruteForceRequest executed with time " << hours << ":" << minutes << ":" << seconds <<
+                std::endl;
         // std::cout << "\naActions: ";
         // for (int i = 0; i < 350 && aActions[i] != -1; ++i) std::cout << aActions[i] << " ";
         // std::cout << "\ndamages: ";
-        // for (int i = 0; i < 350 && damages[i] != -1; ++i) std::cout << damages[i] << " ";
-        // std::cout << std::endl;
+        for (int i = 0; i < 350 && damages[i] != -1; ++i) std::cout << damages[i] << " ";
+        std::cout << std::endl;
         BattleEmulator::ResetTurnProcessed();
 
         foundSeeds = 0;
@@ -568,20 +543,14 @@ namespace {
 
         int totalSeconds = hours * 3600 + minutes * 60 + seconds;
         totalSeconds = totalSeconds - 15;
-        auto time1 = static_cast<uint64_t>(floor((totalSeconds - 2.5) * (1 / 0.12515)));
-        time1 = time1 << 16;
+        auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1.5) * (1 / 0.12515)));
+        time1 = (time1 & 0xffff) << 16;
 
-        auto time2 = static_cast<uint64_t>(floor((totalSeconds + 2.5) * (1 / 0.125155)));
-        time2 = time2 << 16;
-        int32_t gene[350] = {0};
-        for (int i = 0; i < 350; ++i) {
-            gene[i] = aActions[i];
-            if (aActions[i] == -1) {
-                gene[i] = -1;
-                gene[i + 1] = -1;
-                break;
-            }
-        }
+        auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1.5) * (1 / 0.125155)));
+        time2 = (time2 & 0xffff) << 16;
+
+        time1 = 630021145;
+        time2 = 630021146;
 
         /*
         *NowStateの各ビットの使用状況は下記の通りである。
@@ -596,8 +565,7 @@ namespace {
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                                      合計 6Byte
         */
-
-        BruteForceMainLoop(copiedPlayers, time1, time2, turns, gene, damages);
+        BruteForceMainLoop(copiedPlayers, time1, time2, turns, aActions, damages);
 
         std::cout << std::endl << "found: " << foundSeeds << std::endl;
 
@@ -633,6 +601,40 @@ namespace {
         } catch (const std::out_of_range &e) {
             std::cerr << "Out of range: " << e.what() << std::endl;
             return -1;
+        }
+    }
+
+    NOINLINE std::pair<char, int> toABCint(const char *str) {
+        if (str == nullptr) throw std::invalid_argument("Input is null");
+
+        size_t len = std::strlen(str);
+        if (len > 4) throw std::length_error("Input exceeds maximum allowed length (4)");
+
+        // 先頭がアルファベットの場合
+        if (len >= 2 && std::isalpha(static_cast<unsigned char>(str[0]))) {
+            char prefix = static_cast<char>(std::tolower(static_cast<unsigned char>(str[0])));
+            int value = 0;
+
+            for (size_t i = 1; i < len; ++i) {
+                if (!std::isdigit(static_cast<unsigned char>(str[i]))) {
+                    throw std::invalid_argument("Invalid character in numeric portion");
+                }
+                value = value * 10 + (str[i] - '0');
+            }
+
+            return std::make_pair(prefix, value);
+        }
+
+        // 通常の整数として扱う（先頭が数字の場合）
+        try {
+            int number = std::stoi(str);
+            return std::make_pair('\0', number);
+        } catch (const std::invalid_argument &e) {
+            std::cerr << "Invalid argument: " << e.what() << std::endl;
+            return std::make_pair('\0', -1);
+        } catch (const std::out_of_range &e) {
+            std::cerr << "Out of range: " << e.what() << std::endl;
+            return std::make_pair('\0', -1);
         }
     }
 
@@ -717,7 +719,8 @@ int main(int argc, char *argv[]) {
         3840264243
         */
 
-    uint64_t time1 = 0x051095e1;
+    //0x51095e1: 25, 25, 61, 61, 25, 25, 25, 23, 61, 61, 61, 56, 23, 61, 25, 25, 61, 59, 23, 25, 59, 56, 59, 25, 25, 25, 23, 61, 25, 25, 25,
+    uint64_t time1 = 630021145;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -742,18 +745,18 @@ int main(int argc, char *argv[]) {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
+    //int32_t gene1[350] = {0};
+    int32_t gene1[350] = {25, 25, 61, 61, 25, 25, 25, 23, 61, 61, 61, 56, 23, 61, 25, 25, 61, 59, 23, 25, 59, 56, 59, 25, 25, 25, 23, 61, 25, 25, 25, BattleEmulator::ATTACK_ALLY};
     //0x22e2dbaf:
     //0x44dbafa: 25, 25, 25, 50, 54, 25, 50, 54, 56, 54, 25, 54, 53, 53, 25, 50, 25, 56, 54, 25, 54,
     //int32_t gene1[350] = {25, 25, 25, 50, 53, 54, 54, 54, 50, 53, 54, 25, 50, 25, 54, 50, 25, 56, 54, 53, 54, 27,  BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-
-
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    //
 
 
     //
@@ -796,23 +799,20 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x051095e1;
+    uint64_t seed = 629634391;
 
     int actions[350] = {
         BattleEmulator::ATTACK_ALLY,
+        BattleEmulator::HEAL,
         -1,
     };
     Player Player5[2] = {BasePlayers[0], BasePlayers[1]};
-    SearchRequest(Player5, seed, actions, THREAD_COUNT);
+    SearchRequest(Player5, seed, actions, 1);
 
     std::cout << performanceLogger.rdbuf() << std::endl;
 
     return 0;
 #endif
-
-    if (EasterEgg(argc, argv)) {
-        return 1;
-    }
 
     if (argc < 5) {
         help(argv[0]);
@@ -820,22 +820,18 @@ int main(int argc, char *argv[]) {
     }
 
     // 戦闘発生時間の取得
-    const int hcount = toint(argv[1]);
-    const int hours = toint(argv[2]);
-    const int minutes = toint(argv[3]);
-    const int seconds = toint(argv[4]);
+    const int hours = toint(argv[1]);
+    const int minutes = toint(argv[2]);
+    const int seconds = toint(argv[3]);
 
-    if (hours < 0 || minutes < 0 || seconds < 0 || hcount < 0) {
+    if (hours < 0 || minutes < 0 || seconds < 0) {
         std::cerr << "Invalid time parameters" << std::endl;
         return 1;
     }
 
     Player players2[2] = {BasePlayers[0], BasePlayers[1]};
 
-    players2[0].SpecialMedicineCount = hcount;
-
-    ProcessInputBuilder(argc, argv);
-    auto exitCode = ProgramMain(players2, hours, minutes, seconds);
+    auto exitCode = ProgramMain(players2, hours, minutes, seconds, argc, argv);
     std::cout << performanceLogger.rdbuf();
 #ifdef DEBUG
     auto t1 = std::chrono::high_resolution_clock::now();

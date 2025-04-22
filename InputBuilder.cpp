@@ -6,41 +6,7 @@ void InputBuilder::push(int damage) {
     InputEntry entry;
     entry.damage = damage;
 
-    if (damage == -5) {
-        entry.candidates.push_back(BattleEmulator::SPECIAL_MEDICINE);
-    }
-
-    if (damage == -2) {
-        entry.candidates.push_back(BattleEmulator::DECELERATLE);
-    }
-
-    if (damage == -3) {
-        entry.candidates.push_back(BattleEmulator::KASAP);
-    }
-
-    if (damage == -4) {
-        entry.candidates.push_back(BattleEmulator::SWEET_BREATH);
-    }
-
-    if (damage == 0)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-
-    if (damage >= 8 && damage <= 11)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-    if (damage >= 19 && damage < 24)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-    if (damage == 24) {
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-        entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-    }
-    if (damage > 24 && damage < 30)
-        entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-    if (damage == 30) {
-        entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-        entry.candidates.push_back(BattleEmulator::MIRACLE_SLASH);
-    }
-    if (damage > 30 && damage <= 37)
-        entry.candidates.push_back(BattleEmulator::MIRACLE_SLASH);
+    entry.candidates.push_back(300);
 
     if (entry.candidates.empty()) {
         std::cerr << "WARNING: A damage value of 0 " << damage << " has no applicable range\n";
@@ -77,7 +43,7 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
     for (int candidate: entry.candidates) {
         ResultStructure next = current; // 既にAII_damageが追加済み
         if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::KASAP || candidate ==
-            BattleEmulator::DECELERATLE) {
+            BattleEmulator::DECELERATLE || candidate == 300) {
             next.Edamage[next.EdamageCounter++] = entry.damage;
         } else {
             next.Aactions[next.AactionsCounter++] = candidate;
