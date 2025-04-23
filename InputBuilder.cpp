@@ -8,15 +8,17 @@ void InputBuilder::push(int damage, const char prefix) {
 
     if (damage == -5) {
         entry.candidates.push_back(BattleEmulator::SPECIAL_MEDICINE);
-    }else if (damage == -2) {
+    } else if (damage == -2) {
         entry.candidates.push_back(BattleEmulator::DECELERATLE);
-    }else if (damage == -3) {
+    } else if (damage == -3) {
         entry.candidates.push_back(BattleEmulator::KASAP);
-    }else if (damage == -4) {
+    } else if (damage == -4) {
         entry.candidates.push_back(BattleEmulator::SWEET_BREATH);
-    }else if (damage == 0) {
+    } else if (damage == 0) {
         entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-    }else
+    } else if (prefix == 'm') {
+        entry.candidates.push_back(BattleEmulator::SLEEPING);
+    } else
 
 #if defined(BattleEmulatorLV19)
     if (prefix == 'a') {
@@ -29,11 +31,11 @@ void InputBuilder::push(int damage, const char prefix) {
         entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
     }
 #elif defined(BattleEmulatorLV15) || defined(BattleEmulatorLV13)
-    if (prefix == 'a') {
-        entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
-    } else {
-        entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
-    }
+        if (prefix == 'a') {
+            entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
+        } else {
+            entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
+        }
 #endif
 
     if (entry.candidates.empty()) {
@@ -65,7 +67,9 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
     }
 
     // 入力の順番情報を保持するため、各入力のダメージを1度だけ追加
-    current.AII_damage[current.AII_damageCounter++] = inputs[index].damage;
+    if (inputs[index].damage != -16) {
+        current.AII_damage[current.AII_damageCounter++] = inputs[index].damage;
+    }
 
     const InputEntry &entry = inputs[index];
     for (int candidate: entry.candidates) {

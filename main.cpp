@@ -53,6 +53,7 @@ namespace {
     void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed, int turns);
 
     void printHeader(std::stringstream &ss);
+
     std::pair<char, int> toABCint(const char *str);
 
     int foundSeeds = 0;
@@ -353,18 +354,18 @@ namespace {
     // ヘッダー出力関数
     NOINLINE void printShortcutTableHeader() {
         std::cout << std::left << std::setw(5) << "Key"
-                  << std::left << std::setw(18) << "Action"
-                  << std::endl;
+                << std::left << std::setw(18) << "Action"
+                << std::endl;
 
         std::cout << std::string(3, '-') << " "
-                  << std::string(18, '-') << std::endl;
+                << std::string(18, '-') << std::endl;
     }
 
     // 各行の出力関数
-    NOINLINE void printShortcutEntry(const char* shortcutKey, const char* name) {
+    NOINLINE void printShortcutEntry(const char *shortcutKey, const char *name) {
         std::cout << std::left << std::setw(5) << shortcutKey
-                  << std::left << std::setw(18) << name
-                  << std::endl;
+                << std::left << std::setw(18) << name
+                << std::endl;
     }
 
     void help(const char *program_name) {
@@ -388,36 +389,66 @@ namespace {
     }
 
     NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
-        // 4番目以降の引数を `push()` に入れる
+        // 最初の3件は時間情報のため、4件未満ならエラー
+        if (argc < 4) {
+            return false;
+        }
+
+        int enemyConsecutive = 0;
+
+        // argv[4]以降が行動の引数
         for (int i = 4; i < argc; ++i) {
-            if (isMatchStrWithTrim(argv[i], "h")  || isMatchStrWithTrim(argv[i], "ah")) {
+            // まず、文字列一致で特定のコマンドを処理
+            if (isMatchStrWithTrim(argv[i], "h") || isMatchStrWithTrim(argv[i], "ah")) {
+                // 回復：味方の行動。眠ると0回なので、敵行動連続はリセット
                 builder.push(-5, 'n');
+                enemyConsecutive = 0;
                 continue;
             }
             if (isMatchStrWithTrim(argv[i], "a") || isMatchStrWithTrim(argv[i], "s")) {
                 builder.push(-4, 'n');
+                enemyConsecutive++;
+                if (enemyConsecutive >= 3) {
+                    // 3回以上連続なら敵が眠っていると判断
+                    builder.push(-16, 'm');
+                    enemyConsecutive = 0;
+                }
                 continue;
             }
             if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "d")) {
                 builder.push(-2, 'n');
+                enemyConsecutive++;
+                if (enemyConsecutive >= 3) {
+                    builder.push(-16, 'm');
+                    enemyConsecutive = 0;
+                }
                 continue;
             }
             if (isMatchStrWithTrim(argv[i], "r") || isMatchStrWithTrim(argv[i], "k")) {
                 builder.push(-3, 'n');
+                enemyConsecutive++;
+                if (enemyConsecutive >= 3) {
+                    builder.push(-16, 'm');
+                    enemyConsecutive = 0;
+                }
                 continue;
             }
-            try{
-                auto [prefix, damage] = toABCint(argv[i]);
-                if (damage >= 0) {
-                    builder.push(damage, prefix);
-                } else {
-                    std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
-                    return false;
+
+            // 上記以外の場合は、toABCintで分解して処理
+            auto [prefix, tmp] = toABCint(argv[i]);
+            // toABCintでhなどが処理できないため、基本は数値コマンドと解釈する
+            builder.push(tmp, prefix);
+
+            // prefixによって、敵の行動と判断する条件（今回は味方はh/ahのみなので）
+            if (prefix != 'a') {
+                enemyConsecutive++;
+                if (enemyConsecutive >= 3) {
+                    builder.push(-16, 'm');
+                    enemyConsecutive = 0;
                 }
-            } catch (const std::exception& e) {
-                std::cout << "Invalid Input!: " << (argv[i] == nullptr ? "null" : argv[i])
-                          << " => Exception: " << e.what() << std::endl;
-                return false;
+            } else {
+                // 万一、toABCintで味方扱いのものが返された場合はリセット
+                enemyConsecutive = 0;
             }
         }
         return true;
@@ -465,7 +496,8 @@ namespace {
     void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed, int turns) {
         std::cout << dumpTable(result1, genome.actions, turns) << std::endl;
 
-        std::cout << "ver: "<< version << ", atk: "<< BasePlayers[0].atk << ", def: " << BasePlayers[0].def << ", seed: ";
+        std::cout << "ver: " << version << ", atk: " << BasePlayers[0].atk << ", def: " << BasePlayers[0].def <<
+                ", seed: ";
         std::cout << "0x" << std::hex << seed << std::dec << ", actions: ";
 
         for (auto i = 0; i < 100; ++i) {
@@ -636,7 +668,7 @@ namespace {
             Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
 
 
-            bool resultBool = BattleEmulator::Main(position,  20, gene, players,
+            bool resultBool = BattleEmulator::Main(position, 20, gene, players,
                                                    (std::optional<BattleResult> &) std::nullopt, seed, nullptr, damages,
                                                    maxElement,
                                                    nowState);
