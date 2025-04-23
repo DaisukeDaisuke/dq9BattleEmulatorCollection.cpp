@@ -5,6 +5,13 @@
 #ifndef NEWDIRECTORY_BATTLERESULT_H
 #define NEWDIRECTORY_BATTLERESULT_H
 
+/**
+ * @class BattleResult
+ * @brief バトルの結果を記録・管理するクラス
+ *
+ * このクラスは、各ターンにおける行動やダメージ、バフやデバフの状態など、バトルの詳細な結果を記録します。
+ * また、記録されたデータを更新するためのメソッドを提供します。
+ */
 class BattleResult {
 
 public:

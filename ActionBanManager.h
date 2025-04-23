@@ -14,6 +14,14 @@ constexpr uint64_t action_to_bit(int action) {
 // 最大350ターン分の管理
 constexpr int MAX_TURNS = 63;
 
+/**
+ * @class ActionBanManager
+ * @brief 行動を特定ターンで制限するための管理クラス
+ *
+ * このクラスは、特定のターンで特定の行動を禁止（BAN）するためのメカニズムを提供します。
+ * 各ターンにおける行動のBAN状態はビットフィールド形式で管理されます。
+ * これは、探索アルゴリズムにおいて同じ行動の展開を禁止するためにあります。
+ */
 class ActionBanManager {
 private:
     // 各ターンごとに行動を記録するビットフィールド

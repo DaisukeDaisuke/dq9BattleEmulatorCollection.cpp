@@ -9,6 +9,17 @@
 #include "Genome.h"
 
 
+/**
+ * @class HeapQueue
+ * @brief 優先度付きキューヒープ構造を使用して、指定された数の要素を効率的に管理するクラス。
+ *
+ * @details
+ * このクラスは、優先度付きキューのように動作し、要素をヒープベースで管理します。
+ * 最大要素数を超えた場合、最小要素を削除し、新しい要素を挿入することで管理を行います。
+ *
+ * @note Fitness（適応度）による比較を基に最小ヒープとして振舞います。
+ *
+ */
 class HeapQueue {
 private:
     std::vector<Genome> heap;

@@ -35,7 +35,23 @@ void ActionOptimizer::updateCompromiseScore(Genome &genome) {
 
 #if defined(MULTITHREADING)
 
-// 並列処理のための関数
+/**
+ * @brief 各ワーカースレッドで実行されるメイン処理
+ *
+ * この関数はマルチスレッド環境下で RunAlgorithmAsync から呼ばれるワーカー処理として設計されています。
+ * シングルスレッドでアルゴリズムを実行する場合は、RunAlgorithm を使用してください。
+ * 指定された範囲内で最適なターン数およびゲノムを探索し、その結果をペアとして返します。
+ *
+ * @param players 味方と敵の2つの Player オブジェクトを含む配列。players[0] が味方、players[1] が敵です。
+ * @param seed    バトルの初期シード値。乱数生成の際のシードとして利用されます。
+ * @param turns   現在のターン数（探索開始の基準）。
+ * @param maxGenerations マルチスレッドにおける総反復回数。
+ * @param actions アルゴリズムが利用するアクションの履歴。（サイズは 350 と仮定）
+ * @param start   アルゴリズムが探索を開始するインデックスを指定します。
+ * @param end     アルゴリズムが探索を終了するインデックスを指定します。
+ * @return        探索で処理されたターン数と最適化されたゲノムのペア
+ */
+
 std::pair<int, Genome> ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns,
                                                                  int maxGenerations, int actions[], int start,
                                                                  int end) {
@@ -81,7 +97,22 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmSingleThread(const Player pl
 }
 
 
-// メインの並列処理関数
+/**
+ * マルチスレッドを利用して、プレイヤーの状態に基づく行動最適化アルゴリズムを非同期的に実行します。
+ * 各スレッドは異なる探索範囲を担当し、ターンシミュレーションの最適な候補を並列的に計算します。
+ * 全スレッドの計算結果から最適なターン数とゲノムを選択して返します。
+ *
+ * @param players       味方と敵の2つの Player オブジェクトが格納された配列です。
+ *                      players[0] が味方、players[1] が敵に対応します。
+ * @param seed          バトルの実際の初期シードかつ、乱数生成器のシード値です。同じシードを指定すると計算結果の再現性が保たれます。
+ * @param turns         ゲームの現在のターン数を示します。探索開始位置として利用されます。
+ * @param totalIterations  全体で探索を繰り返す回数（イテレーション数）です。探索規模を設定します。
+ * @param actions       既存の過去行動が格納された配列です。配列の長さは350である必要があります。
+ *                      配列内の値 -1 または 0 は有効な終了を示します。
+ * @param numThreads    同時にスレッドを使用して並列処理を行うスレッドの数を指定します。
+ *
+ * @return              計算終了後に処理した総ターン数と最適化されたゲノム情報を格納したペアを返します。
+ */
 std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2], uint64_t seed, int turns,
                                                           int totalIterations, int actions[350], int numThreads) {
     lcg::init(seed, true);
@@ -125,6 +156,54 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
 #endif
 
 // オレオレアルゴリズム実行
+
+/**
+ * プレイヤーの状態情報を基に、最適な行動方針を決定するためのアルゴリズムによる最適化処理を実行します。
+ * このアルゴリズムは、ヒューリスティックな適応度評価に基づいて反復的に行動候補を探索するために
+ * 優先度付きキューを利用し、ターン制バトルシミュレーションにおける最適な決定をシミュレートすることを目指します。
+ *
+ * @param players  味方と敵の2つの Player オブジェクトが格納された配列です。
+ *                 players[0] が味方、players[1] が敵に対応します。
+ * @param seed     乱数生成用のシード値です。同じシードを使用することで再現性が保証されます。
+ * @param turns    ゲームの進行状態を示す正確なターン数です。探索開始位置として利用されます。
+ * @param maxGenerations 最適化処理（世代/反復）の最大回数です（-1の場合は制限なしとなります）。
+ * @param actions  最適化のすでに行動済みの過去行動が格納された配列です。サイズは350でなければなりません。
+ *                 配列内の値 -1 または 0 は有効な行動の終了を示します。
+ * @param seedOffset アルゴリズム(乱数生成)の動作を一貫させるために、主シードに加算されるオフセット値です。
+ *
+ * @return 遺伝子（Genome）オブジェクトを返します。これはアルゴリズムにより決定された状態と最適行動戦略を
+ *         含み、適応度、行動履歴、ターン履歴など詳細情報を持っています。
+ *
+ * この関数は、指定された seed と seedOffset を用いて乱数生成器を初期化し、
+ * シミュレーション中の確率的挙動を駆動します。優先度付きキューを活用し、ヒューリスティック
+ * に基づいて候補解を生成・進化させていきます。このキューは、各反復で評価される適応度スコアを基準
+ * に解の優先順位付けを行います。
+ *
+ * アルゴリズムの処理としては以下を行います：
+ * - プレイヤーの状態をコピーし、シミュレーションが進行するにつれて更新します。
+ * - 各行動の適応度に与える影響を評価します。
+ * - 行動禁止などのルールに従い、冗長または好ましくない状態を追跡・回避します。
+ * - 優先度付きキューを利用して候補となる Genome を保存・比較し、さらなる探索のために
+ *   潜在的な最適解を効率的に選択します。
+ * - 指定された場合、探索する解の世代数に上限を設けることで計算量を制約します。
+ *
+ * 特に取り扱うケースは以下の通りです：
+ * - 睡眠、麻痺、ターンスキップなどの望ましくない状態に対する適応度の調整。
+ * - 毒の軽減や関連するバフ/デバフに対する解毒アイテムなど、特定行動の動的な取り扱い。
+ *
+ * 前提条件：
+ * - Player オブジェクト、行動配列、その他補助構造体は正しく初期化されていること。
+ * - actions 配列のサイズは正確に350であること。
+ * - 乱数生成器 (RNG) は十分な確率シナリオをモデル化できること。
+ *
+ * 制約事項：
+ * - 状態と遺伝子の処理のために十分なメモリ領域が必要です。
+ * - 実行時間は maxGenerations およびプレイヤーの状態や行動の複雑さに依存します。
+ * - maxGenerations に制限が厳しい場合、最適解が必ずしも見つかるとは限りません。
+ *
+ * 本関数は、主にdq9における戦闘のゲーム最適化において、条件に基づきターン制の意思決定を
+ * 反復的に最適化する必要がある際に利用されることを意図しています。
+ */
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
                                      int actions[350], int seedOffset) {
     std::mt19937 rng(seed + seedOffset);
@@ -250,7 +329,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
         auto backToPast = false;
 
-        if (tmpgenomu.Initialized && (currentGenome.EActions[0] == BattleEmulator::KASAP || currentGenome.EActions[1] == BattleEmulator::KASAP) && currentGenome.AllyPlayer.BuffLevel != 0) {
+        if (tmpgenomu.Initialized && (currentGenome.EActions[0] == BattleEmulator::KASAP || currentGenome.EActions[1] ==
+                                      BattleEmulator::KASAP) && currentGenome.AllyPlayer.BuffLevel != 0) {
             backToPast = true;
         }
 
@@ -513,7 +593,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-        if (AllyPlayerPre.specialCharge == true && AllyPlayerPre.specialChargeTurn != 0 && AllyPlayerPre.acrobaticStar == false && !Bans.is_action_banned(
+        if (AllyPlayerPre.specialCharge == true && AllyPlayerPre.specialChargeTurn != 0 && AllyPlayerPre.acrobaticStar
+            == false && !Bans.is_action_banned(
                 BattleEmulator::ACROBATIC_STAR, turns)) {
             action = BattleEmulator::ACROBATIC_STAR;
             if (tmpgenomu.Visited >= 1) {

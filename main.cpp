@@ -137,7 +137,13 @@ namespace {
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 #endif
-    // ヘッダーを出力する関数
+    /**
+     * バトルログのヘッダー情報を文字列ストリームに書き込みます。
+     * ヘッダーはターンや各種パラメータのラベルで構成され、フォーマット済みの表形式で出力されます。
+     * また、ヘッダーの下部には区切り線が出力されます。
+     *
+     * @param ss 出力先の文字列ストリームオブジェクト
+     */
     void printHeader(std::stringstream &ss) {
         ss << std::left << std::setw(6) << "turn"
                 << std::setw(18) << "sp"
@@ -162,6 +168,15 @@ namespace {
 
     std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns);
 
+    /**
+     * バトル結果および対応するデータからテーブルを作成し、その内容を文字列として返します。
+     * テーブルには各ターンの攻撃や防御、特殊行動などの詳細情報が含まれます。
+     *
+     * @param result バトル結果を格納したBattleResultオブジェクト
+     * @param gene 各ターンの味方の行動を示す遺伝子配列
+     * @param PastTurns 結果の出力に含めない過去のターン数
+     * @return 整形されたテーブルを表す文字列
+     */
     std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
         std::stringstream ss6;
         printHeader(ss6);
@@ -368,6 +383,13 @@ namespace {
                 << std::endl;
     }
 
+    /**
+     * プログラムの使用方法について、ヘルプ情報をコンソールに表示します。
+     * 指定されたプログラム名をもとに、コマンドのフォーマットや例を出力します。
+     * また、アクションショートカットテーブルも表示されます。
+     *
+     * @param program_name 実行中のプログラム名
+     */
     void help(const char *program_name) {
         std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
         std::cout << "tables" << std::endl;
@@ -388,6 +410,16 @@ namespace {
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
 
+    /**
+     * 入力データを解析し、ビルダーに適切なコマンドを追加します。
+     * コマンドの形式やルールに基づき、条件処理を行います。
+     * 時に、眠りなどに対し適切に処理できるように設計されています。
+     *
+     * @param argc 入力引数の個数
+     * @param argv 入力引数を保持する文字列配列
+     * @return 入力が正常に処理され、ビルダーに追加された場合はtrueを返し、
+     *         引数の個数が不十分または他のエラーが発生した場合はfalseを返します。
+     */
     NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
         // 最初の3件は時間情報のため、4件未満ならエラー
         if (argc < 4) {
@@ -454,6 +486,14 @@ namespace {
         return true;
     }
 
+    /**
+     * このexeのメインロジック。
+     *
+     * @param hours 時間を表す整数値
+     * @param minutes 分を表す整数値
+     * @param seconds 秒を表す整数値
+     * @return 処理が成功した場合は0を返し、エラーが発生した場合は1を返します。
+     */
     NOINLINE int ProgramMain(int hours, int minutes, int seconds) {
         // 構造体の組み合わせを作成
         try {
@@ -493,6 +533,15 @@ namespace {
         return 0;
     }
 
+    /**
+     * 戦闘結果とゲノム情報を基に、テーブルデータを出力し、指定されたシード値と行動データをコンソールに表示します。
+     * 結果には攻撃力、防御力、バージョン情報が含まれます。
+     *
+     * @param result1 戦闘結果オブジェクト。テーブル生成に必要なデータを提供します。
+     * @param genome ゲノム情報オブジェクト。行動データを含みます。
+     * @param seed テーブル生成と表示に使用されるランダムシード値。
+     * @param turns テーブル表示を省略するターン数(リリースバイナリでのみ使用)
+     */
     void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed, int turns) {
         std::cout << dumpTable(result1, genome.actions, turns) << std::endl;
 
@@ -533,7 +582,7 @@ namespace {
 
         int32_t gene[350] = {0};
         auto turns = 0;
-        for (int i = 0; i < 350; ++i) {
+        for (int i = 0; i < 349; ++i) {
             gene[i] = aActions[i];
             if (aActions[i] == -1) {
                 gene[i] = -1;
@@ -656,6 +705,17 @@ namespace {
 
 #endif
 
+    /**
+     * 指定された範囲のシードを使って総当たりを行い、一致するシード知を探索します。
+     * 各シードごとにバトルシミュレーションを実行し、条件を満たす場合はシードを記録します。
+     *
+     * @param copiedPlayers バトルに使用するプレイヤーデータ（コピーされた配列）
+     * @param start シード探索の開始位置
+     * @param end シード探索の終了位置
+     * @param turns バトルの最大ターン数
+     * @param gene バトルシミュレーションに使用する遺伝子データの配列
+     * @param damages バトル中に発生するダメージを記録する配列
+     */
     void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t end, int turns, int gene[350],
                             int damages[350]) {
         int *position = new int(1);
@@ -682,7 +742,20 @@ namespace {
         delete nowState;
     }
 
-    // ブルートフォースリクエスト関数
+    /**
+     * 指定されたプレイヤーペアと時間パラメータ、行動データを使って、総当たりを実行しシード値を探索します。
+     * 実行結果として、探索されたシード値を返却します。また、デバッグモードで実行時間およびパフォーマンスを記録します。
+     * 複数のシード値が見つかった場合は、0を返します
+     *
+     * @param copiedPlayers プレイヤーのデータを格納した配列（2人分）
+     * @param hours         現在の時間（時）
+     * @param minutes       現在の時間（分）
+     * @param seconds       現在の時間（秒）
+     * @param turns         バトルのターン数
+     * @param aActions      各ターンの行動データが格納された配列
+     * @param damages       各ターンでのダメージデータが格納された配列
+     * @return 見つかったシード値（見つからない場合は0を返す）
+     */
     [[nodiscard]] uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds,
                                              int turns,
                                              int aActions[350], int damages[350]) {
@@ -771,6 +844,19 @@ namespace {
         }
     }
 
+    /**
+     * 入力文字列を解析し、先頭のアルファベットが存在する場合はプレフィックスと数値部分を
+     * ペアとして返します。文字列が純粋な数値の場合は、プレフィックスなしでその数値を返します。
+     *
+     * 入力文字列が空、長さ超過、または不正な形式の場合は適切な例外がスローされます。
+     * 入力が整数として解析される場合には例外処理でエラーがログとして出力されます。
+     *
+     * @param str 入力文字列（最大長は4文字）
+     * @return アルファベットのプレフィックスと整数部分のペア。プレフィックスが存在しない場合は
+     *         '\0' が返されます。
+     * @throws std::invalid_argument 引数が nullptr の場合や、不正な形式の文字列が含まれる場合にスローされます。
+     * @throws std::length_error 入力文字列の長さが4文字を超える場合にスローされます。
+     */
     NOINLINE std::pair<char, int> toABCint(const char *str) {
         if (str == nullptr) throw std::invalid_argument("Input is null");
 
@@ -806,31 +892,64 @@ namespace {
     }
 
 
-    // 左側の空白をトリム
+    /**
+     * 文字列の先頭から空白文字を削除した新しい文字列を返します。
+     * 空白文字として扱われるのは、スペース、タブ、改行、復帰、フォームフィード、および垂直タブです。
+     *
+     * @param s 対象の文字列
+     * @return 先頭の空白文字を削除した新しい文字列
+     */
     NOINLINE std::string ltrim(const std::string &s) {
         size_t start = s.find_first_not_of(" \t\n\r\f\v");
         return (start == std::string::npos) ? "" : s.substr(start);
     }
 
-    // 右側の空白をトリム
+    /**
+     * 文字列の末尾から空白文字を除去します。
+     * 空白文字として認識されるのは、スペース、タブ、改行、復帰、改ページ、
+     * 垂直タブなどのホワイトスペース文字です。
+     *
+     * @param s 処理対象の文字列
+     * @return 空白が除去された新しい文字列
+     */
     NOINLINE std::string rtrim(const std::string &s) {
         size_t end = s.find_last_not_of(" \t\n\r\f\v");
         return (end == std::string::npos) ? "" : s.substr(0, end + 1);
     }
 
 
-    // char* を受け取るバージョン（std::stringに変換せず処理）
+    /**
+     * 指定された文字列の先頭および末尾に存在する空白文字を削除します。
+     * 入力文字列がnullの場合は空の文字列を返します。
+     *
+     * @param s トリム対象のC文字列
+     * @return トリム後の文字列
+     */
     NOINLINE std::string trim(const char *s) {
         if (s == nullptr) return "";
         std::string str(s);
         return trim(str);
     }
 
-    // 両側の空白をトリム
+    /**
+     * 文字列の両端から空白を削除し、トリムされた文字列を返します。
+     * 入力文字列の先頭と末尾の空白文字（スペース、タブ、改行など）が取り除かれます。
+     *
+     * @param s トリム対象の文字列
+     * @return トリムされた文字列
+     */
     NOINLINE std::string trim(const std::string &s) {
         return rtrim(ltrim(s));
     }
 
+    /**
+     * 二つの文字列をトリム処理後に比較し、一致するかどうかを判定します。
+     * トリム処理は各文字列の先頭と末尾の不要な空白を削除します。
+     *
+     * @param s1 比較対象の最初の文字列
+     * @param s2 比較対象の二番目の文字列
+     * @return トリム後の文字列が一致する場合にtrue、一致しない場合にfalseを返します
+     */
     NOINLINE bool isMatchStrWithTrim(const char *s1, const char *s2) {
         return trim(s1) == trim(s2);
     }

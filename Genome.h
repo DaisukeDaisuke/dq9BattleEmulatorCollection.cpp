@@ -8,7 +8,14 @@
 #include <cstdint>
 #include "Player.h"
 
-// 遺伝子型
+/**
+ * @struct Genome
+ * @brief バトルの最適化における個体の情報を管理する構造体
+ *
+ * この構造体は最適化アルゴリズムで使用される個体（Genome）のステータスや状態を表現します。
+ * 各個体はプレイヤー情報、ゲーム状態、ターン数、アクション履歴、フィットネススコアなどの情報を含みます。
+ * また、優先度付きキューでの操作のための比較演算子も実装されています。
+ */
 struct Genome {
     Player AllyPlayer;
     Player EnemyPlayer;

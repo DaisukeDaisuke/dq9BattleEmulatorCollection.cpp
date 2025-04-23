@@ -36,6 +36,14 @@ constexpr int baseHP = 89;
 constexpr int DragonSlashKaisinnP = kaisinnP / 2;
 constexpr int WooshSlashKaisinnP = kaisinnP / 5;
 
+/**
+ * @brief 味方のhpを基に、hpテーブルをコンパイル時に生成します。
+ *
+ * この関数は、基準値 (baseHP) を使用して縮小された割合に基づき整数値のテーブルを計算し、
+ * それを配列として返します。
+ *
+ * @return 生成された9要素の整数配列。
+ */
 constexpr std::array<int, 9> makeProportionTable3() {
     std::array<int, 9> table{};
     // iを9から1までループし、対応する値を生成する
@@ -48,8 +56,26 @@ constexpr std::array<int, 9> makeProportionTable3() {
     return table;
 }
 
+/**
+ * @brief コンパイル時に生成されたHPの割合テーブル。
+ *
+ * 基準値 (baseHP) を使用して、割合に基づく9要素の整数値を含む配列。
+ * この配列は makeProportionTable3 関数によって計算され、戦闘計算ロジックに利用されます。
+ */
 constexpr auto proportionTable3 = makeProportionTable3();
 
+/**
+ * @brief コンボ攻撃の処理を行い、ダメージ値を計算します。
+ *
+ * この関数は、現在の攻撃が直前の攻撃と連続しているかを判定し、コンボカウントに応じて
+ * ダメージを増幅します。同時に内部状態を更新します。
+ *
+ * @param Id 攻撃を識別するための整数ID。
+ * @param damage 基本となるダメージ値。
+ * @param NowState 現在の状態を示す64ビット符号なし整数ポインタ。
+ *
+ * @return コンボの結果として増幅されたダメージ値。
+ */
 double BattleEmulator::processCombo(int32_t Id, double damage, uint64_t *NowState) {
     auto previousAttack = ((*NowState) >> 32) & 0xff;
     auto comboCounter = ((*NowState) >> 40) & 0xf;
@@ -82,6 +108,15 @@ double BattleEmulator::processCombo(int32_t Id, double damage, uint64_t *NowStat
 }
 
 
+/**
+ * @brief 指定されたアクションIDに対応するアクション名を取得します。
+ *
+ * この関数は、渡されたアクションIDに基づいて適切なアクション名を文字列として返します。
+ * 対応するIDが存在しない場合は、"Unknown Action" が返されます。
+ *
+ * @param actionId アクションを識別するID。
+ * @return アクションIDに対応するアクション名の文字列。
+ */
 const char *BattleEmulator::getActionName(int actionId) {
     switch (actionId) {
         case BattleEmulator::BUFF:
@@ -196,23 +231,6 @@ const char *BattleEmulator::getActionName(int actionId) {
     }
 }
 
-// #if defined(MULTITHREADING)
-//
-// static std::atomic<int> turnProcessed; // atomicを使用
-//
-// void BattleEmulator::ResetTurnProcessed() {
-//     turnProcessed.store(0, std::memory_order_relaxed); // relaxedで軽量にリセット
-// }
-//
-// int BattleEmulator::getTurnProcessed() {
-//     return turnProcessed.load(std::memory_order_relaxed); // relaxedで読み取り
-// }
-//
-// inline void BattleEmulator::processTurn() {
-//     // ここでturnProcessedをインクリメントする処理を追加
-//     turnProcessed.fetch_add(1, std::memory_order_relaxed); // atomic加算
-// }
-// #elif defined(NO_MULTITHREADING)
 
 thread_local int threadTurnProcessed = 0;
 
@@ -232,6 +250,69 @@ inline void BattleEmulator::processTurn() {
 //#endif
 
 
+/**
+ * @brief バトルシミュレーションのメイン処理。
+ *
+ * この関数は、プレイヤーと敵の各ターン（forループ1回）ごとに行動を計算し、
+ * バトル状態およびダメージ結果を更新します。
+ *
+ * 各パラメーターの詳細は以下の通りです:
+ *
+ * @param position
+ *   lcg.cppで定義している線形合同法(LCG)の乱数生成に使用する現在の乱数の位置を表すポインタです。
+ *   バトルエミュレーション側では直接インクリメントする場合もありますが、各種乱数取得関数に渡すと
+ *   自動的にlcg.cpp内でインクリメントされ、乱数生成と連動した値が提供されます。
+ *
+ * @param RunCount
+ *   この関数内のforループの回数として扱われ、1ターンはループ1回分のシミュレーションに相当します。
+ *
+ * @param Gene
+ *   各ターンで味方が実行すべき行動を示す固定長の遺伝子テーブルです。
+ *   配列のインデックスはターン数-1に対応しており、固定長(350要素)としてペクターを使わない理由は高速化のためです。
+ *
+ * @param players
+ *   戦闘のhpなどのステータスを保持するプレイヤー（および敵）の配列です。
+ *   配列の先頭要素(index=0)は味方、index=1は敵を表し、各ターンで行動・HP更新等が行われます。
+ *   これは参照渡しであるため、関数実行後に更新されます。
+ *
+ * @param result
+ *   バトル結果の蓄積先として使用するstd::optional型の参照です。
+ *   modeが -1 の場合にBattleResultへ結果を蓄積しますが、空のoptionalを渡すとセグメンテーション違反が発生するため注意が必要です。
+ *   また、resultは生成コストがそれなりにかかるため、使用しないシナリオではなるべく避けるよう推奨します。
+ *
+ * @param seed
+ *   ゲームバトルの初期乱数シードで、主にデバッグ時にデバッカーから参照するために使用されています。
+ *
+ * @param eActions
+ *   敵の行動パターンを示す配列ですが、ブランチによっては使用される可能性もあるため、名残的に定義されています。
+ *
+ * @param damages
+ *   mainでchar*[]から適切にパースされ、内部でint[]に変換された中間表現のダメージ配列です。
+ *   この配列の各要素により、各ターンの必須の行動が指定されます。
+ *   modeが0以上の場合、要求された中間表現と一致しなかった場合には即座にシミュレーションを終了します。
+ *
+ * @param mode
+ *   シミュレーション実行モードを指定する整数値です。詳細は以下の通りです:
+ *   - mode >= 0 : 総当たりシミュレーションモード（damagesが使用される）。
+ *   - mode == -1: バトル結果がBattleResultに蓄積される記録モード。
+ *   - mode == -2: 結果は記録せず、最速実行のみのモード。
+ *
+ * @param NowState
+ *   内部シミュレーション状態をビット単位で管理する64ビット整数へのポインタです。
+ *   この状態は内部でのみ管理され、外部から変更されることは想定していません。
+ *   各ビットの用途は以下の通りです:
+ *      - 0～3   : Current Rotation Table (4bit)
+ *      - 4～7   : Rotation Internal State (4bit)
+ *      - 8～11  : Free Camera State (4bit)
+ *      - 12～31 : Turn Count Processed (20bit)
+ *      - 32～39 : Combo Previous Attack Id (2byte)
+ *      - 40～47 : Combo Counter (1byte)
+ *   合計で6バイト分の情報を管理しています。main.cpp内の説明とも合わせてご参照ください。
+ *
+ * @return
+ *   modeが0以上の場合、実行中の（damagesに沿った）シミュレーションが要求に一致している場合はtrue、
+ *   それ以外の場合はfalseを返します。（modeが -1 または -2の場合、常にfalse）
+ */
 bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], Player *players,
                           std::optional<BattleResult> &result,
                           uint64_t seed, const int eActions[350], const int damages[350], int mode,
@@ -340,7 +421,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     continue;
                 }
                 break;
-            }while (true);
+            } while (true);
 
 
             preAction = enemyAction[counter];
@@ -664,7 +745,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         if (Player::isPlayerAlive(players[0]) && Player::isPlayerAlive(players[1])) {
             (*position) += 1;
         }
-        camera::Main(position, actions, NowState, player0_has_initiative, false);
+        camera::Main(position, actions, NowState);
 
 #ifdef DEBUG2
         //DEBUG_COUT2((*position));
@@ -1184,7 +1265,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             if (players[attacker].acrobaticStar && kaisinn) {
                 //nope
-            }else{
+            } else {
                 ProcessRage(position, baseDamage, players, kaisinn);
             }
             (*position)++; //目を覚ました
