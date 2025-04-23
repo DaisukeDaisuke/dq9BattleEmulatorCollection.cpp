@@ -420,71 +420,92 @@ namespace {
      * @return 入力が正常に処理され、ビルダーに追加された場合はtrueを返し、
      *         引数の個数が不十分または他のエラーが発生した場合はfalseを返します。
      */
-    NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
-        // 最初の3件は時間情報のため、4件未満ならエラー
-        if (argc < 4) {
-            return false;
-        }
-
-        int enemyConsecutive = 0;
-
-        // argv[4]以降が行動の引数
-        for (int i = 4; i < argc; ++i) {
-            // まず、文字列一致で特定のコマンドを処理
-            if (isMatchStrWithTrim(argv[i], "h") || isMatchStrWithTrim(argv[i], "ah")) {
-                // 回復：味方の行動。眠ると0回なので、敵行動連続はリセット
-                builder.push(-5, 'n');
-                enemyConsecutive = 0;
-                continue;
-            }
-            if (isMatchStrWithTrim(argv[i], "a") || isMatchStrWithTrim(argv[i], "s")) {
-                builder.push(-4, 'n');
-                enemyConsecutive++;
-                if (enemyConsecutive >= 3) {
-                    // 3回以上連続なら敵が眠っていると判断
-                    builder.push(-16, 'm');
-                    enemyConsecutive = 0;
-                }
-                continue;
-            }
-            if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "d")) {
-                builder.push(-2, 'n');
-                enemyConsecutive++;
-                if (enemyConsecutive >= 3) {
-                    builder.push(-16, 'm');
-                    enemyConsecutive = 0;
-                }
-                continue;
-            }
-            if (isMatchStrWithTrim(argv[i], "r") || isMatchStrWithTrim(argv[i], "k")) {
-                builder.push(-3, 'n');
-                enemyConsecutive++;
-                if (enemyConsecutive >= 3) {
-                    builder.push(-16, 'm');
-                    enemyConsecutive = 0;
-                }
-                continue;
-            }
-
-            // 上記以外の場合は、toABCintで分解して処理
-            auto [prefix, tmp] = toABCint(argv[i]);
-            // toABCintでhなどが処理できないため、基本は数値コマンドと解釈する
-            builder.push(tmp, prefix);
-
-            // prefixによって、敵の行動と判断する条件（今回は味方はh/ahのみなので）
-            if (prefix != 'a') {
-                enemyConsecutive++;
-                if (enemyConsecutive >= 3) {
-                    builder.push(-16, 'm');
-                    enemyConsecutive = 0;
-                }
-            } else {
-                // 万一、toABCintで味方扱いのものが返された場合はリセット
-                enemyConsecutive = 0;
-            }
-        }
-        return true;
+NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
+    // 最初の3件は時間情報のため、最低でも4件必要
+    if (argc < 4) {
+        return false;
     }
+
+    // 行動引数は argv[4] 以降
+    int totalActions = argc - 4;
+    // 1ターンあたりの上限行動数（3件）
+    const int actionsPerTurn = 3;
+
+    // ターン数は、totalActions を actionsPerTurn で割った商＋余りがあれば1ターンとして計上
+    int turns = totalActions / actionsPerTurn;
+    int remainder = totalActions % actionsPerTurn;
+    if (remainder > 0) {
+        turns++;
+    }
+
+    int enemyConsecutive = 0; // 複数ターンにわたる敵連続行動数
+    int tokenIndex = 4;        // 最初の行動引数の位置
+
+    for (int turn = 0; turn < turns; turn++) {
+        bool allyPresent = false;  // このターンに味方行動があるかのフラグ
+        int enemyActions = 0;      // このターン内の敵の行動数
+
+        // 現ターンの行動数（最後のターンは3未満の場合があるので調整）
+        int actionsThisTurn = actionsPerTurn;
+        if ((turn == turns - 1) && (remainder > 0)) {
+            actionsThisTurn = remainder;
+        }
+
+        // 現ターン分のトークンを処理
+        for (int j = 0; j < actionsThisTurn; j++) {
+            const char* token = argv[tokenIndex++];
+            bool isActionAlly = false;
+
+            if (isMatchStrWithTrim(token, "h") || isMatchStrWithTrim(token, "ah")) {
+                // 回復は明示的な味方行動
+                builder.push(-5, 'n');
+                allyPresent = true;
+            }
+            else if (isMatchStrWithTrim(token, "a") || isMatchStrWithTrim(token, "s")) {
+                // ここでは基本的に敵側行動として扱う
+                builder.push(-4, 'n');
+                enemyActions++;
+            }
+            else if (isMatchStrWithTrim(token, "b") || isMatchStrWithTrim(token, "d")) {
+                builder.push(-2, 'n');
+                enemyActions++;
+            }
+            else if (isMatchStrWithTrim(token, "r") || isMatchStrWithTrim(token, "k")) {
+                builder.push(-3, 'n');
+                enemyActions++;
+            }
+            else {
+                // 上記以外は toABCint による分解処理
+                auto [prefix, tmp] = toABCint(token);
+                builder.push(tmp, prefix);
+                // 味方行動の条件（今回は prefix == 'a' が味方とする）
+                if (prefix == 'a') {
+                    isActionAlly = true;
+                    allyPresent = true;
+                }
+                else {
+                    enemyActions++;
+                }
+            }
+        } // 1ターン分の処理終了
+
+        if (allyPresent) {
+            // 味方の行動が1件でもあれば、敵連続カウントはリセット
+            enemyConsecutive = 0;
+        }
+        else {
+            // このターン内の敵行動数を累積
+            enemyConsecutive += enemyActions;
+            // 連続敵行動が3件以上の場合、眠り判定を行う
+            while (enemyConsecutive >= 3) {
+                builder.push(-16, 'm');
+                enemyConsecutive -= 3;
+            }
+        }
+    }
+
+    return true;
+}
 
     /**
      * このexeのメインロジック。
