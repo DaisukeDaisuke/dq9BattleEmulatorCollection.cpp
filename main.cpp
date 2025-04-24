@@ -50,7 +50,7 @@ namespace {
     uint64_t BruteForceRequest(Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                                int damages[350], int aActions[350]);
 
-    void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed);
+    void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed, int turns);
 
     void printHeader(std::stringstream &ss);
 
@@ -356,10 +356,20 @@ namespace {
         return 0;
     }
 
-    void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed) {
-        std::cout << dumpTable(result1, genome.actions, 0) << std::endl;
+    /**
+     * 戦闘結果とゲノム情報を基に、テーブルデータを出力し、指定されたシード値と行動データをコンソールに表示します。
+     * 結果には攻撃力、防御力、バージョン情報が含まれます。
+     *
+     * @param result1 戦闘結果オブジェクト。テーブル生成に必要なデータを提供します。
+     * @param genome ゲノム情報オブジェクト。行動データを含みます。
+     * @param seed テーブル生成と表示に使用されるランダムシード値。
+     * @param turns テーブル表示を省略するターン数(リリースバイナリでのみ使用)
+     */
+    void dumpTableMain(BattleResult &result1, Genome &genome, uint64_t seed, int turns) {
+        std::cout << dumpTable(result1, genome.actions, turns) << std::endl;
 
-        std::cout << "0x" << std::hex << seed << std::dec << ": ";
+        std::cout << "ver: " << version << ", seed: ";
+        std::cout << "0x" << std::hex << seed << std::dec << ", actions: ";
 
         for (auto i = 0; i < 100; ++i) {
             if (genome.actions[i] == 0 || genome.actions[i] == -1) {
@@ -423,7 +433,11 @@ namespace {
         delete position;
         delete nowState;
 
-        dumpTableMain(result1.value(), genome, seed);
+#if defined(MINGW_BUILD)
+        dumpTableMain(result1.value(), genome, seed, 0);
+#else
+        dumpTableMain(result1.value(), genome, seed, turns - 1);
+#endif
 
 #ifdef DEBUG
         auto t3 = std::chrono::high_resolution_clock::now();
