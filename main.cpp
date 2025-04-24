@@ -305,6 +305,7 @@ namespace {
                 // ホイミの場合：valuesに-2、aActionsにHEALを追加
                 aActions[actionsIndex++] = BattleEmulator::HEAL;
                 values[valuesIndex++] = -2;
+                values[valuesIndex++] = -2;
                 enemyConsecutive = 0;
                 allyFound = true;
             } else {
@@ -314,6 +315,15 @@ namespace {
                     // 味方攻撃の場合：まずvaluesに-3（味方行動の目印）を追加し、その後ダメージ値 number を追加
                     aActions[actionsIndex++] = BattleEmulator::ATTACK_ALLY;
                     values[valuesIndex++] = -3;
+                    if (valuesIndex < MAX) {
+                        values[valuesIndex++] = number;
+                    }
+                    enemyConsecutive = 0;
+                    allyFound = true;
+                } else if (prefix == 'h') {
+                    // h20とホイミ行動に数字をつけたときの処理
+                    aActions[actionsIndex++] = BattleEmulator::HEAL;
+                    values[valuesIndex++] = -2;
                     if (valuesIndex < MAX) {
                         values[valuesIndex++] = number;
                     }
