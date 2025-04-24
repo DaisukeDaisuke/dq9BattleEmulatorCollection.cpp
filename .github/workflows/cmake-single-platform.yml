@@ -32,9 +32,6 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target ybe_v2
 
-    - name: echo SHA256 rbe_single
-      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/ybe_v2.exe"
-
     - name: echo SHA256 ybe_v2
       run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/ybe_v2.exe"
 
