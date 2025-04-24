@@ -450,6 +450,37 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
+        //ヒャド
+        if (AllyPlayerPre.mp >= 3 && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
+            action = BattleEmulator::CRACK_ALLY;
+            if (tmpgenomu.Visited >= 1) {
+                currentGenome.fitness = baseFitness; // 固定値に
+                currentGenome.Visited = 0;
+            } else {
+                currentGenome.fitness = baseFitness + 15 + static_cast<int>(rng() % 6);
+            }
+            currentGenome.actions[turns - 1] = action;
+
+            CopedPlayers[0] = tmpgenomu.AllyPlayer;
+            CopedPlayers[1] = tmpgenomu.EnemyPlayer;
+
+            (*position) = tmpgenomu.position;
+            (*nowState) = tmpgenomu.state;
+
+            BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
+                                 CopedPlayers,
+                                 (std::optional<BattleResult> &) std::nullopt, seed,
+                                 nullptr, nullptr, -2, nowState.get());
+            currentGenome.position = (*position);
+            currentGenome.state = (*nowState);
+            currentGenome.turn = turns + 1;
+            currentGenome.processed = turns;
+            currentGenome.AllyPlayer = CopedPlayers[0];
+            currentGenome.EnemyPlayer = CopedPlayers[1];
+
+            que.push(currentGenome);
+        }
+
         if (!Bans.is_action_banned(BattleEmulator::ATTACK_ALLY, turns)) {
             action = BattleEmulator::ATTACK_ALLY;
             auto visited = tmpgenomu.Visited;
