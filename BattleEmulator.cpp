@@ -19,6 +19,14 @@
 
 thread_local int preHP[3] = {0, 0, 0};
 
+/**
+ * @brief 状態データから現在のコンボ情報をリセットします。
+ *
+ * この関数は64ビット整数で管理されている現在の状態データ (NowState) に対して、
+ * コンボに関連するビット領域 (bit 40-52) をクリアします。
+ *
+ * @param NowState 現在の状態を保持する64ビット整数へのポインタ。
+ */
 void inline BattleEmulator::resetCombo(uint64_t *NowState) {
     (*NowState) &= ~(0xFFF00000000);
 }

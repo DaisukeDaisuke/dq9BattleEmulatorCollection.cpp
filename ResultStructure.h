@@ -10,11 +10,21 @@
 
 #include "BattleEmulator.h"
 
+/**
+ * @brief 入力エントリを表す構造体
+ *
+ * この構造体は、ある一つのダメージ値と、対応する候補（candidates）のリストを持ちます。
+ */
 struct InputEntry {
     int damage = 0;
     std::vector<int> candidates;
 };
 
+/**
+ * @brief バトルシミュレーションの入力を管理する構造体
+ *
+ * この構造体は、バトルにおける敵および味方のダメージと行動IDを管理します。
+ */
 struct ResultStructure {
     int Edamage[350] = {}; // 敵側ダメージ
     int EdamageCounter = 0;
