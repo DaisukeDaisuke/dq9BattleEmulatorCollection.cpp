@@ -122,7 +122,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                      int actions[350], int seedOffset) {
     std::mt19937 rng(seed + seedOffset);
     bool CrackleEnable = false;
-    bool heal = (rng() % 8);
+    bool heal = (rng() % 8) + 3;
     std::unique_ptr<int> position = std::make_unique<int>(1);
     std::unique_ptr<uint64_t> nowState = std::make_unique<uint64_t>(0);
     auto counter = 0;
@@ -339,13 +339,13 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-        if (AllyPlayerPre.mp >= 8 && !Bans.is_action_banned(BattleEmulator::DRAGON_SLASH, turns)) {
+        if (!Bans.is_action_banned(BattleEmulator::DRAGON_SLASH, turns)) {
             action = BattleEmulator::DRAGON_SLASH;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 6);
+                currentGenome.fitness = baseFitness + 8 + static_cast<int>(rng() % 12);
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -399,7 +399,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-        if (AllyPlayerPre.mp >= heal && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
+        //mp不足なのにヒャド使わないようにする
+        if (AllyPlayerPre.mp >= 3 && AllyPlayerPre.mp >= heal && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
             action = BattleEmulator::CRACK_ALLY;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
