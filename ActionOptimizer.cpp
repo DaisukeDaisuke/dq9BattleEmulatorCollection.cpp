@@ -333,8 +333,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.AllyPlayer = CopedPlayers[0];
             currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 30) {
-                currentGenome.fitness += 60;
+            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 40) {
+                currentGenome.fitness += 100;
             }
             que.push(currentGenome);
         }

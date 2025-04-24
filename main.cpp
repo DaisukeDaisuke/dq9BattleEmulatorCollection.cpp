@@ -43,8 +43,6 @@ namespace {
 
     bool isMatchStrWithTrim(const char *s1, const char *s2);
 
-    bool EasterEgg(int argc, char *argv[]);
-
     void help(const char *program_name);
 
     void SearchRequest(Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
@@ -62,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v2.0.10";
+    const char *version = "v4.0.3_vo_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -257,14 +255,14 @@ namespace {
         std::string multiThreading = ", multithreading is disabled";
 #endif
 #if defined(OPTIMIZATION_O3_ENABLED)
-        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O3), Build date: " <<
+        std::cout << "dq9 Morag battle emulator " << version << " (Optimized for O3), Build date: " <<
                 buildDate
                 << ", " <<
                 buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(OPTIMIZATION_O2_ENABLED)
-        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Morag battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " <<
+        std::cout << "dq9 Morag battle emulator " << version << " (No optimization), Build date: " <<
                 buildDate << ", " << buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #else
         std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
@@ -285,62 +283,73 @@ namespace {
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
 
+    //入力パーサー
     NOINLINE int ProgramMain(Player players[2], int hours, int minutes, int seconds, int argc, char *argv[]) {
         const int MAX = 350;
+        // values[] はダメージやホイミ/味方行動マーカー、麻痺マーカー (-10) を格納する
         int values[MAX] = {0};
-        int aActions[MAX] = {0};  // 味方の行動情報を格納する
-        int maxElement = 0;
+        // aActions[] は味方行動（ホイミ、味方攻撃、麻痺の場合は PARALYSIS）を格納する
+        int aActions[MAX] = {0};
 
-        // ターン進行管理用
-        int turnCount = 0;
-        int enemyConsecutive = 0; // 連続した敵行動の数
+        int valuesIndex = 0; // values[] の書き込み位置
+        int actionsIndex = 0; // aActions[] の書き込み位置
 
-        // argv[0]～argv[3]は別の用途として飛ばし、4番目以降が行動コマンドとする
-        for (int i = 4; i < argc; ++i) {
-            std::string arg = argv[i];
+        int enemyConsecutive = 0; // 連続する敵行動数
+        bool allyFound = false; // 現在のグループ内に味方行動があるか
 
-            // 味方の行動の場合（"h"や先頭が'a'の場合）
-            if (arg == "h") {
-                // "h"の場合の処理（例：特定数値へ変換）
-                aActions[turnCount++] = BattleEmulator::HEAL;
-                values[maxElement] = -2;
-                // 味方行動の場合は敵の連続カウントをリセット
+        // argv[0]～argv[3]は別用途として、4番目以降が行動コマンドとなる
+        for (int i = 4; i < argc && valuesIndex < MAX; ++i) {
+            std::string cmd(argv[i]);
+
+            if (cmd == "h") {
+                // ホイミの場合：valuesに-2、aActionsにHEALを追加
+                aActions[actionsIndex++] = BattleEmulator::HEAL;
+                values[valuesIndex++] = -2;
                 enemyConsecutive = 0;
-            }
-            else {
-                // toABCintでprefixと数値部分を抽出
-                auto [prefix, tmp] = toABCint(argv[i]);
-
-                // 味方の行動（aのprefixを持つ場合）
+                allyFound = true;
+            } else {
+                // toABCintでprefixと数値部分を取得
+                auto [prefix, number] = toABCint(argv[i]);
                 if (prefix == 'a') {
-                    aActions[turnCount++] = BattleEmulator::ATTACK_ALLY;
-                    values[maxElement++] = -3;
-                    values[maxElement] = tmp;
-                    enemyConsecutive = 0;        // 味方が行動したら、敵の連続行動カウントはリセット
-                }
-                // 敵の行動の場合：prefixがなく、tmpが有効な数値の場合
-                else {
-                    values[maxElement] = tmp;
-                    enemyConsecutive++;
-                    // 敵行動が連続している場合、1回目以降はターンを進める
-                    if (enemyConsecutive >= 2) {
-                        aActions[turnCount++] = -10;
+                    // 味方攻撃の場合：まずvaluesに-3（味方行動の目印）を追加し、その後ダメージ値 number を追加
+                    aActions[actionsIndex++] = BattleEmulator::ATTACK_ALLY;
+                    values[valuesIndex++] = -3;
+                    if (valuesIndex < MAX) {
+                        values[valuesIndex++] = number;
                     }
-                    // ※ 1回目の敵行動はそのターンの敵行動と考えるため、すぐはターン進行させない
+                    enemyConsecutive = 0;
+                    allyFound = true;
+                } else {
+                    // 敵行動の場合：その数値をそのまま追加
+                    values[valuesIndex++] = number;
+                    enemyConsecutive++;
+
+                    // 敵行動が2回連続した場合、かつターン内に味方行動がなければ麻痺判定を行う
+                    if (enemyConsecutive == 2 && !allyFound) {
+                        // 値としては -10 を追加
+                        if (valuesIndex < MAX) {
+                            values[valuesIndex++] = -10;
+                        }
+                        aActions[actionsIndex++] = BattleEmulator::PARALYSIS;
+                        // 敵連続カウンタをリセット
+                        enemyConsecutive = 0;
+                    }
                 }
             }
-
-            maxElement++;
         }
 
-        // 最後に区切りとして-1を設定
-        values[maxElement] = -1;
-        aActions[turnCount] = -1;
+        // 結果の区切りとして末尾に -1 を設定
+        if (valuesIndex < MAX) {
+            values[valuesIndex] = -1;
+        }
+        if (actionsIndex < MAX) {
+            aActions[actionsIndex] = -1;
+        }
 
 
         FoundSeed = 0;
         foundSeeds = 0;
-        auto seed = BruteForceRequest(players, hours, minutes, seconds, maxElement, values, aActions);
+        auto seed = BruteForceRequest(players, hours, minutes, seconds, valuesIndex, values, aActions);
         if (foundSeeds == 1) {
             SearchRequest(players, seed, aActions, THREAD_COUNT);
         }
@@ -531,9 +540,9 @@ namespace {
 
         std::cout << "BruteForceRequest executed with time " << hours << ":" << minutes << ":" << seconds <<
                 std::endl;
-        // std::cout << "\naActions: ";
-        // for (int i = 0; i < 350 && aActions[i] != -1; ++i) std::cout << aActions[i] << " ";
-        // std::cout << "\ndamages: ";
+        std::cout << "\naActions: ";
+        for (int i = 0; i < 350 && aActions[i] != -1; ++i) std::cout << aActions[i] << " ";
+        std::cout << "\ndamages: ";
         for (int i = 0; i < 350 && damages[i] != -1; ++i) std::cout << damages[i] << " ";
         std::cout << std::endl;
         BattleEmulator::ResetTurnProcessed();
@@ -548,9 +557,6 @@ namespace {
 
         auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1.5) * (1 / 0.125155)));
         time2 = (time2 & 0xffff) << 16;
-
-        time1 = 630021145;
-        time2 = 630021146;
 
         /*
         *NowStateの各ビットの使用状況は下記の通りである。
@@ -703,7 +709,7 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef DEBUG2
-    uint64_t time1 = 0x258d5c19;
+    uint64_t time1 = 2231963236;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -728,18 +734,19 @@ int main(int argc, char *argv[]) {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {25, -10, -10, -10, 26, 25, 25, 23, 25, 61, 23, 61, 25, 61, 59, 23, 25, 59, 61, 25, 23, 25, 25, 61, 25, 23, 56, 25, 25, 25, 25, 25, 59, 59, 59, 59,
-        BattleEmulator::ATTACK_ALLY};
+    int32_t gene1[350] = {0};
+    //int32_t gene1[350] = {25, -10, -10, -10, 26, 25, 25, 23, 25, 61, 23, 61, 25, 61, 59, 23, 25, 59, 61, 25, 23, 25, 25, 61, 25, 23, 56, 25, 25, 25, 25, 25, 59, 59, 59, 59,
+      //  BattleEmulator::ATTACK_ALLY};
     //0x22e2dbaf:
     //0x44dbafa: 25, 25, 25, 50, 54, 25, 50, 54, 56, 54, 25, 54, 53, 53, 25, 50, 25, 56, 54, 25, 54,
     //int32_t gene1[350] = {25, 25, 25, 50, 53, 54, 54, 54, 50, 53, 54, 25, 50, 25, 54, 50, 25, 56, 54, 53, 54, 27,  BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     //
 
 

@@ -199,7 +199,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 792) {
+        if ((*position) == 75) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -318,7 +318,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     if (damages[exCounter] == -1) {
                         return true;
                     }
-                    if (basedamage != 0 && damages[exCounter++] != basedamage) {
+                    if (basedamage == 0 && damages[exCounter] == 0) {
+                        exCounter++;
+                    }else if (basedamage != 0 && damages[exCounter++] != basedamage) {
                         return false;
                     }
                     if (damages[exCounter] == -1) {
@@ -410,26 +412,33 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         Player::heal(players[0], basedamage);
                         if (action == HEAL) {
                             if (mode != -1 && mode != -2) {
+                                if (damages[exCounter] == -1) {
+                                    return true;
+                                }
                                 if (damages[exCounter] == -2) {
                                     exCounter++;
+                                }
+                                if (damages[exCounter] == -1) {
+                                    return true;
                                 }
                             }
                         }
                     } else {
                         Player::reduceHp(players[1], basedamage);
                         if (mode != -1 && mode != -2) {
-
                             if (damages[exCounter] == -1) {
                                 return true;
                             }
-                            if (basedamage != 0 && damages[exCounter++] != -3) {
-                                return false;
-                            }
-                            if (basedamage != 0 && damages[exCounter++] != basedamage) {
-                                return false;
-                            }
-                            if (damages[exCounter] == -1) {
-                                return true;
+                            if (action != PARALYSIS && action != CURE_PARALYSIS) {
+                                if (damages[exCounter++] != -3) {
+                                    return false;
+                                }
+                                if (damages[exCounter++] != basedamage) {
+                                    return false;
+                                }
+                                if (damages[exCounter] == -1) {
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -885,6 +894,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //回避
             baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
         //            ProcessFUN_021db2a0(position, attacker, players);
+
+            tmp = static_cast<double>(baseDamage);
             if (kaisinn) {
                 //0x020759ec
                 if ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST || (Id & 0xffff) ==
@@ -894,6 +905,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
                 }
             }
+
+            baseDamage = static_cast<int>(floor(tmp));
 
             if (!kaihi) {
                 ProcessRage(position, baseDamage, players);
