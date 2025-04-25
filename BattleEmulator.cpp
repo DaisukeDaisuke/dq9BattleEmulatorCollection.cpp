@@ -368,7 +368,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 399) {
+        if ((*position) == 647) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -1305,11 +1305,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = static_cast<int>(floor(tmp));
 
-            if (players[attacker].acrobaticStar && kaisinn) {
-                //nope
-            } else {
-                ProcessRage(position, baseDamage, players, kaisinn);
-            }
+            ProcessRage(position, baseDamage, players, kaisinn); //不定消費は謎
             (*position)++; //目を覚ました
             (*position)++; //不明
             if (kaisinn) {
