@@ -335,8 +335,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-#if defined(lv13_sp13_hagane_atk101)
-
         if (AllyPlayerPre.mp >= 10 && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
             action = BattleEmulator::CRACK_ALLY;
             if (tmpgenomu.Visited >= 1) {
@@ -366,7 +364,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
             que.push(currentGenome);
         }
-#endif
 
         if (!Bans.is_action_banned(BattleEmulator::ATTACK_ALLY, turns)) {
             action = BattleEmulator::ATTACK_ALLY;
