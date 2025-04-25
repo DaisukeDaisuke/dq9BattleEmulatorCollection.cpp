@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v5.0.5_vf_aa";
+    const char *version = "v5.0.5_vE_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -797,10 +797,10 @@ NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
 
         int totalSeconds = hours * 3600 + minutes * 60 + seconds;
         totalSeconds = totalSeconds - 15;
-        auto time1 = static_cast<uint64_t>(floor((totalSeconds - 2.5) * (1 / 0.12515)));
+        auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1.5) * (1 / 0.12515)));
         time1 = time1 << 16;
 
-        auto time2 = static_cast<uint64_t>(floor((totalSeconds + 2.5) * (1 / 0.125155)));
+        auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1.5) * (1 / 0.125155)));
         time2 = time2 << 16;
         int32_t gene[350] = {0};
         for (int i = 0; i < 350; ++i) {
@@ -1004,27 +1004,28 @@ int main(int argc, char *argv[]) {
             3840264243
             */
     // seed: 0x57c848f, actions: 25, 25, 25, 25, 50, 61, 25, 61, 56, 61, 25, 58, 25, 25, 61, 50, 58, 61,
+    //seed: 0x4305ae3, actions: 25, 25, 25, 25, 61, 50, 61, 25, 50, 61, 50, 25, 50, 56, 25, 25, 25, 25, 25, 50, 61, 61, 61, 59,
 
-        uint64_t time1 = 0x57c848f;
+    uint64_t time1 = 0x4305ae3;
 
-        int dummy[100];
-        lcg::init(time1, false);
-        int *position1 = new int(1);
+    int dummy[100];
+    lcg::init(time1, false);
+    int *position1 = new int(1);
 
-        //0x22f09d67: 25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25,
-        /*
-            *NowStateの各ビットの使用状況は下記の通りである。
-            +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
-               |            Name            |     size      |
-            0  | Current Rotation Table     |     4bit      |
-            4  | Rotation Internal State    |     4bit      |
-            8  | Free Camera State          |     4bit      |
-            12 | Turn Count Processed       |     20bit     |
-            32 | Combo Previous Attack Id   |     2byte     |
-            40 | Combo Counter              |     1byte     |
-            +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                                         合計 6Byte
-        */
+    //0x22f09d67: 25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25,
+    /*
+        *NowStateの各ビットの使用状況は下記の通りである。
+        +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
+           |            Name            |     size      |
+        0  | Current Rotation Table     |     4bit      |
+        4  | Rotation Internal State    |     4bit      |
+        8  | Free Camera State          |     4bit      |
+        12 | Turn Count Processed       |     20bit     |
+        32 | Combo Previous Attack Id   |     2byte     |
+        40 | Combo Counter              |     1byte     |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                     合計 6Byte
+    */
 
         auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
@@ -1035,7 +1036,7 @@ int main(int argc, char *argv[]) {
     //0x78f0155: 25, 25, 25, 55, 50, 50, 50, 50, 27, 25, 25, 50, 25, 25, 25, 25, 50, 27, 27, 59, 27, 56, 25, 25, 25, 53, 53, 25, 53,
     //ver: v5.0.4, atk: 82, def: 90, seed: 0x5cac57dc, actions: 25, 25, 50, 50, 53, 50, 50, 50, 25, 50, 59, 53, 25, 56, 25, 58, 25, 59, 25, 56, 53, 25, 25, 53, 58, 59,
 
-        int32_t gene1[350] = {25, 25, 25, 25, 50, 61, 25, 61, 56, 61, 25, 58, 25, 25, 61, 50, 58, 61,   BattleEmulator::ATTACK_ALLY};
+        int32_t gene1[350] = {25, 25, 25, 25, 61, 50, 61, 25, 50, 61, 50, 25, 50, 56, 25, 25, 25, 25, 25, 50, 61, 61, 61, 59,  BattleEmulator::ATTACK_ALLY};
         //gene1[19-1] = BattleEmulator::DEFENCE;
         int counter = 0;
         //
@@ -1080,9 +1081,14 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x1731ec50;
+    uint64_t seed = 70094041;
 
-    int actions[350] = {BattleEmulator::ATTACK_ALLY,BattleEmulator::ATTACK_ALLY, -1,};
+    int actions[350] = {
+        BattleEmulator::ATTACK_ALLY,
+        BattleEmulator::ATTACK_ALLY,
+        BattleEmulator::SPECIAL_MEDICINE,
+        -1,
+    };
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
 
     std::cout << performanceLogger.rdbuf() << std::endl;
