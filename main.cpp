@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v4.0.3_vf_aa";
+    const char *version = "v4.0.3_vE_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -195,12 +195,13 @@ namespace {
                 sp = specialAction;
 
                 if (eAction[0] != "magic Burst" && eAction[1] != "magic Burst") {
+                    //動けない場合、テーブルにアクションを表示しない
                     if (!initiative && (action == BattleEmulator::INACTIVE_ALLY || action ==
-                                        BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
+                                        BattleEmulator::TURN_SKIPPED ||
                                         action == BattleEmulator::SLEEPING)) {
                         sp = "---------------";
                     }
-                    if ((action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
+                    if ((action == BattleEmulator::PARALYSIS || action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
                         sp = "---------------";
                     }
                 }
@@ -308,7 +309,7 @@ namespace {
                 values[valuesIndex++] = -2;
                 enemyConsecutive = 0;
                 allyFound = true;
-            }else if (cmd == "y") {
+            } else if (cmd == "y") {
                 // ホイミの場合：valuesに-2、aActionsにHEALを追加
                 aActions[actionsIndex++] = BattleEmulator::INACTIVE_ALLY;
                 values[valuesIndex++] = -4;
@@ -341,14 +342,12 @@ namespace {
                     enemyConsecutive++;
 
                     // 敵行動が2回連続した場合、かつターン内に味方行動がなければ麻痺判定を行う
-                    if (enemyConsecutive == 2 && !allyFound) {
-                        // 値としては -10 を追加
-                        if (valuesIndex < MAX) {
-                            values[valuesIndex++] = -10;
-                        }
+                    //麻痺時にパフパフがあるとズレるが、その時はあきらめる
+                    if (enemyConsecutive >= 2 && !allyFound) {
                         aActions[actionsIndex++] = BattleEmulator::PARALYSIS;
-                        // 敵連続カウンタをリセット
-                        enemyConsecutive = 0;
+                        // enemyConsecutiveをリセットしないことで麻痺を連続して拾う
+                    } else {
+                        allyFound = false;
                     }
                 }
             }

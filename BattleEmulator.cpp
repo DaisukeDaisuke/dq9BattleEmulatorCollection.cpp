@@ -299,6 +299,10 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     actionTable = ATTACK_ALLY;
                 }
             }
+            //麻痺ったときに不正な防御しないように
+            if (actionTable == INACTIVE_ALLY || actionTable == DEFENCE || actionTable == PARALYSIS) {
+                actionTable = ATTACK_ALLY;
+            }
         } else {
             if (players[0].hp >= 35) {
                 actionTable = ATTACK_ALLY;
