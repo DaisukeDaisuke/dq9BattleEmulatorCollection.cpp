@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v4.0.3_vE_aa";
+    const char *version = "v4.0.3_vR_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -284,6 +284,95 @@ namespace {
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
 
+    NOINLINE bool ProcessInputBuilder(const int argc, char *argv[], int *aActions, int *values, int &valuesIndex) {
+        // 最初の3件は時間情報のため、最低でも4件必要
+        if (argc < 4) {
+            return false;
+        }
+
+        int counter2 = 0;
+
+        // 行動引数は argv[4] 以降
+        int totalActions = argc - 4;
+        // 1ターンあたりの上限行動数（3件）
+        constexpr int actionsPerTurn = 2;
+
+        // ターン数は、totalActions を actionsPerTurn で割った商＋余りがあれば1ターンとして計上
+        int turns = totalActions / actionsPerTurn;
+        int remainder = totalActions % actionsPerTurn;
+        if (remainder > 0) {
+            turns++;
+        }
+
+        int enemyConsecutive = 0; // 複数ターンにわたる敵連続行動数
+        int tokenIndex = 4; // 最初の行動引数の位置
+
+        for (int turn = 0; turn < turns; turn++) {
+            bool allyPresent = false; // このターンに味方行動があるかのフラグ
+            int enemyActions = 0; // このターン内の敵の行動数
+
+            // 現ターンの行動数（最後のターンは3未満の場合があるので調整）
+            int actionsThisTurn = actionsPerTurn;
+            if ((turn == turns - 1) && (remainder > 0)) {
+                actionsThisTurn = remainder;
+            }
+
+            // 現ターン分のトークンを処理
+            for (int j = 0; j < actionsThisTurn; j++) {
+                const char *token = argv[tokenIndex++];
+                if (isMatchStrWithTrim(token, "h") || isMatchStrWithTrim(token, "ah")) {
+                    // 回復は明示的な味方行動
+                    aActions[valuesIndex++] = BattleEmulator::HEAL;
+                    values[counter2++] = -2;
+                    values[counter2++] = -2;
+                    allyPresent = true;
+                } else if (isMatchStrWithTrim(token, "y") || isMatchStrWithTrim(token, "i")) {
+                    aActions[valuesIndex++] = BattleEmulator::INACTIVE_ALLY;
+                    allyPresent = true;
+                } else {
+                    // 上記以外は toABCint による分解処理
+                    auto [prefix, tmp] = toABCint(token);
+
+                    // 味方行動の条件（今回は prefix == 'a' が味方とする）
+                    if (prefix == 'a') {
+                        aActions[valuesIndex++] = BattleEmulator::ATTACK_ALLY;
+                        values[counter2++] = -3;
+                        values[counter2++] = tmp;
+                        allyPresent = true;
+                    } else if (prefix == 'h') {
+                        aActions[valuesIndex++] = BattleEmulator::HEAL;
+                        values[counter2++] = -2;
+                        values[counter2++] = tmp;
+                        allyPresent = true;
+                    } else {
+                        values[counter2++] = tmp;
+                        enemyActions++;
+                    }
+                }
+            } // 1ターン分の処理終了
+
+            if (allyPresent) {
+                // 味方の行動が1件でもあれば、敵連続カウントはリセット
+                enemyConsecutive = 0;
+            } else {
+                // このターン内の敵行動数を累積
+                enemyConsecutive += enemyActions;
+                // 連続敵行動が3件以上の場合、眠り判定を行う
+                while (enemyConsecutive >= 1) {
+                    aActions[valuesIndex++] = BattleEmulator::PARALYSIS;
+                    enemyConsecutive -= 1;
+                }
+            }
+        }
+
+        aActions[valuesIndex] = -1;
+        values[counter2] = -1;
+
+
+        return true;
+    }
+
+
     //入力パーサー
     NOINLINE int ProgramMain(Player players[2], int hours, int minutes, int seconds, int argc, char *argv[]) {
         const int MAX = 350;
@@ -293,74 +382,8 @@ namespace {
         int aActions[MAX] = {0};
 
         int valuesIndex = 0; // values[] の書き込み位置
-        int actionsIndex = 0; // aActions[] の書き込み位置
 
-        int enemyConsecutive = 0; // 連続する敵行動数
-        bool allyFound = false; // 現在のグループ内に味方行動があるか
-
-        // argv[0]～argv[3]は別用途として、4番目以降が行動コマンドとなる
-        for (int i = 4; i < argc && valuesIndex < MAX; ++i) {
-            std::string cmd(argv[i]);
-
-            if (cmd == "h") {
-                // ホイミの場合：valuesに-2、aActionsにHEALを追加
-                aActions[actionsIndex++] = BattleEmulator::HEAL;
-                values[valuesIndex++] = -2;
-                values[valuesIndex++] = -2;
-                enemyConsecutive = 0;
-                allyFound = true;
-            } else if (cmd == "y") {
-                // ホイミの場合：valuesに-2、aActionsにHEALを追加
-                aActions[actionsIndex++] = BattleEmulator::INACTIVE_ALLY;
-                values[valuesIndex++] = -4;
-                enemyConsecutive = 0;
-                allyFound = true;
-            } else {
-                // toABCintでprefixと数値部分を取得
-                auto [prefix, number] = toABCint(argv[i]);
-                if (prefix == 'a') {
-                    // 味方攻撃の場合：まずvaluesに-3（味方行動の目印）を追加し、その後ダメージ値 number を追加
-                    aActions[actionsIndex++] = BattleEmulator::ATTACK_ALLY;
-                    values[valuesIndex++] = -3;
-                    if (valuesIndex < MAX) {
-                        values[valuesIndex++] = number;
-                    }
-                    enemyConsecutive = 0;
-                    allyFound = true;
-                } else if (prefix == 'h') {
-                    // h20とホイミ行動に数字をつけたときの処理
-                    aActions[actionsIndex++] = BattleEmulator::HEAL;
-                    values[valuesIndex++] = -2;
-                    if (valuesIndex < MAX) {
-                        values[valuesIndex++] = number;
-                    }
-                    enemyConsecutive = 0;
-                    allyFound = true;
-                } else {
-                    // 敵行動の場合：その数値をそのまま追加
-                    values[valuesIndex++] = number;
-                    enemyConsecutive++;
-
-                    // 敵行動が2回連続した場合、かつターン内に味方行動がなければ麻痺判定を行う
-                    //麻痺時にパフパフがあるとズレるが、その時はあきらめる
-                    if (enemyConsecutive >= 2 && !allyFound) {
-                        aActions[actionsIndex++] = BattleEmulator::PARALYSIS;
-                        // enemyConsecutiveをリセットしないことで麻痺を連続して拾う
-                    } else {
-                        allyFound = false;
-                    }
-                }
-            }
-        }
-
-        // 結果の区切りとして末尾に -1 を設定
-        if (valuesIndex < MAX) {
-            values[valuesIndex] = -1;
-        }
-        if (actionsIndex < MAX) {
-            aActions[actionsIndex] = -1;
-        }
-
+        ProcessInputBuilder(argc, argv, aActions, values, valuesIndex);
 
         FoundSeed = 0;
         foundSeeds = 0;
@@ -449,7 +472,7 @@ namespace {
         delete nowState;
 
 #if defined(MINGW_BUILD)
-        dumpTableMain(result1.value(), genome, seed, 0);
+        dumpTableMain(result1.value(), genome, seed, turns - 1);
 #else
         dumpTableMain(result1.value(), genome, seed, turns - 1);
 #endif
@@ -545,7 +568,7 @@ namespace {
             Player players[2] = {copiedPlayers[0], copiedPlayers[1]};
 
 
-            bool resultBool = BattleEmulator::Main(position, turns, gene, players,
+            bool resultBool = BattleEmulator::Main(position, 100, gene, players,
                                                    (std::optional<BattleResult> &) std::nullopt, seed, nullptr,
                                                    damages,
                                                    maxElement,
