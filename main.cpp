@@ -308,6 +308,12 @@ namespace {
                 values[valuesIndex++] = -2;
                 enemyConsecutive = 0;
                 allyFound = true;
+            }else if (cmd == "y") {
+                // ホイミの場合：valuesに-2、aActionsにHEALを追加
+                aActions[actionsIndex++] = BattleEmulator::INACTIVE_ALLY;
+                values[valuesIndex++] = -4;
+                enemyConsecutive = 0;
+                allyFound = true;
             } else {
                 // toABCintでprefixと数値部分を取得
                 auto [prefix, number] = toABCint(argv[i]);
@@ -581,6 +587,9 @@ namespace {
 
         auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1.5) * (1 / 0.125155)));
         time2 = (time2 & 0xffff) << 16;
+
+        time1 = 2166867405;
+        time2 = 2166867405 + 1;
 
         /*
         *NowStateの各ビットの使用状況は下記の通りである。

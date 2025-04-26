@@ -504,7 +504,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             if (damages[exCounter] == -1) {
                                 return true;
                             }
-                            if (action != PARALYSIS && action != CURE_PARALYSIS) {
+                            if (action != PARALYSIS && action != CURE_PARALYSIS && action != INACTIVE_ALLY) {
                                 if (damages[exCounter++] != -3) {
                                     return false;
                                 }
@@ -513,6 +513,10 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 }
                                 if (damages[exCounter] == -1) {
                                     return true;
+                                }
+                            }else if (action == INACTIVE_ALLY) {
+                                if (damages[exCounter] == -4) {
+                                    exCounter++;
                                 }
                             }
                         }
