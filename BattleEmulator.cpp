@@ -262,7 +262,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 75) {
+        if ((*position) == 506) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -630,12 +630,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; // 回避
             baseDamage = FUN_021e8458_typeC(position, 35.0, 35.0, 5.0);
             (*position)++; // 不明
-            if (!players[defender].specialCharge) {
+            if (!players[attacker].specialCharge) {
                 (*position)++; // 必殺チャージ(敵)　0%
                 if (lcg::getPercent(position, 100) < 1) {
                     //0x021ed7a8
-                    players[defender].specialCharge = true;
-                    players[defender].specialChargeTurn = 6;
+                    players[attacker].specialCharge = true;
+                    players[attacker].specialChargeTurn = 6;
                 }
             }
             break;
@@ -699,10 +699,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
             (*position)++; //不明
             (*position)++; //必殺チャージ(敵)
-            if (!players[defender].specialCharge && lcg::getPercent(position, 100) < 1) {
+            if (!players[attacker].specialCharge && lcg::getPercent(position, 100) < 1) {
                 //0x021ed7a8
-                players[defender].specialCharge = true;
-                players[defender].specialChargeTurn = 6;
+                players[attacker].specialCharge = true;
+                players[attacker].specialChargeTurn = 6;
             }
             baseDamage = 0;
             break;

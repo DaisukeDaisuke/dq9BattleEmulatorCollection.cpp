@@ -588,9 +588,6 @@ namespace {
         auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1.5) * (1 / 0.125155)));
         time2 = (time2 & 0xffff) << 16;
 
-        time1 = 2166867405;
-        time2 = 2166867405 + 1;
-
         /*
         *NowStateの各ビットの使用状況は下記の通りである。
         +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
@@ -742,14 +739,14 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef DEBUG2
-    uint64_t time1 = 2231963236;
+    uint64_t time1 = 0x8127c5cd;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
 
-    //0x44dbafa: 25, 25, 25, 50, 53, 54, 54, 54, 50, 53, 54, 25, 50, 25, 54, 50, 25, 56, 54, 53, 54, 27,
-    //0x22f09d67: 25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25,
+    // seed: 0x8127c5cd, actions: 22, 25, 25, 25, 26, 25, 25, 25, 59, 61, 59, 23, 25, 25, 61, 23, 25, 25, 25, 25, 23, 25, 25, 23, 53, 25,
+
     /*
         *NowStateの各ビットの使用状況は下記の通りである。
         +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
@@ -767,20 +764,21 @@ int main(int argc, char *argv[]) {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
+
     //int32_t gene1[350] = {25, -10, -10, -10, 26, 25, 25, 23, 25, 61, 23, 61, 25, 61, 59, 23, 25, 59, 61, 25, 23, 25, 25, 61, 25, 23, 56, 25, 25, 25, 25, 25, 59, 59, 59, 59,
       //  BattleEmulator::ATTACK_ALLY};
     //0x22e2dbaf:
     //0x44dbafa: 25, 25, 25, 50, 54, 25, 50, 54, 56, 54, 25, 54, 53, 53, 25, 50, 25, 56, 54, 25, 54,
-    //int32_t gene1[350] = {25, 25, 25, 50, 53, 54, 54, 54, 50, 53, 54, 25, 50, 25, 54, 50, 25, 56, 54, 53, 54, 27,  BattleEmulator::ATTACK_ALLY};
+    int32_t gene1[350] = {22, 25, 25, 25, 26, 25, 25, 25, 59, 61, 59, 23, 25, 25, 61, 23, 25, 25, 25, 25, 23, 25, 25, 23, 53, 25,  BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    //
+    //int32_t gene1[350] = {0};
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // //
 
 
     //

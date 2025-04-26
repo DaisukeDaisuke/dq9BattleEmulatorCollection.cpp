@@ -491,12 +491,11 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.EnemyPlayer = CopedPlayers[1];
 
 
-
             que.push(currentGenome);
         }
 
-        if (AllyPlayerPre.specialCharge == true && AllyPlayerPre.acrobaticStar == false && !Bans.is_action_banned(
-                BattleEmulator::ACROBATIC_STAR, turns)) {
+        if (AllyPlayerPre.specialCharge == true && AllyPlayerPre.specialChargeTurn != 0 && AllyPlayerPre.acrobaticStar == false
+            && !Bans.is_action_banned(BattleEmulator::ACROBATIC_STAR, turns)) {
             action = BattleEmulator::ACROBATIC_STAR;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
@@ -513,7 +512,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             (*nowState) = tmpgenomu.state;
 
 
-
             BattleEmulator::Main(position.get(), tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
@@ -524,7 +522,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             currentGenome.processed = turns;
             currentGenome.AllyPlayer = CopedPlayers[0];
             currentGenome.EnemyPlayer = CopedPlayers[1];
-
 
 
             que.push(currentGenome);
