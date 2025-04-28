@@ -335,7 +335,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-        if (AllyPlayerPre.mp >= 10 && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
+        if (CrackleEnable && AllyPlayerPre.mp >= 10 && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
             action = BattleEmulator::CRACK_ALLY;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に

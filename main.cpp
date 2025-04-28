@@ -66,7 +66,7 @@ namespace {
 
     std::stringstream performanceLogger = std::stringstream();
 
-    constexpr int THREAD_COUNT = 4;
+    constexpr int THREAD_COUNT = 5;
     // `InputBuilder` インスタンス作成
     InputBuilder builder;
 #if defined(HAGANE)
@@ -528,7 +528,7 @@ namespace {
         }
 
         auto [turnProcessed,genome] =
-                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads);
+                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 3000, gene, numThreads);
 
         std::optional<BattleResult> result1;
         result1 = BattleResult();
