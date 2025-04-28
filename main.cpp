@@ -62,7 +62,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v8.0.2";
+    const char *version = "v8.0.2_vj_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -433,7 +433,7 @@ namespace {
         std::cout << turns << std::endl;
         dumpTableMain(result1.value(), genome, seed, 0);
 #else
-        dumpTableMain(result1.value(), genome, seed, turns - 1);
+        dumpTableMain(result1.value(), genome, seed, turns);
 #endif
 
 #if defined(DEBUG)
