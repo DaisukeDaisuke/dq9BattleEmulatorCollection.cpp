@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v4.0.3_vR_aa";
+    const char *version = "v4.0.3_vT_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -272,15 +272,7 @@ namespace {
     }
 
     void help(const char *program_name) {
-        std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
-        std::cout << "tables" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::KASAP) << R"(:   "r" or "k")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SPECIAL_MEDICINE) << R"(:   "h")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
-        std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
-        std::cout << "example: " << program_name << " 2 2 26 29 9 32 9 9 36 9 b" << std::endl;
-        std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
+        std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;;
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
 
@@ -472,9 +464,9 @@ namespace {
         delete nowState;
 
 #if defined(MINGW_BUILD)
-        dumpTableMain(result1.value(), genome, seed, turns - 1);
+        dumpTableMain(result1.value(), genome, seed, 0);
 #else
-        dumpTableMain(result1.value(), genome, seed, turns - 1);
+        dumpTableMain(result1.value(), genome, seed, turns);
 #endif
 
 #ifdef DEBUG
