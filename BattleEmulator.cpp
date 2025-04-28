@@ -680,7 +680,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             const int probability[4] = {62, 75, 87, 100};
                             auto probability1 = probability[std::abs(players[0].BuffTurns)];
                             auto probability2 = lcg::getPercent(position, 100);
-                            if (probability1 > probability2) {
+                            if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
                                 players[0].BuffLevel = 0;
                                 RecalculateBuff(players);
                             }
@@ -692,7 +692,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             const int probability[4] = {62, 75, 87, 100};
                             auto probability1 = probability[std::abs(players[0].speedTurn)];
                             auto probability2 = lcg::getPercent(position, 100);
-                            if (probability1 > probability2) {
+                            if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
                                 players[0].speedLevel = 0;
                                 RecalculateBuff(players);
                             }
