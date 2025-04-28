@@ -544,7 +544,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             int paralysisTable[4] = {62, 75, 87, 100};
                             auto probability1 = paralysisTable[std::abs(players[0].paralysisTurns)];
                             auto probability2 = lcg::getPercent(position, 100);
-                            if (probability1 >= probability2) {
+                            if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
                                 // 0.5 < 0.65
                                 players[0].paralysis = false;
                                 players[0].paralysisLevel = 0;
@@ -624,7 +624,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             const int probability[4] = {62, 75, 87, 100};
                             auto probability1 = probability[std::abs(players[0].MagicMirrorTurn)];
                             auto probability2 = lcg::getPercent(position, 100);
-                            if (probability1 >= probability2) {
+                            if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
                                 // 0x0215a050 MMT
                                 players[0].hasMagicMirror = false;
                             }
@@ -636,7 +636,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             const int probability[4] = {62, 75, 87, 100};
                             auto probability1 = probability[std::abs(players[0].AtkBuffTurn)];
                             auto probability2 = lcg::getPercent(position, 100);
-                            if (probability1 >= probability2) {
+                            if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
                                 players[0].AtkBuffLevel = 0;
                                 RecalculateBuff(players);
                             }
@@ -647,7 +647,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             const int probability[4] = {62, 75, 87, 100};
                             auto probability1 = probability[std::abs(players[0].BuffTurns)];
                             auto probability2 = lcg::getPercent(position, 100);
-                            if (probability1 >= probability2) {
+                            if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
                                 players[0].BuffLevel = 0;
                                 RecalculateBuff(players);
                             }
