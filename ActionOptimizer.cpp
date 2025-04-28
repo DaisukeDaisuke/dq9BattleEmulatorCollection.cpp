@@ -205,7 +205,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                              result, seed,
                              nullptr, nullptr, -1, nowState.get());
 
-        if (CopedPlayers[0].hp <= 0) {
+        if (currentGenome.Initialized && CopedPlayers[0].hp <= 0) {
             continue;
         }
 
@@ -222,23 +222,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         if (BaseGenome.turn < currentGenome.turn) {
             continue; //最適解より長い回答は求めてない
         }
-
-        counter1 = 0;
-        currentGenome.EActions[0] = 0;
-        currentGenome.EActions[1] = 0;
-        auto actioncount = ((result->turn + 1) & 1) + 2;
-        for (int i = std::max(0, result->position - actioncount); i < result->position; ++i) {
-            if (result->isEnemy[i]) {
-                //Eactions[counter1] = result->actions[i];
-                //Edamage[counter1] = result->damages[i];
-                currentGenome.EActions[counter1++] = result->actions[i];
-            } else {
-                Aactions = result->actions[i];
-                //Adamage = result->damages[i];
-                currentGenome.Aactions = result->actions[i];
-            }
-        }
-
 
         if (currentGenome.Visited == 0) {
             updateCompromiseScore(currentGenome);
@@ -261,12 +244,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             continue;
         }
         bool skip = false;
-
-        if (Aactions == BattleEmulator::SLEEPING || Aactions == BattleEmulator::PARALYSIS || Aactions ==
-            BattleEmulator::TURN_SKIPPED) {
-            //canmove1 = false;
-            skip = true;
-        }
 
         auto baseFitness = tmpgenomu.fitness;
 
