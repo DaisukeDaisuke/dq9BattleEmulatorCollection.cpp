@@ -733,9 +733,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 (*position)++; //目を覚ました
                 (*position)++; //不明
             }
-            process7A8(position, baseDamage, players, defender);
             tmp = baseDamage * players[defender].defence;
             baseDamage = static_cast<int>(floor(tmp));
+            process7A8(position, baseDamage, players, defender);
             break;
         case BattleEmulator::ATTACK_ENEMY:
             (*position) += 2;
@@ -769,9 +769,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 (*position)++; //目を覚ました
                 (*position)++; //不明
             }
-            process7A8(position, baseDamage, players, defender);
             tmp = baseDamage * players[defender].defence;
             baseDamage = static_cast<int>(floor(tmp));
+            process7A8(position, baseDamage, players, defender);
             break;
         case BattleEmulator::INACTIVE_ALLY:
         case BattleEmulator::PARALYSIS:
@@ -856,9 +856,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 players[defender].paralysisLevel++;
             }
             (*position)++; //不明
-            process7A8(position, baseDamage, players, defender);
             tmp = baseDamage * players[defender].defence;
             baseDamage = static_cast<int>(floor(tmp));
+            process7A8(position, baseDamage, players, defender);
             break;
         case BattleEmulator::CRACK_ENEMY:
             (*position) += 2;
@@ -874,10 +874,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             } else {
                 (*position)++;
             }
-            process7A8(position, baseDamage, players, defender);
-
             tmp = baseDamage * players[defender].defence;
             baseDamage = static_cast<int>(floor(tmp));
+            process7A8(position, baseDamage, players, defender);
             break;
         case BattleEmulator::HP_HOOVER: //バンパイアエッジ
             (*position) += 2;
@@ -1078,9 +1077,6 @@ void BattleEmulator::process7A8(int *position, int baseDamage, Player *players, 
                 }
                 auto percent_tmp = lcg::getPercent(position, 100);
                 double tmp = baseDamage;
-                if (!players[0].paralysis && !players[0].sleeping) {
-                    tmp *= players[defender].defence;
-                }
                 auto baseDamage_tmp = static_cast<int>(floor(tmp));
                 for (int i = 0; i < 9; ++i) {
                     if (baseDamage_tmp >= proportionTable3[i]) {
