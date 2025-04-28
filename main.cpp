@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v4.0.3_vZ_aa";
+    const char *version = "v4.0.3_vG_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
