@@ -306,7 +306,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 1058) {
+        if ((*position) == 862) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -997,7 +997,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position) += 2;
         //0x021ec6f8 アクロバットスター
-            if (players[0].acrobaticStar && (Id & 0xffff) == MASSIVE_SWIPE && isFlee) {
+            if (players[0].acrobaticStar && (Id & 0xffff) == MASSIVE_SWIPE) {
                 //アクロバットスターで、逃げた時だけ特殊な挙動をする
                 /*
                 --------start_FUN_02158dfc-------

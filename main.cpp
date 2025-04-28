@@ -62,7 +62,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v7.0.4_vO_aa";
+    const char *version = "v7.0.4_vT_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -773,10 +773,8 @@ int main(int argc, char *argv[]) {
 
 
 #if defined(DEBUG2)
-    //0x3054ea5: 25, 57, 57, 50, 57, 50, 53, 50, 25, 25, 50, 25, 53, 50, 56, 25, 57, 25, 25, 50, 25, 53, 50, 53, 27, 56, 27, 53, 53, 25,
-    //0x10ee370b: 25, 25, 50, 25, 50, 25, 50, 25, 50, 25, 57, 25, 50, 56, 57, 25, 25, 25, 25, 50, 27, 27, 50, 27, 50, 25, 59, 56, 25, 25, 57,
-    //0x4e9cd27: 25, 25, 50, 25, 50, 25, 50, 57, 50, 27, 27, 50, 25, 50, 57, 56, 53, 25, 27, 50, 25, 25, 50, 25, 56, 53, 53, 53, 25, 53, 53, 59, 25, 59,
-    uint64_t time1 = 0x4e9cd27;
+    //seed: 0x1b433d8, actions: 25, 25, 50, 59, 50, 56, 53, 57, 57, 25, 25, 53, 50, 25, 59, 50, 58, 56, 25, 25, 57, 50, 53, 25, 56, 25, 59, 25,
+    uint64_t time1 = 0x1b433d8;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -803,7 +801,7 @@ int main(int argc, char *argv[]) {
     //int32_t gene1[350] = {0};
     //0x3054ea5: 25, 59, 50, 59, 50, 25, 50, 25, 50, 25, 25, 50, 58, 25, 50, 56, 25, 58, 25, 53, 53, 50, 25, 56, 59, 25, 59,
     int32_t gene1[350] = {
-        25, 25, 50, 25, 50, 25, 50, 57, 50, 27, 27, 50, 25, 50, 57, 56, 53, 25, 27, 50, 25, 25, 50, 25, 56, 53, 53, 53, 25, 53, 53, 59, 25, 59,
+        25, 25, 50, 59, 50, 56, 53, 57, 57, 25, 25, 53, 50, 25, 59, 50, 58, 56, 25, 25, 57, 50, 53, 25, 56, 25, 59, 25,
         BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;
@@ -864,7 +862,7 @@ int main(int argc, char *argv[]) {
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x022fe0f0;
+    uint64_t seed = 0x01b433de;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
