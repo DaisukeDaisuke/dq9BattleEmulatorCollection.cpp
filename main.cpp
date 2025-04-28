@@ -266,7 +266,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v1.0.16";
+const std::string version = "v1.0.16+2";
 void showHeader() {
 #ifdef BUILD_DATE
     const std::string buildDate = BUILD_DATE;
@@ -317,7 +317,7 @@ int main() {
     const Player copiedPlayers[2] = {
         // プレイヤー1
         {
-            309, 309.0, 312, 312, 298, 298, 193, 234, 165, // 最初のメンバー
+            309, 309.0, 312+2, 312+2, 298, 298, 193, 234, 165, // 最初のメンバー
             165, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
