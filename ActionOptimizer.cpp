@@ -148,7 +148,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                              result, seed,
                              nullptr, nullptr, -1, nowState);
 
-        if (CopedPlayers[0].hp <= 0) {
+        if (genome.Initialized && CopedPlayers[0].hp <= 0) {
             continue;
         }
 
