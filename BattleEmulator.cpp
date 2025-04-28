@@ -496,7 +496,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             const int probability[4] = {62, 75, 87, 100};
                             auto probability1 = probability[std::abs(players[1].BuffTurns)];
                             auto probability2 = lcg::getPercent(position, 100);
-                            if (probability1 > probability2) {//スカラ解除の分岐は>が正しかった
+                            //75%のときだけ一致のときはバフが続行する
+                            if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
                                 players[1].BuffLevel = 0;
                                 RecalculateBuff(players, 1);
                             }
