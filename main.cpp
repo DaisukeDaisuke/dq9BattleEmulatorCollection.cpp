@@ -287,7 +287,7 @@ namespace {
         // 行動引数は argv[4] 以降
         int totalActions = argc - 4;
         // 1ターンあたりの上限行動数（3件）
-        constexpr int actionsPerTurn = 2;
+        constexpr int actionsPerTurn = 3;
 
         // ターン数は、totalActions を actionsPerTurn で割った商＋余りがあれば1ターンとして計上
         int turns = totalActions / actionsPerTurn;
@@ -753,13 +753,14 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef DEBUG2
-    uint64_t time1 = 0x8127c5cd;
+    uint64_t time1 = 0x3af1931f;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
 
-    // seed: 0x8127c5cd, actions: 22, 25, 25, 25, 26, 25, 25, 25, 59, 61, 59, 23, 25, 25, 61, 23, 25, 25, 25, 25, 23, 25, 25, 23, 53, 25,
+    // ver: v4.0.3_vG_aa, seed: 0x3af1931f, actions: 25, 25, 25, 26, 25, 24, 24, 25, 61, 59, 56, 25, 59, 25, 61, 61, 23, 61, 25, 23, 25, 61, 25, 25, 25, 59, 61,
+
 
     /*
         *NowStateの各ビットの使用状況は下記の通りである。
@@ -783,7 +784,9 @@ int main(int argc, char *argv[]) {
       //  BattleEmulator::ATTACK_ALLY};
     //0x22e2dbaf:
     //0x44dbafa: 25, 25, 25, 50, 54, 25, 50, 54, 56, 54, 25, 54, 53, 53, 25, 50, 25, 56, 54, 25, 54,
-    int32_t gene1[350] = {22, 25, 25, 25, 26, 25, 25, 25, 59, 61, 59, 23, 25, 25, 61, 23, 25, 25, 25, 25, 23, 25, 25, 23, 53, 25,  BattleEmulator::ATTACK_ALLY};
+    int32_t gene1[350] = {
+        25, 25, 25, 26, 25, 24, 24, 25, 61, 59, 56, 25, 59, 25, 61, 61, 23, 61, 25, 23, 25, 61, 25, 25, 25, 59, 61,
+        BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //int32_t gene1[350] = {0};
