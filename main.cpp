@@ -571,10 +571,10 @@ namespace {
 
         int totalSeconds = hours * 3600 + minutes * 60 + seconds;
         totalSeconds = totalSeconds - 15;
-        auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1.5) * (1 / 0.12515)));
+        auto time1 = static_cast<uint64_t>(floor((totalSeconds - 8.5) * (1 / 0.12515)));
         time1 = time1 << 16;
 
-        auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1.5) * (1 / 0.125155)));
+        auto time2 = static_cast<uint64_t>(floor((totalSeconds + 8.5) * (1 / 0.125155)));
         time2 = time2 << 16;
         int32_t gene[350] = {0};
         for (int i = 0; i < 350; ++i) {
@@ -738,7 +738,7 @@ int main(int argc, char *argv[]) {
 
     //ver: v8.0.1, atk: 51, def: 61, seed: 0x6cc478c, actions: 25, 59, 59, 61, 61, 62, 59, 62, 59, 61, 27, 61, 62, 25, 62, 25, 59, 62, 59, 27, 62, 59, 62, 25, 25, 59, 62, 61, 26, 56, 61,
     //ver: v8.0.1, atk: 61, def: 61, seed: 0x693bdce9, actions: 27, 25, 25, 26, 25, 26, 25, 25, 56, 59, 25, 25, 53, 53,
-    uint64_t time1 = 0x693bdce9;
+    uint64_t time1 = 646621388;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -769,7 +769,7 @@ int main(int argc, char *argv[]) {
 
     //0x2b79118:
     int32_t gene1[350] = {
-        27, 25, 25, 26, 25, 26, 25, 25, 56, 59, 25, 25, 53, 53,
+        27, 25, 25, 26, BattleEmulator::DRAGON_SLASH, BattleEmulator::CRACK_ALLY, 62, 59, 62, 59, 59, 62, 61, 61, 56, 62, 59, 25, 61, 59,
 BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;
