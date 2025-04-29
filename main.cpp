@@ -62,7 +62,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v6.0.4_vL_aa";
+    const char *version = "v6.0.4_vS_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -686,10 +686,10 @@ namespace {
 
         int totalSeconds = hours * 3600 + minutes * 60 + seconds;
         totalSeconds = totalSeconds - 15;
-        auto time1 = static_cast<uint64_t>(floor((totalSeconds - 1.5) * (1 / 0.12515)));
+        auto time1 = static_cast<uint64_t>(floor((totalSeconds - 8.5) * (1 / 0.12515)));
         time1 = time1 << 16;
 
-        auto time2 = static_cast<uint64_t>(floor((totalSeconds + 1.5) * (1 / 0.125155)));
+        auto time2 = static_cast<uint64_t>(floor((totalSeconds + 8.5) * (1 / 0.125155)));
         time2 = time2 << 16;
         int32_t gene[350] = {0};
         for (int i = 0; i < 350; ++i) {
