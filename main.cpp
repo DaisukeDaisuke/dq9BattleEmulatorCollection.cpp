@@ -738,7 +738,7 @@ int main(int argc, char *argv[]) {
 
     //ver: v8.0.1, atk: 51, def: 61, seed: 0x6cc478c, actions: 25, 59, 59, 61, 61, 62, 59, 62, 59, 61, 27, 61, 62, 25, 62, 25, 59, 62, 59, 27, 62, 59, 62, 25, 25, 59, 62, 61, 26, 56, 61,
     //ver: v8.0.1, atk: 61, def: 61, seed: 0x693bdce9, actions: 27, 25, 25, 26, 25, 26, 25, 25, 56, 59, 25, 25, 53, 53,
-    uint64_t time1 = 646621388;
+    uint64_t time1 = 1765530857;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -762,14 +762,13 @@ int main(int argc, char *argv[]) {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    //int32_t gene1[350] = {0};
     //0x3719d77: 25, 53, 25, 27, 25, 50, 25, 25, 25, 25, 50, 59, 27, 25, 58, 50, 25, 25, 27, 25, 50, 25, 25, 50, 53, 25,
 //ver: v8.0.1, atk: 51, def: 61, seed: 0x35ddb6d, actions: 25, 61, 61, 62, 62, 61, 25, 61, 62, 61, 61, 62, 27, 27, 62, 61, 27, 62, 25, 62, 62, 25, 25, 53, 25, 27, 56, 25,
 //ver: v8.0.1, atk: 51, def: 61, seed: 0x6cc478c, actions: 25, 62, 61, 61, 25, 61, 61, 62, 61, 27, 62, 25, 62, 25, 62, 25, 62, 25, 25, 62, 25, 25, 62, 25, 26, 25, 25, 25, 27, 25,
 
     //0x2b79118:
     int32_t gene1[350] = {
-        27, 25, 25, 26, BattleEmulator::DRAGON_SLASH, BattleEmulator::CRACK_ALLY, 62, 59, 62, 59, 59, 62, 61, 61, 56, 62, 59, 25, 61, 59,
+        25, 61, 61, 61, 25, 62, 61, 25, 61, 56, 62, 25, 25, 27, 25, 25, 25,
 BattleEmulator::ATTACK_ALLY
     };
     //gene1[19-1] = BattleEmulator::DEFENCE;
@@ -839,7 +838,7 @@ BattleEmulator::ATTACK_ALLY
 
 #if defined(DEBUG3)
 
-    uint64_t seed = 0x046febf1;
+    uint64_t seed = 1765530857;
 
     int actions[350] = {BattleEmulator::ATTACK_ALLY, -1,};
     SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);

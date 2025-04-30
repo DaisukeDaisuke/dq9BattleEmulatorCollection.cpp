@@ -18,10 +18,10 @@ thread_local int preHP[3] = {0, 0, 0};
 
 #if defined(kbattle_v2_Normal)
 
-constexpr double mitoreP = -0.0150;
-constexpr double kaisinnP = 100;
-constexpr double ShieldGuardP = 0.5;
-constexpr int baseHP = 65;
+constexpr double mitoreP = -0.0150;//見惚れ率
+constexpr double kaisinnP = 200;//会心率
+constexpr double ShieldGuardP = 0.5;//シールドガード率
+constexpr int baseHP = 65;//ベースのhp
 #endif
 constexpr double DragonSlashKaisinnP = kaisinnP / 2;
 constexpr int WooshSlashKaisinnP = 100;
