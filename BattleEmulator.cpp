@@ -262,7 +262,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 506) {
+        if ((*position) == 651) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -300,7 +300,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 }
             }
             //麻痺ったときに不正な防御しないように
-            if (actionTable == INACTIVE_ALLY || actionTable == DEFENCE || actionTable == PARALYSIS) {
+            if (actionTable == INACTIVE_ALLY || actionTable == PARALYSIS) {
                 actionTable = ATTACK_ALLY;
             }
         } else {
@@ -340,6 +340,13 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 auto c = 0;
                 //--------start_FUN_02158dfc-------
 
+                if (players[0].rage) {
+                    players[0].rageTurns--;
+                    if (players[0].rageTurns <= 0) {
+                        players[0].rage = false;
+                    }
+                }
+
                 if (lcg::getPercent(position, 100) < 0.0330) {
                     //0x021588ec
                     //次の乱数が90%以上(一致含む)なら見惚れないらしい。
@@ -370,12 +377,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 if (c == VICTIMISER && !players[0].paralysis) {
                     c = HP_HOOVER;
                 }
-                if (players[0].rage) {
-                    players[0].rageTurns--;
-                    if (players[0].rageTurns <= 0) {
-                        players[0].rage = false;
-                    }
-                }
+
                 (*position)++;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(c, position, players, 1, 0, NowState);
@@ -564,7 +566,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         //DEBUG_COUT2((*position));
-        if ((*position) == 176) {
+        if ((*position) == 651) {
             //std::cout << "!!" << std::endl;
         }
 #endif

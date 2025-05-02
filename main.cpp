@@ -196,12 +196,7 @@ namespace {
 
                 if (eAction[0] != "magic Burst" && eAction[1] != "magic Burst") {
                     //動けない場合、テーブルにアクションを表示しない
-                    if (!initiative && (action == BattleEmulator::INACTIVE_ALLY || action ==
-                                        BattleEmulator::TURN_SKIPPED ||
-                                        action == BattleEmulator::SLEEPING)) {
-                        sp = "---------------";
-                    }
-                    if ((action == BattleEmulator::PARALYSIS || action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
+                    if ((action == BattleEmulator::INACTIVE_ALLY || action == BattleEmulator::PARALYSIS || action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
                         sp = "---------------";
                     }
                 }
@@ -753,7 +748,7 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef DEBUG2
-    uint64_t time1 = 0x3af1931f;
+    uint64_t time1 = 0x3e5f51b;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -784,8 +779,9 @@ int main(int argc, char *argv[]) {
       //  BattleEmulator::ATTACK_ALLY};
     //0x22e2dbaf:
     //0x44dbafa: 25, 25, 25, 50, 54, 25, 50, 54, 56, 54, 25, 54, 53, 53, 25, 50, 25, 56, 54, 25, 54,
+    //ver: v4.0.3_vS_aa, seed: 0x3e5f51b, actions: 25, 22, 22, 25, 25, 26, 25, 25, 59, 61, 25, 59, 23, 56, 25, 61, 61, 23, 61, 25, 56, 61, 59, 25,
     int32_t gene1[350] = {
-        25, 25, 25, 26, 25, 24, 24, 25, 61, 59, 56, 25, 59, 25, 61, 61, 23, 61, 25, 23, 25, 61, 25, 25, 25, 59, 61,
+        25, 22, 22, 25, 25, 26, 25, 25, 59, 61, 25, 59, 23, 56, 25, 61, 61, 23, 61, 25, 56, 61, 59, 25,
         BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
