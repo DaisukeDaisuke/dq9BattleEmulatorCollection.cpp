@@ -347,7 +347,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     }
                 }
 
-                if (lcg::getPercent(position, 100) < 0.0330) {
+                if (lcg::getPercent(position, 100) < -0.0330) {
                     //0x021588ec
                     //次の乱数が90%以上(一致含む)なら見惚れないらしい。
                     int mitore = lcg::getPercent(position, 100); //0x02158964

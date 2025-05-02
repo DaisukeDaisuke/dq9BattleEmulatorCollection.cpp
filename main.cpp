@@ -271,6 +271,23 @@ namespace {
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
 
+    void pla(int &enemyConsecutive, int * aActions, int &valuesIndex, bool EnemyPresent) {
+        // このターン内の敵行動数を累積
+
+        if (EnemyPresent) {
+            enemyConsecutive--;
+        }
+
+        // 連続敵行動が3件以上の場合、眠り判定を行う
+        if (enemyConsecutive >= 3) {
+            while (enemyConsecutive >= 1) {
+                aActions[valuesIndex++] = BattleEmulator::PARALYSIS;
+                enemyConsecutive -= 1;
+            }
+        }
+        enemyConsecutive = 0;
+    }
+
     NOINLINE bool ProcessInputBuilder(const int argc, char *argv[], int *aActions, int *values, int &valuesIndex) {
         // 最初の3件は時間情報のため、最低でも4件必要
         if (argc < 4) {
@@ -282,7 +299,7 @@ namespace {
         // 行動引数は argv[4] 以降
         int totalActions = argc - 4;
         // 1ターンあたりの上限行動数（3件）
-        constexpr int actionsPerTurn = 3;
+        constexpr int actionsPerTurn = 2;
 
         // ターン数は、totalActions を actionsPerTurn で割った商＋余りがあれば1ターンとして計上
         int turns = totalActions / actionsPerTurn;
@@ -293,10 +310,13 @@ namespace {
 
         int enemyConsecutive = 0; // 複数ターンにわたる敵連続行動数
         int tokenIndex = 4; // 最初の行動引数の位置
+        int enemyActions = 0; // このターン内の敵の行動数
 
         for (int turn = 0; turn < turns; turn++) {
             bool allyPresent = false; // このターンに味方行動があるかのフラグ
-            int enemyActions = 0; // このターン内の敵の行動数
+            bool EnemyPresent = false; // このターンに味方行動があるかのフラグ
+            int turnCouner = 0;
+
 
             // 現ターンの行動数（最後のターンは3未満の場合があるので調整）
             int actionsThisTurn = actionsPerTurn;
@@ -309,6 +329,9 @@ namespace {
                 const char *token = argv[tokenIndex++];
                 if (isMatchStrWithTrim(token, "h") || isMatchStrWithTrim(token, "ah")) {
                     // 回復は明示的な味方行動
+                    enemyConsecutive += enemyActions;
+                    pla(enemyConsecutive, aActions, valuesIndex, EnemyPresent);
+                    enemyActions = 0;
                     aActions[valuesIndex++] = BattleEmulator::HEAL;
                     values[counter2++] = -2;
                     values[counter2++] = -2;
@@ -316,17 +339,25 @@ namespace {
                 } else if (isMatchStrWithTrim(token, "y") || isMatchStrWithTrim(token, "i")) {
                     aActions[valuesIndex++] = BattleEmulator::INACTIVE_ALLY;
                     allyPresent = true;
+                } else if (isMatchStrWithTrim(token, "p")) {
+                    enemyActions++;
                 } else {
                     // 上記以外は toABCint による分解処理
                     auto [prefix, tmp] = toABCint(token);
 
                     // 味方行動の条件（今回は prefix == 'a' が味方とする）
                     if (prefix == 'a') {
+                        enemyConsecutive += enemyActions;
+                        pla(enemyConsecutive, aActions, valuesIndex, EnemyPresent);
+                        enemyActions = 0;
                         aActions[valuesIndex++] = BattleEmulator::ATTACK_ALLY;
                         values[counter2++] = -3;
                         values[counter2++] = tmp;
                         allyPresent = true;
                     } else if (prefix == 'h') {
+                        enemyConsecutive += enemyActions;
+                        pla(enemyConsecutive, aActions, valuesIndex, EnemyPresent);
+                        enemyActions = 0;
                         aActions[valuesIndex++] = BattleEmulator::HEAL;
                         values[counter2++] = -2;
                         values[counter2++] = tmp;
@@ -334,22 +365,10 @@ namespace {
                     } else {
                         values[counter2++] = tmp;
                         enemyActions++;
+                        EnemyPresent = true;
                     }
                 }
             } // 1ターン分の処理終了
-
-            if (allyPresent) {
-                // 味方の行動が1件でもあれば、敵連続カウントはリセット
-                enemyConsecutive = 0;
-            } else {
-                // このターン内の敵行動数を累積
-                enemyConsecutive += enemyActions;
-                // 連続敵行動が3件以上の場合、眠り判定を行う
-                while (enemyConsecutive >= 1) {
-                    aActions[valuesIndex++] = BattleEmulator::PARALYSIS;
-                    enemyConsecutive -= 1;
-                }
-            }
         }
 
         aActions[valuesIndex] = -1;
@@ -748,14 +767,14 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef DEBUG2
-    uint64_t time1 = 0x3e5f51b;
+    uint64_t time1 = 67084695;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
 
     // ver: v4.0.3_vG_aa, seed: 0x3af1931f, actions: 25, 25, 25, 26, 25, 24, 24, 25, 61, 59, 56, 25, 59, 25, 61, 61, 23, 61, 25, 23, 25, 61, 25, 25, 25, 59, 61,
-
+    //0x3cfc959, actions: 25, 25, 25, 26, 25, 24, 25, 61, 23, 59, 61, 61, 23, 25, 23, 25, 59, 61, 61, 23, 25, 56, 25, 59, 59, 59, 25,
 
     /*
         *NowStateの各ビットの使用状況は下記の通りである。
@@ -780,15 +799,19 @@ int main(int argc, char *argv[]) {
     //0x22e2dbaf:
     //0x44dbafa: 25, 25, 25, 50, 54, 25, 50, 54, 56, 54, 25, 54, 53, 53, 25, 50, 25, 56, 54, 25, 54,
     //ver: v4.0.3_vS_aa, seed: 0x3e5f51b, actions: 25, 22, 22, 25, 25, 26, 25, 25, 59, 61, 25, 59, 23, 56, 25, 61, 61, 23, 61, 25, 56, 61, 59, 25,
-    int32_t gene1[350] = {
-        25, 22, 22, 25, 25, 26, 25, 25, 59, 61, 25, 59, 23, 56, 25, 61, 61, 23, 61, 25, 56, 61, 59, 25,
-        BattleEmulator::ATTACK_ALLY};
+    // int32_t gene1[350] = {
+    //     25, 25, 25, 26, 25, 24, 25, 61, 23, 59, 61, 61, 23, 25, 23, 25, 59, 61, 61, 23, 25, 56, 25, 59, 59, 59, 25,
+    //     BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-    //int32_t gene1[350] = {0};
-    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    int32_t gene1[350] = {0};
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // //
