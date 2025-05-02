@@ -272,12 +272,6 @@ namespace {
     }
 
     void pla(int &enemyConsecutive, int * aActions, int &valuesIndex, bool EnemyPresent) {
-        // このターン内の敵行動数を累積
-
-        if (EnemyPresent) {
-            enemyConsecutive--;
-        }
-
         // 連続敵行動が3件以上の場合、眠り判定を行う
         if (enemyConsecutive >= 3) {
             while (enemyConsecutive >= 1) {
@@ -339,7 +333,11 @@ namespace {
                 } else if (isMatchStrWithTrim(token, "y") || isMatchStrWithTrim(token, "i")) {
                     aActions[valuesIndex++] = BattleEmulator::INACTIVE_ALLY;
                     allyPresent = true;
-                } else if (isMatchStrWithTrim(token, "p")) {
+                } else if (isMatchStrWithTrim(token, "r")) {
+                    enemyConsecutive += enemyActions;
+                    pla(enemyConsecutive, aActions, valuesIndex, EnemyPresent);
+                    enemyActions = 0;
+                }  else if (isMatchStrWithTrim(token, "p")) {
                     enemyActions++;
                 } else {
                     // 上記以外は toABCint による分解処理
@@ -370,6 +368,9 @@ namespace {
                 }
             } // 1ターン分の処理終了
         }
+
+        enemyConsecutive += enemyActions;
+        pla(enemyConsecutive, aActions, valuesIndex, false);
 
         aActions[valuesIndex] = -1;
         values[counter2] = -1;
