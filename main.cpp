@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v4.0.3_vA_aa";
+    const char *version = "v4.0.3_vW_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -324,6 +324,9 @@ namespace {
 
             // 現ターン分のトークンを処理
             for (int j = 0; j < actionsThisTurn; j++) {
+                if (argc <= tokenIndex) {
+                    break;
+                }
                 const char *token = argv[tokenIndex++];
                 if (isMatchStrWithTrim(token, "h") || isMatchStrWithTrim(token, "ah")) {
                     // 回復は明示的な味方行動
