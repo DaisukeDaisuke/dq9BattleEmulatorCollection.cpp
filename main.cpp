@@ -271,7 +271,7 @@ namespace {
         std::cerr << "error: Not enough argc!!" << std::endl;
     }
 
-    void pla(int &enemyConsecutive, int * aActions, int &valuesIndex, bool EnemyPresent) {
+    void pla(int &enemyConsecutive, int *aActions, int &valuesIndex, bool EnemyPresent) {
         // 連続敵行動が3件以上の場合、眠り判定を行う
         if (enemyConsecutive >= 3) {
             while (enemyConsecutive >= 1) {
@@ -305,8 +305,12 @@ namespace {
         int enemyConsecutive = 0; // 複数ターンにわたる敵連続行動数
         int tokenIndex = 4; // 最初の行動引数の位置
         int enemyActions = 0; // このターン内の敵の行動数
+        int offset = 0;
 
         for (int turn = 0; turn < turns; turn++) {
+            if (argc <= tokenIndex) {
+                break;
+            }
             bool allyPresent = false; // このターンに味方行動があるかのフラグ
             bool EnemyPresent = false; // このターンに味方行動があるかのフラグ
             int turnCouner = 0;
@@ -333,11 +337,18 @@ namespace {
                 } else if (isMatchStrWithTrim(token, "y") || isMatchStrWithTrim(token, "i")) {
                     aActions[valuesIndex++] = BattleEmulator::INACTIVE_ALLY;
                     allyPresent = true;
+                    offset++;
+                    if (remainder > 0) {
+                        remainder--;
+                    } else {
+                        turns++;
+                    }
+                    break;
                 } else if (isMatchStrWithTrim(token, "r")) {
                     enemyConsecutive += enemyActions;
                     pla(enemyConsecutive, aActions, valuesIndex, EnemyPresent);
                     enemyActions = 0;
-                }  else if (isMatchStrWithTrim(token, "p")) {
+                } else if (isMatchStrWithTrim(token, "p")) {
                     enemyActions++;
                 } else {
                     // 上記以外は toABCint による分解処理
@@ -367,6 +378,24 @@ namespace {
                     }
                 }
             } // 1ターン分の処理終了
+            //0 2 21 a19 9 11 16 13 13 r
+            //0 2 18 15 a16 y 14 11 9 11
+            //0 2 42 a17 11 10 a18 12 10 9 13 r
+            if ((enemyActions == 2 || enemyActions == 3) && ((tokenIndex - 3 - enemyActions) % 2 == offset % 2)) {
+                enemyActions--;
+            }
+
+            // if (enemyActions == 2 || enemyActions == 3) {
+            //     if (offset % 2 == 0) {
+            //         if ((tokenIndex - 3 - enemyActions) % 2 == 0) {
+            //             enemyActions--;
+            //         }
+            //     } else {
+            //         if ((tokenIndex - 3 - enemyActions) % 2 != 0) {
+            //             enemyActions--;
+            //         }
+            //     }
+            // }
         }
 
         enemyConsecutive += enemyActions;
@@ -479,7 +508,7 @@ namespace {
         delete nowState;
 
 #if defined(MINGW_BUILD)
-        dumpTableMain(result1.value(), genome, seed, 0);
+        dumpTableMain(result1.value(), genome, seed, turns);
 #else
         dumpTableMain(result1.value(), genome, seed, turns);
 #endif
@@ -768,12 +797,13 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef DEBUG2
-    uint64_t time1 = 0x3cab616;
+    uint64_t time1 = 0x3f2e9a4;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
 
+    //ver: v4.0.3_vA_aa, seed: 0x3f2e9a4, actions: 25, 24, 24, 24, 24, 23, 61, 25, 23, 61, 61, 27, 61, 23, 25, 61, 59, 23, 59, 61, 23, 25, 56, 25, 25, 25, 23, 61, 25, 61, 61, 25, 23,
     //ver: v4.0.3_vA_aa, seed: 0x3cab616, actions: 25, 25, 25, 25, 59, 23, 25, 61, 25, 23, 61, 59, 25, 25, 61, 56, 25, 59, 25, 59, 23, 59, 27, 25, 25,
 
     /*
@@ -795,7 +825,7 @@ int main(int argc, char *argv[]) {
     Player players1[2];
 
     int32_t gene1[350] = {
-        25, 25, 25, 25, 59, 23, 25, 61, 25, 23, 61, 59, 25, 25, 61, 56, 25, 59, 25, 59, 23, 59, 27, 25, 25,
+        25, 24, 24, 24, 24, 23, 61, 25, 23, 61, 61, 27, 61, 23, 25, 61, 59, 23, 59, 61, 23, 25, 56, 25, 25, 25, 23, 61, 25, 61, 61, 25, 23,
         BattleEmulator::ATTACK_ALLY};
     //0x22e2dbaf:
     //0x44dbafa: 25, 25, 25, 50, 54, 25, 50, 54, 56, 54, 25, 54, 53, 53, 25, 50, 25, 56, 54, 25, 54,
