@@ -768,12 +768,16 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef DEBUG2
-    uint64_t time1 = 67084695;
+    uint64_t time1 = 0x3dfae20;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
 
+    //ver: v4.0.3_vD_aa, seed: 0x3dfae20, actions: 25, 25, 25, 25, 25, 26, 25, 59, 25, 25, 25, 61, 61, 61, 23, 61, 61, 23, 25, 56, 25, 25, 61, 27, 59, 56, 61, 59, 59, 25,
+    //ver: v4.0.3_vD_aa, seed: 0x1112bda6, actions: 25, 25, 25, 22, 25, 26, 25, 27, 25, 59, 25, 61, 23, 25, 25, 61, 23, 59, 25, 25, 61, 61, 23, 59, 25, 61, 23, 25, 61, 59, 23, 25, 53, 23,
+
+    //ver: v4.0.3_vN_aa, seed: 0x9b904ac, actions: 25, 25, 25, 26, 25, 25, 25, 25, 23, 25, 61, 59, 61, 23, 25, 25, 61, 25, 61, 56, 25, 61, 61, 25, 25, 23, 59, 25, 61, 25,
     // ver: v4.0.3_vG_aa, seed: 0x3af1931f, actions: 25, 25, 25, 26, 25, 24, 24, 25, 61, 59, 56, 25, 59, 25, 61, 61, 23, 61, 25, 23, 25, 61, 25, 25, 25, 59, 61,
     //0x3cfc959, actions: 25, 25, 25, 26, 25, 24, 25, 61, 23, 59, 61, 61, 23, 25, 23, 25, 59, 61, 61, 23, 25, 56, 25, 59, 59, 59, 25,
 
@@ -795,8 +799,8 @@ int main(int argc, char *argv[]) {
 
     Player players1[2];
 
-    //int32_t gene1[350] = {25, -10, -10, -10, 26, 25, 25, 23, 25, 61, 23, 61, 25, 61, 59, 23, 25, 59, 61, 25, 23, 25, 25, 61, 25, 23, 56, 25, 25, 25, 25, 25, 59, 59, 59, 59,
-      //  BattleEmulator::ATTACK_ALLY};
+    int32_t gene1[350] = {25, 25, 25, 25, 25, 26, 25, 59, 25, 25, 25, 61, 61, 61, 23, 61, 61, 23, 25, 56, 25, 25, 61, 27, 59, 56, 61, 59, 59, 25,
+        BattleEmulator::ATTACK_ALLY};
     //0x22e2dbaf:
     //0x44dbafa: 25, 25, 25, 50, 54, 25, 50, 54, 56, 54, 25, 54, 53, 53, 25, 50, 25, 56, 54, 25, 54,
     //ver: v4.0.3_vS_aa, seed: 0x3e5f51b, actions: 25, 22, 22, 25, 25, 26, 25, 25, 59, 61, 25, 59, 23, 56, 25, 61, 61, 23, 61, 25, 56, 61, 59, 25,
@@ -805,14 +809,14 @@ int main(int argc, char *argv[]) {
     //     BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-    int32_t gene1[350] = {0};
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-    gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // int32_t gene1[350] = {0};
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+    // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
     // //

@@ -262,7 +262,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 651) {
+        if ((*position) == 719) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -340,13 +340,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 auto c = 0;
                 //--------start_FUN_02158dfc-------
 
-                if (players[0].rage) {
-                    players[0].rageTurns--;
-                    if (players[0].rageTurns <= 0) {
-                        players[0].rage = false;
-                    }
-                }
-
                 if (lcg::getPercent(position, 100) < -0.0330) {
                     //0x021588ec
                     //次の乱数が90%以上(一致含む)なら見惚れないらしい。
@@ -376,6 +369,13 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 }
                 if (c == VICTIMISER && !players[0].paralysis) {
                     c = HP_HOOVER;
+                }
+
+                if (players[0].rage) {
+                    players[0].rageTurns--;
+                    if (players[0].rageTurns <= 0) {
+                        players[0].rage = false;
+                    }
                 }
 
                 (*position)++;
