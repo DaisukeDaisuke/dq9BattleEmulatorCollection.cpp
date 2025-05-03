@@ -262,7 +262,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 719) {
+        if ((*position) == 735) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -371,13 +371,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     c = HP_HOOVER;
                 }
 
-                if (players[0].rage) {
-                    players[0].rageTurns--;
-                    if (players[0].rageTurns <= 0) {
-                        players[0].rage = false;
-                    }
-                }
-
                 (*position)++;
                 //--------end_FUN_02158dfc-------
                 basedamage = callAttackFun(c, position, players, 1, 0, NowState);
@@ -419,6 +412,13 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     (*position) += 1;
                 } else {
                     break;
+                }
+
+                if (players[0].rage) {
+                    players[0].rageTurns--;
+                    if (players[0].rageTurns <= 0) {
+                        players[0].rage = false;
+                    }
                 }
                 //--------end_FUN_021594bc-------
             } else {
@@ -566,7 +566,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         //DEBUG_COUT2((*position));
-        if ((*position) == 651) {
+        if ((*position) == 735) {
             //std::cout << "!!" << std::endl;
         }
 #endif
@@ -704,13 +704,14 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //回避
             FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
             (*position)++; //不明
-            (*position)++; //必殺チャージ(敵)
-            if (!players[attacker].specialCharge && lcg::getPercent(position, 100) < 1) {
-                //0x021ed7a8
-                players[attacker].specialCharge = true;
-                players[attacker].specialChargeTurn = 6;
+            if (!players[attacker].specialCharge) {
+                (*position)++; //必殺チャージ(敵)
+                if (lcg::getPercent(position, 100) < 1) {
+                    //0x021ed7a8
+                    players[attacker].specialCharge = true;
+                    players[attacker].specialChargeTurn = 6;
+                }
             }
-            baseDamage = 0;
             break;
         case BattleEmulator::VICTIMISER:
             (*position) += 2;
