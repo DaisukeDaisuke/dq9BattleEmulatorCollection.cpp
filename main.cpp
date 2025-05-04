@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v5.0.5_vS_aa";
+    const char *version = "v5.0.5_vD_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -460,8 +460,7 @@ NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
                 // 回復は明示的な味方行動
                 builder.push(-5, 'n');
                 allyPresent = true;
-            }
-            if (isMatchStrWithTrim(token, "d") || isMatchStrWithTrim(token, "D")) {
+            }else if (isMatchStrWithTrim(token, "d") || isMatchStrWithTrim(token, "D")) {
                 // 回復は明示的な味方行動
                 builder.push(-5, 'd');
                 allyPresent = true;
