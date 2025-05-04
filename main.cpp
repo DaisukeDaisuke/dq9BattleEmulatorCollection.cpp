@@ -60,7 +60,10 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v4.0.3_vW_aa";
+    int foundTurn = 0;
+    int foundTurnOffset = 0;
+
+    const char *version = "v4.0.3_vC_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -337,6 +340,7 @@ namespace {
                     values[counter2++] = -2;
                     values[counter2++] = -2;
                     allyPresent = true;
+                    foundTurnOffset = 0;
                 } else if (isMatchStrWithTrim(token, "y") || isMatchStrWithTrim(token, "i")) {
                     aActions[valuesIndex++] = BattleEmulator::INACTIVE_ALLY;
                     allyPresent = true;
@@ -346,6 +350,7 @@ namespace {
                     } else {
                         turns++;
                     }
+                    foundTurnOffset++;
                     break;
                 } else if (isMatchStrWithTrim(token, "r")) {
                     enemyConsecutive += enemyActions;
@@ -353,9 +358,12 @@ namespace {
                     enemyActions = 0;
                 } else if (isMatchStrWithTrim(token, "p")) {
                     enemyActions++;
+                    foundTurnOffset++;
                 } else {
                     // 上記以外は toABCint による分解処理
                     auto [prefix, tmp] = toABCint(token);
+
+                    foundTurnOffset = 0;
 
                     // 味方行動の条件（今回は prefix == 'a' が味方とする）
                     if (prefix == 'a') {
@@ -387,18 +395,6 @@ namespace {
             if ((enemyActions == 2 || enemyActions == 3) && ((tokenIndex - 3 - enemyActions) % 2 == offset % 2)) {
                 enemyActions--;
             }
-
-            // if (enemyActions == 2 || enemyActions == 3) {
-            //     if (offset % 2 == 0) {
-            //         if ((tokenIndex - 3 - enemyActions) % 2 == 0) {
-            //             enemyActions--;
-            //         }
-            //     } else {
-            //         if ((tokenIndex - 3 - enemyActions) % 2 != 0) {
-            //             enemyActions--;
-            //         }
-            //     }
-            // }
         }
 
         enemyConsecutive += enemyActions;
@@ -427,6 +423,7 @@ namespace {
         FoundSeed = 0;
         foundSeeds = 0;
         auto seed = BruteForceRequest(players, hours, minutes, seconds, valuesIndex, values, aActions);
+        std::cout << "foundTurn: " << (foundTurn + foundTurnOffset) << ", " << valuesIndex << std::endl;
         if (foundSeeds == 1) {
             SearchRequest(players, seed, aActions, THREAD_COUNT);
         }
@@ -491,6 +488,9 @@ namespace {
             }
             turns++;
         }
+        if (foundTurn != 0) {
+            turns = foundTurn + foundTurnOffset;
+        }
 
         auto [turnProcessed,genome] =
                 ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 3000, gene, numThreads);
@@ -511,7 +511,7 @@ namespace {
         delete nowState;
 
 #if defined(MINGW_BUILD)
-        dumpTableMain(result1.value(), genome, seed, turns);
+        dumpTableMain(result1.value(), genome, seed, 0);
 #else
         dumpTableMain(result1.value(), genome, seed, turns);
 #endif
@@ -601,6 +601,7 @@ namespace {
         auto *nowState = new uint64_t(0);
         int maxElement = 350;
         for (uint64_t seed = start; seed < end; ++seed) {
+            BattleEmulator::resetStartTurn();
             lcg::init(seed);
             (*nowState) = 0;
             (*position) = 1;
@@ -616,6 +617,7 @@ namespace {
                 std::cout << seed << std::endl;
                 FoundSeed = seed;
                 foundSeeds++;
+                foundTurn = BattleEmulator::getStartTurn();
             }
         }
         delete position;

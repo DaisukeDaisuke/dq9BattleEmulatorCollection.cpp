@@ -144,6 +144,15 @@ const char *BattleEmulator::getActionName(int actionId) {
 }
 
 thread_local int threadTurnProcessed = 0;
+thread_local int startTurn = 0;
+
+void BattleEmulator::resetStartTurn() {
+    startTurn = 0;
+}
+
+int BattleEmulator::getStartTurn() {
+    return startTurn;
+}
 
 void BattleEmulator::ResetTurnProcessed() {
     threadTurnProcessed = 0;
@@ -382,6 +391,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
                 if (mode != -1 && mode != -2) {
                     if (damages[exCounter] == -1) {
+                        startTurn = counterJ;
                         return true;
                     }
                     if (basedamage == 0 && damages[exCounter] == 0) {
@@ -390,9 +400,11 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         return false;
                     }
                     if (damages[exCounter] == -1) {
+                        startTurn = counterJ;
                         return true;
                     }
                     if (mode <= exCounter) {
+                        startTurn = counterJ;
                         return true;
                     }
                 } else if (mode == -1) {
@@ -485,6 +497,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         if (action == HEAL) {
                             if (mode != -1 && mode != -2) {
                                 if (damages[exCounter] == -1) {
+                                    startTurn = counterJ;
                                     return true;
                                 }
                                 if (damages[exCounter] == -2) {
@@ -503,6 +516,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 }
 
                                 if (damages[exCounter] == -1) {
+                                    startTurn = counterJ;
                                     return true;
                                 }
                             }
@@ -512,6 +526,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         Player::reduceHp(players[1], basedamage);
                         if (mode != -1 && mode != -2) {
                             if (damages[exCounter] == -1) {
+                                startTurn = counterJ;
                                 return true;
                             }
                             if (action != PARALYSIS && action != CURE_PARALYSIS && action != INACTIVE_ALLY) {
@@ -522,6 +537,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                     return false;
                                 }
                                 if (damages[exCounter] == -1) {
+                                    startTurn = counterJ;
                                     return true;
                                 }
                             }else if (action == INACTIVE_ALLY) {
