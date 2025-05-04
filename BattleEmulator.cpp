@@ -329,13 +329,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
         auto counter = 0;
 
-        if (players[1].rage) {
-            players[1].rageTurns--;
-            if (players[1].rageTurns <= 0) {
-                players[1].rage = false;
-            }
-        }
-
         int enemyAction = ProcessEnemyRandomAction44(position);
         int32_t actionTable = -1;
 
@@ -462,6 +455,14 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 } else {
                     break;
                 }
+
+                if (players[1].rage) {
+                    players[1].rageTurns--;
+                    if (players[1].rageTurns <= 0) {
+                        players[1].rage = false;
+                    }
+                }
+
                 //--------end_FUN_021594bc-------
             } else {
                 int32_t action = actionTable & 0xffff;
