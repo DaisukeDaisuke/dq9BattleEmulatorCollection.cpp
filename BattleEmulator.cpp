@@ -368,7 +368,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 647) {
+        if ((*position) == 726) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -953,7 +953,41 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case SWEET_BREATH:
             (*position) += 2;
             (*position)++; //会心 0x02158584
-            (*position)++; //関係ない 0x021ec6f8
+        //(*position)++; //関係ない 0x021ec6f8
+            if (players[0].acrobaticStar) {
+                //アクロバットスターで、逃げた時だけ特殊な挙動をする
+                /*
+                --------start_FUN_02158dfc-------
+                0x02159b10 0x00000064 734
+                --------end_FUN_02158dfc-------
+                --------start_FUN_021ebd9c_ct-------
+                randIntRange: 0x0216139c 3 4 735
+                randIntRange: 0x021613b0 6 8 736
+                0x02158584 0x00002710 737
+                kaisin: 10000/0
+                0x021ec6f8 0x00000064 738
+                0x02157f58 0x00000064 739
+                kaihi 25
+                float: 0x02075724 0xbfe40000 0x3fe40000 740
+                float: 0x02075738 0xbf800000 0x3f800000 741
+                0x021ed7a8 0x00000064 742
+                --------end_FUN_021ebd9c_ct-------
+                --------start_FUN_021594bc-------
+                0x02159d40 0x00000064 743
+                --------end_FUN_021594bc-------
+                 */
+                percent_tmp = lcg::getPercent(position, 100); //0x02157f58
+                if (percent_tmp >= 0 && percent_tmp <= 49) {
+                    (*position)++; //回避
+                    FUN_0207564c(position, players[attacker].atk, players[defender].def);
+                    if (!players[defender].specialCharge) {
+                        (*position)++; //0x021ed7a8
+                    }
+                    return 0;
+                }
+            } else {
+                (*position)++;
+            }
             if (!players[0].paralysis && !players[0].sleeping) {
                 //TODO 眠ってるときのやけつくいき
                 if (!players[defender].acrobaticStar && lcg::getPercent(position, 100) < 2) {
@@ -1124,7 +1158,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case BattleEmulator::SKY_ATTACK:
         case BattleEmulator::POISON_ATTACK:
             (*position) += 2;
-            if (players[0].acrobaticStar) {
+            if (players[0].acrobaticStar) {//0x021ec6f8 アクロバットスター
                 percent_tmp = lcg::getPercent(position, 100);
                 if (percent_tmp >= 0 && percent_tmp <= 49) {
                     return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender, NowState);
