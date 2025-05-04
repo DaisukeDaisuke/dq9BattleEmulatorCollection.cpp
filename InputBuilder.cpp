@@ -19,7 +19,9 @@ void InputBuilder::push(int damage, const char prefix) {
     InputEntry entry;
     entry.damage = damage;
 
-    if (damage == -5) {
+    if (prefix == 'd') {
+        entry.candidates.push_back(BattleEmulator::SPECIAL_ANTIDOTE);
+    }else if (damage == -5) {
         entry.candidates.push_back(BattleEmulator::SPECIAL_MEDICINE);
     } else if (damage == -2) {
         entry.candidates.push_back(BattleEmulator::DECELERATLE);

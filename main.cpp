@@ -461,6 +461,11 @@ NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
                 builder.push(-5, 'n');
                 allyPresent = true;
             }
+            if (isMatchStrWithTrim(token, "d") || isMatchStrWithTrim(token, "D")) {
+                // 回復は明示的な味方行動
+                builder.push(-5, 'd');
+                allyPresent = true;
+            }
             else if (isMatchStrWithTrim(token, "a") || isMatchStrWithTrim(token, "s")) {
                 // ここでは基本的に敵側行動として扱う
                 builder.push(-4, 'n');
