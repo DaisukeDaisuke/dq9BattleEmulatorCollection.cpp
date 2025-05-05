@@ -368,7 +368,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 726) {
+        if ((*position) == 202) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -995,7 +995,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     kaihi = true;
                 }
             }
-            if (lcg::getPercent(position, 100) < 25 && !kaihi) {
+            percent_tmp = lcg::getPercent(position, 100);
+            if (percent_tmp < 25 && !kaihi) {
                 players[defender].sleeping = true;
                 players[defender].sleepingTurn = 2;
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
@@ -1006,11 +1007,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 if (baseDamage != 0) {
                     //TODO 0ダメージのときの消費を調べる
                     (*position)++; //0x021e54fc
-                }
-            } else if (kaihi) {
-                baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
-                if (baseDamage == 0) {
-                    baseDamage = lcg::getPercent(position, 2); // 0x021e81a0
                 }
             }
             process7A8(position, 0, players, defender);
