@@ -237,7 +237,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     genome.EActions[1] = -1;
     genome.Aactions = -1;
     genome.fitness = 0;
-    genome.turn = turns + 1;
+    genome.turn = turns;
     genome.Initialized = false;
     genome.compromiseScore = 0;
     genome.isEliminated = false;
