@@ -1009,12 +1009,14 @@ int main(int argc, char *argv[]) {
             */
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 69227196;
+    uint64_t time1 = 0x416b4f2;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
 
+    //ver: v5.0.5_vD_aa, atk: 82, def: 90, seed: 0x416b4f2, actions: 25, 25, 25, 25, 50, 25, 25, 25, 25, 61, 50, 25, 56, 25, 25, 61, 27, 25, 61, 55, 25, 56, 27,
+    //ver: v5.0.5_vC_aa, atk: 82, def: 90, seed: 0x427227d, actions: 25, 35, 35, 25, 59, 50, 25, 50, 50, 25, 56, 25, 25, 25, 25, 50, 61, 25, 61, 56, 61, 61, 58,
     /*
         *NowStateの各ビットの使用状況は下記の通りである。
         +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
@@ -1037,7 +1039,7 @@ int main(int argc, char *argv[]) {
 
     //AI Warning: This is code related to debug2
         int32_t gene1[350] = {
-            25, 25, 25, 50, 25, 27, 50, 56, 59, 25, 25, 61, 50, 56, 25, 61, 25, 25, 53, 53, 25,
+            25, 25, 25, 25, 50, 25, 25, 25, 25, 61, 50, 25, 56, 25, 25, 61, 27, 25, 61, 55, 25, 56, 27,
             BattleEmulator::ATTACK_ALLY};
         //gene1[19-1] = BattleEmulator::DEFENCE;
         int counter = 0;

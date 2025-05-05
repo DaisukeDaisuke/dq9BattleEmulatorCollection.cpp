@@ -368,7 +368,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 202) {
+        if ((*position) == 528) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -978,8 +978,14 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                  */
                 percent_tmp = lcg::getPercent(position, 100); //0x02157f58
                 if (percent_tmp >= 0 && percent_tmp <= 49) {
-                    (*position)++; //回避
-                    FUN_0207564c(position, players[attacker].atk, players[defender].def);
+                    percent_tmp = lcg::getPercent(position, 100);
+                    if (percent_tmp < 25) {
+                        baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
+                        if (baseDamage == 0) {
+                            baseDamage = lcg::getPercent(position, 2); // 0x021e81a0
+                        }
+                    }
+
                     if (!players[defender].specialCharge) {
                         (*position)++; //0x021ed7a8
                     }
