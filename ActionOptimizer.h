@@ -13,14 +13,14 @@
 class ActionOptimizer {
 public:
     static Genome RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[350],
-                               int seedOffset);
+                               int seedOffset, bool Dropbug);
 # ifdef MULTITHREADING
 
     static std::pair<int, Genome> RunAlgorithmAsync(const Player players[2], uint64_t seed, int turns,
-                                                    int totalIterations, int actions[350], int numThreads);
+                                                    int totalIterations, int actions[350], int numThreads, bool Dropbug);
 
 private:
-    static std::pair<int, Genome> RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[], int start, int end);
+    static std::pair<int, Genome> RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns, int maxGenerations, int actions[], int start, int end, bool Dropbug);
 
 #endif
 

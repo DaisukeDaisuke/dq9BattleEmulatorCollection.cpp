@@ -45,7 +45,7 @@ namespace {
 
     void help(const char *program_name);
 
-    void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
+    bool SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads, bool Dropbug);
 
     uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                                int aActions[350], int damages[350]);
@@ -60,7 +60,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v5.0.5_vB_aa";
+    const char *version = "v5.0.5_vZ_aa";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -420,96 +420,90 @@ namespace {
      * @return 入力が正常に処理され、ビルダーに追加された場合はtrueを返し、
      *         引数の個数が不十分または他のエラーが発生した場合はfalseを返します。
      */
-NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
-    // 最初の3件は時間情報のため、最低でも4件必要
-    if (argc < 4) {
-        return false;
-    }
-
-    // 行動引数は argv[4] 以降
-    int totalActions = argc - 4;
-    // 1ターンあたりの上限行動数（3件）
-    const int actionsPerTurn = 3;
-
-    // ターン数は、totalActions を actionsPerTurn で割った商＋余りがあれば1ターンとして計上
-    int turns = totalActions / actionsPerTurn;
-    int remainder = totalActions % actionsPerTurn;
-    if (remainder > 0) {
-        turns++;
-    }
-
-    int enemyConsecutive = 0; // 複数ターンにわたる敵連続行動数
-    int tokenIndex = 4;        // 最初の行動引数の位置
-
-    for (int turn = 0; turn < turns; turn++) {
-        bool allyPresent = false;  // このターンに味方行動があるかのフラグ
-        int enemyActions = 0;      // このターン内の敵の行動数
-
-        // 現ターンの行動数（最後のターンは3未満の場合があるので調整）
-        int actionsThisTurn = actionsPerTurn;
-        if ((turn == turns - 1) && (remainder > 0)) {
-            actionsThisTurn = remainder;
+    NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
+        // 最初の3件は時間情報のため、最低でも4件必要
+        if (argc < 4) {
+            return false;
         }
 
-        // 現ターン分のトークンを処理
-        for (int j = 0; j < actionsThisTurn; j++) {
-            const char* token = argv[tokenIndex++];
-            bool isActionAlly = false;
+        // 行動引数は argv[4] 以降
+        int totalActions = argc - 4;
+        // 1ターンあたりの上限行動数（3件）
+        const int actionsPerTurn = 3;
 
-            if (isMatchStrWithTrim(token, "h") || isMatchStrWithTrim(token, "ah")) {
-                // 回復は明示的な味方行動
-                builder.push(-5, 'n');
-                allyPresent = true;
-            }else if (isMatchStrWithTrim(token, "d") || isMatchStrWithTrim(token, "D")) {
-                // 回復は明示的な味方行動
-                builder.push(-5, 'd');
-                allyPresent = true;
+        // ターン数は、totalActions を actionsPerTurn で割った商＋余りがあれば1ターンとして計上
+        int turns = totalActions / actionsPerTurn;
+        int remainder = totalActions % actionsPerTurn;
+        if (remainder > 0) {
+            turns++;
+        }
+
+        int enemyConsecutive = 0; // 複数ターンにわたる敵連続行動数
+        int tokenIndex = 4; // 最初の行動引数の位置
+
+        for (int turn = 0; turn < turns; turn++) {
+            bool allyPresent = false; // このターンに味方行動があるかのフラグ
+            int enemyActions = 0; // このターン内の敵の行動数
+
+            // 現ターンの行動数（最後のターンは3未満の場合があるので調整）
+            int actionsThisTurn = actionsPerTurn;
+            if ((turn == turns - 1) && (remainder > 0)) {
+                actionsThisTurn = remainder;
             }
-            else if (isMatchStrWithTrim(token, "a") || isMatchStrWithTrim(token, "s")) {
-                // ここでは基本的に敵側行動として扱う
-                builder.push(-4, 'n');
-                enemyActions++;
-            }
-            else if (isMatchStrWithTrim(token, "b") || isMatchStrWithTrim(token, "d")) {
-                builder.push(-2, 'n');
-                enemyActions++;
-            }
-            else if (isMatchStrWithTrim(token, "r") || isMatchStrWithTrim(token, "k")) {
-                builder.push(-3, 'n');
-                enemyActions++;
-            }
-            else {
-                // 上記以外は toABCint による分解処理
-                auto [prefix, tmp] = toABCint(token);
-                builder.push(tmp, prefix);
-                // 味方行動の条件（今回は prefix == 'a' が味方とする）
-                if (prefix == 'a') {
-                    isActionAlly = true;
+
+            // 現ターン分のトークンを処理
+            for (int j = 0; j < actionsThisTurn; j++) {
+                const char *token = argv[tokenIndex++];
+                bool isActionAlly = false;
+
+                if (isMatchStrWithTrim(token, "h") || isMatchStrWithTrim(token, "ah")) {
+                    // 回復は明示的な味方行動
+                    builder.push(-5, 'n');
                     allyPresent = true;
-                }
-                else {
+                } else if (isMatchStrWithTrim(token, "d") || isMatchStrWithTrim(token, "D")) {
+                    // 回復は明示的な味方行動
+                    builder.push(-5, 'd');
+                    allyPresent = true;
+                } else if (isMatchStrWithTrim(token, "a") || isMatchStrWithTrim(token, "s")) {
+                    // ここでは基本的に敵側行動として扱う
+                    builder.push(-4, 'n');
                     enemyActions++;
+                } else if (isMatchStrWithTrim(token, "b") || isMatchStrWithTrim(token, "d")) {
+                    builder.push(-2, 'n');
+                    enemyActions++;
+                } else if (isMatchStrWithTrim(token, "r") || isMatchStrWithTrim(token, "k")) {
+                    builder.push(-3, 'n');
+                    enemyActions++;
+                } else {
+                    // 上記以外は toABCint による分解処理
+                    auto [prefix, tmp] = toABCint(token);
+                    builder.push(tmp, prefix);
+                    // 味方行動の条件（今回は prefix == 'a' が味方とする）
+                    if (prefix == 'a') {
+                        isActionAlly = true;
+                        allyPresent = true;
+                    } else {
+                        enemyActions++;
+                    }
+                }
+            } // 1ターン分の処理終了
+
+            if (allyPresent) {
+                // 味方の行動が1件でもあれば、敵連続カウントはリセット
+                enemyConsecutive = 0;
+            } else {
+                // このターン内の敵行動数を累積
+                enemyConsecutive += enemyActions;
+                // 連続敵行動が3件以上の場合、眠り判定を行う
+                while (enemyConsecutive >= 3) {
+                    builder.push(-16, 'm');
+                    enemyConsecutive -= 3;
                 }
             }
-        } // 1ターン分の処理終了
+        }
 
-        if (allyPresent) {
-            // 味方の行動が1件でもあれば、敵連続カウントはリセット
-            enemyConsecutive = 0;
-        }
-        else {
-            // このターン内の敵行動数を累積
-            enemyConsecutive += enemyActions;
-            // 連続敵行動が3件以上の場合、眠り判定を行う
-            while (enemyConsecutive >= 3) {
-                builder.push(-16, 'm');
-                enemyConsecutive -= 3;
-            }
-        }
+        return true;
     }
-
-    return true;
-}
 
     /**
      * このexeのメインロジック。
@@ -548,7 +542,13 @@ NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
                 auto seed = BruteForceRequest(BasePlayers, hours, minutes, seconds, result.AactionsCounter, aActions,
                                               damages);
                 if (foundSeeds == 1) {
-                    SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT);
+                    auto test = SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT, true);
+                    if (!test) {
+                        std::cout << "The first search request failed." << std::endl;
+                        if (SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT, false)) {
+                            std::cout << "The second search request failed" << std::endl;
+                        }
+                    }
                 }
             }
         } catch (const std::runtime_error &e) {
@@ -598,8 +598,7 @@ NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
                 "Performance: " << std::fixed << std::setprecision(2) << performance << " mann turns/s" << std::endl;
     }
 
-#ifdef MULTITHREADING
-    void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads) {
+    bool SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads, bool Dropbug) {
 #ifdef DEBUG
         auto t0 = std::chrono::high_resolution_clock::now();
         BattleEmulator::ResetTurnProcessed();
@@ -618,14 +617,25 @@ NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
         }
 #if defined(BattleEmulatorLV13)
         auto [turnProcessed,genome] =
-                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 3000, gene, numThreads);
+                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 3000, gene, numThreads, Dropbug);
 #elif defined(BattleEmulatorLV19)
         auto [turnProcessed,genome] =
-        ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads);
+        ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads, Dropbug);
 #elif defined(BattleEmulatorLV15)
         auto [turnProcessed,genome] =
-                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads);
+                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads, Dropbug);
 #endif
+
+#ifdef DEBUG
+        auto t3 = std::chrono::high_resolution_clock::now();
+        auto elapsed_time1 =
+                std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
+        PerformanceDebug("Searcher multi", turnProcessed, static_cast<double>(elapsed_time1), 0);
+#endif
+
+        if (genome.turn >= 100) {
+            return false;
+        }
 
         std::optional<BattleResult> result1;
         result1 = BattleResult();
@@ -647,88 +657,8 @@ NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
         dumpTableMain(result1.value(), genome, seed, turns);
 #endif
 
-#ifdef DEBUG
-        auto t3 = std::chrono::high_resolution_clock::now();
-        auto elapsed_time1 =
-                std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
-        PerformanceDebug("Searcher multi", turnProcessed, static_cast<double>(elapsed_time1), 0);
-#endif
+        return true;
     }
-#elif NO_MULTITHREADING
-
-    void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads = 1) {
-#ifdef DEBUG
-        auto t0 = std::chrono::high_resolution_clock::now();
-        BattleEmulator::ResetTurnProcessed();
-#endif
-
-        int32_t gene[350] = {0};
-        auto turns = 0;
-        for (int i = 0; i < 350; ++i) {
-            gene[i] = aActions[i];
-            if (aActions[i] == -1) {
-                gene[i] = -1;
-                gene[i + 1] = -1;
-                break;
-            }
-            turns++;
-        }
-
-        lcg::init(seed);
-
-        BattleResult bestResult;
-        Genome bestGenome;
-        int maxTurns = INT_MAX - 1;
-
-        std::optional<BattleResult> result1;
-        result1 = BattleResult();
-        Player players[2];
-
-        auto *position = new int(1);
-        auto *nowState = new uint64_t(0);
-
-        for (int i = 0; i < 1000; ++i) {
-            auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 1500, gene, i * 2);
-
-            players[0] = copiedPlayers[0];
-            players[1] = copiedPlayers[1];
-
-            (*position) = 1;
-            (*nowState) = 0;
-
-            result1->clear();
-            BattleEmulator::Main(position, turns + 100, genome.actions, players, result1, seed, nullptr, nullptr, -1,
-                                 nowState);
-
-            if (players[0].hp >= 0 && players[1].hp == 0) {
-                if (result1->turn < maxTurns) {
-                    maxTurns = result1->turn;
-                    bestResult = result1.value();
-                    bestGenome = genome;
-                }
-            }
-        }
-
-
-        delete position;
-        delete nowState;
-#ifdef MINGW_BUILD
-        std::cout << turns << std::endl;
-        dumpTableMain(bestResult, bestGenome, seed, 0);
-#else
-        dumpTableMain(bestResult, bestGenome, seed, turns - 1);
-#endif
-
-#ifdef DEBUG
-        auto turnProcessed = BattleEmulator::getTurnProcessed();
-        auto t3 = std::chrono::high_resolution_clock::now();
-        auto elapsed_time1 =
-                std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
-        PerformanceDebug("Searcher single", turnProcessed, static_cast<double>(elapsed_time1), 0);
-#endif
-    }
-
-#endif
 
     /**
      * 指定された範囲のシードを使って総当たりを行い、一致するシード知を探索します。
