@@ -286,16 +286,11 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         const auto tmpgenomu = currentGenome;
         result->clear(); //メモリ新規確保よりこっちのほうが早い
 
-        BattleEmulator::Main(position.get(), currentGenome.turn - currentGenome.processed, currentGenome.actions,
-                             CopedPlayers,
-                             result, seed,
-                             nullptr, nullptr, -1, nowState.get());
-
-        if (currentGenome.Initialized && CopedPlayers[0].hp <= 0) {
+        if (currentGenome.Initialized && currentGenome.AllyPlayer.hp <= 0) {
             continue;
         }
 
-        if (CopedPlayers[1].hp <= 0) {
+        if (currentGenome.EnemyPlayer.hp <= 0) {
             currentGenome.fitness += 100;
             //que.push(currentGenome);
             if (BaseGenome.turn > currentGenome.turn) {
@@ -307,19 +302,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
 
         if (BaseGenome.turn < currentGenome.turn) {
             continue; //最適解より長い回答は求めてない
-        }
-
-        counter1 = 0;
-        for (int i = result->position - 3; i < result->position; ++i) {
-            if (result->isEnemy[i]) {
-                //Eactions[counter1] = result->actions[i];
-                //Edamage[counter1] = result->damages[i];
-                currentGenome.EActions[counter1++] = result->actions[i];
-            } else {
-                Aactions = result->actions[i];
-                //Adamage = result->damages[i];
-                currentGenome.Aactions = result->actions[i];
-            }
         }
 
         if (currentGenome.Visited == 0) {
@@ -411,14 +393,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
                                  nullptr, nullptr, -2, nowState.get());
-            currentGenome.position = (*position);
-            currentGenome.state = (*nowState);
-            currentGenome.turn = turns + 1;
-            currentGenome.processed = turns;
-            currentGenome.AllyPlayer = CopedPlayers[0];
-            currentGenome.EnemyPlayer = CopedPlayers[1];
+            if (CopedPlayers[0].hp != 0) {
+                currentGenome.position = (*position);
+                currentGenome.state = (*nowState);
+                currentGenome.turn = turns + 1;
+                currentGenome.processed = turns;
+                currentGenome.AllyPlayer = CopedPlayers[0];
+                currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            que.push(currentGenome);
+                que.push(currentGenome);
+            }
         } else if (!Bans.is_action_banned(BattleEmulator::SPECIAL_MEDICINE, turns) && AllyPlayerPre.SpecialMedicineCount
                    > 0) {
             action = BattleEmulator::SPECIAL_MEDICINE;
@@ -440,14 +424,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
                                  nullptr, nullptr, -2, nowState.get());
-            currentGenome.position = (*position);
-            currentGenome.state = (*nowState);
-            currentGenome.turn = turns + 1;
-            currentGenome.processed = turns;
-            currentGenome.AllyPlayer = CopedPlayers[0];
-            currentGenome.EnemyPlayer = CopedPlayers[1];
+            if (CopedPlayers[0].hp != 0) {
+                currentGenome.position = (*position);
+                currentGenome.state = (*nowState);
+                currentGenome.turn = turns + 1;
+                currentGenome.processed = turns;
+                currentGenome.AllyPlayer = CopedPlayers[0];
+                currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            que.push(currentGenome);
+                que.push(currentGenome);
+            }
         }
 
         //ヒャド
@@ -471,14 +457,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
                                  nullptr, nullptr, -2, nowState.get());
-            currentGenome.position = (*position);
-            currentGenome.state = (*nowState);
-            currentGenome.turn = turns + 1;
-            currentGenome.processed = turns;
-            currentGenome.AllyPlayer = CopedPlayers[0];
-            currentGenome.EnemyPlayer = CopedPlayers[1];
+            if (CopedPlayers[0].hp != 0) {
+                currentGenome.position = (*position);
+                currentGenome.state = (*nowState);
+                currentGenome.turn = turns + 1;
+                currentGenome.processed = turns;
+                currentGenome.AllyPlayer = CopedPlayers[0];
+                currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            que.push(currentGenome);
+                que.push(currentGenome);
+            }
         }
 
         if (!Bans.is_action_banned(BattleEmulator::ATTACK_ALLY, turns)) {
@@ -504,29 +492,31 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
                                  nullptr, nullptr, -2, nowState.get());
-            currentGenome.position = (*position);
-            currentGenome.state = (*nowState);
-            currentGenome.turn = turns + 1;
-            currentGenome.processed = turns;
-            currentGenome.AllyPlayer = CopedPlayers[0];
-            currentGenome.EnemyPlayer = CopedPlayers[1];
+            if (CopedPlayers[0].hp != 0) {
+                currentGenome.position = (*position);
+                currentGenome.state = (*nowState);
+                currentGenome.turn = turns + 1;
+                currentGenome.processed = turns;
+                currentGenome.AllyPlayer = CopedPlayers[0];
+                currentGenome.EnemyPlayer = CopedPlayers[1];
 
 #if defined(BattleEmulatorLV13)
-            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 45) {
-                currentGenome.fitness += 60;
-            }
+                if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 45) {
+                    currentGenome.fitness += 60;
+                }
 #elif defined(BattleEmulatorLV19)
-            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 70) {
-                currentGenome.fitness += 30;
-            }
+                if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 70) {
+                    currentGenome.fitness += 30;
+                }
 #elif defined(BattleEmulatorLV15)
-            if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 45) {
-                currentGenome.fitness += 60;
-            }
+                if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 45) {
+                    currentGenome.fitness += 60;
+                }
 #endif
 
 
-            que.push(currentGenome);
+                que.push(currentGenome);
+            }
         }
 
         if (!Bans.is_action_banned(BattleEmulator::DEFENCE, turns)) {
@@ -549,14 +539,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
                                  nullptr, nullptr, -2, nowState.get());
-            currentGenome.position = (*position);
-            currentGenome.state = (*nowState);
-            currentGenome.turn = turns + 1;
-            currentGenome.processed = turns;
-            currentGenome.AllyPlayer = CopedPlayers[0];
-            currentGenome.EnemyPlayer = CopedPlayers[1];
+            if (CopedPlayers[0].hp != 0) {
+                currentGenome.position = (*position);
+                currentGenome.state = (*nowState);
+                currentGenome.turn = turns + 1;
+                currentGenome.processed = turns;
+                currentGenome.AllyPlayer = CopedPlayers[0];
+                currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            que.push(currentGenome);
+                que.push(currentGenome);
+            }
         }
 
 #ifdef BattleEmulatorLV19
@@ -614,14 +606,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
                                  nullptr, nullptr, -2, nowState.get());
-            currentGenome.position = (*position);
-            currentGenome.state = (*nowState);
-            currentGenome.turn = turns + 1;
-            currentGenome.processed = turns;
-            currentGenome.AllyPlayer = CopedPlayers[0];
-            currentGenome.EnemyPlayer = CopedPlayers[1];
+            if (CopedPlayers[0].hp != 0) {
+                currentGenome.position = (*position);
+                currentGenome.state = (*nowState);
+                currentGenome.turn = turns + 1;
+                currentGenome.processed = turns;
+                currentGenome.AllyPlayer = CopedPlayers[0];
+                currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            que.push(currentGenome);
+                que.push(currentGenome);
+            }
         }
 
         if (AllyPlayerPre.specialCharge == true && AllyPlayerPre.specialChargeTurn != 0 && AllyPlayerPre.acrobaticStar
@@ -652,14 +646,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
                                  nullptr, nullptr, -2, nowState.get());
-            currentGenome.position = (*position);
-            currentGenome.state = (*nowState);
-            currentGenome.turn = turns + 1;
-            currentGenome.processed = turns;
-            currentGenome.AllyPlayer = CopedPlayers[0];
-            currentGenome.EnemyPlayer = CopedPlayers[1];
+            if (CopedPlayers[0].hp != 0) {
+                currentGenome.position = (*position);
+                currentGenome.state = (*nowState);
+                currentGenome.turn = turns + 1;
+                currentGenome.processed = turns;
+                currentGenome.AllyPlayer = CopedPlayers[0];
+                currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            que.push(currentGenome);
+                que.push(currentGenome);
+            }
         }
 
 #if defined(BattleEmulatorLV13) || defined(BattleEmulatorLV15)
@@ -683,14 +679,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
                                  nullptr, nullptr, -2, nowState.get());
-            currentGenome.position = (*position);
-            currentGenome.state = (*nowState);
-            currentGenome.turn = turns + 1;
-            currentGenome.processed = turns;
-            currentGenome.AllyPlayer = CopedPlayers[0];
-            currentGenome.EnemyPlayer = CopedPlayers[1];
+            if (CopedPlayers[0].hp != 0) {
+                currentGenome.position = (*position);
+                currentGenome.state = (*nowState);
+                currentGenome.turn = turns + 1;
+                currentGenome.processed = turns;
+                currentGenome.AllyPlayer = CopedPlayers[0];
+                currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            que.push(currentGenome);
+                que.push(currentGenome);
+            }
         }
         if (!Bans.is_action_banned(BattleEmulator::DRAGON_SLASH, turns)) {
             action = BattleEmulator::DRAGON_SLASH;
@@ -712,14 +710,16 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  CopedPlayers,
                                  (std::optional<BattleResult> &) std::nullopt, seed,
                                  nullptr, nullptr, -2, nowState.get());
-            currentGenome.position = (*position);
-            currentGenome.state = (*nowState);
-            currentGenome.turn = turns + 1;
-            currentGenome.processed = turns;
-            currentGenome.AllyPlayer = CopedPlayers[0];
-            currentGenome.EnemyPlayer = CopedPlayers[1];
+            if (CopedPlayers[0].hp != 0) {
+                currentGenome.position = (*position);
+                currentGenome.state = (*nowState);
+                currentGenome.turn = turns + 1;
+                currentGenome.processed = turns;
+                currentGenome.AllyPlayer = CopedPlayers[0];
+                currentGenome.EnemyPlayer = CopedPlayers[1];
 
-            que.push(currentGenome);
+                que.push(currentGenome);
+            }
         }
         /*if (!Bans.is_action_banned(BattleEmulator::ITEM_USE, turns)) {
             action = BattleEmulator::ITEM_USE;
