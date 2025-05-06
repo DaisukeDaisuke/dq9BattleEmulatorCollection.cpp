@@ -545,7 +545,7 @@ namespace {
                     auto test = SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT, true);
                     if (!test) {
                         std::cout << "The first search request failed." << std::endl;
-                        if (SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT, false)) {
+                        if (!SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT, false)) {
                             std::cout << "The second search request failed" << std::endl;
                         }
                     }
