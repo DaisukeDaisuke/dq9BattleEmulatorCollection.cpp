@@ -42,7 +42,7 @@ constexpr int kaisinnP = 500;
 constexpr int baseHP = 89;
 #endif
 constexpr int DragonSlashKaisinnP = kaisinnP / 2;
-constexpr int WooshSlashKaisinnP = kaisinnP / 5;
+constexpr int WooshSlashKaisinnP = 100;
 
 /**
  * @brief 味方のhpを基に、hpテーブルをコンパイル時に生成します。
@@ -243,6 +243,15 @@ const char *BattleEmulator::getActionName(int actionId) {
 
 
 thread_local int threadTurnProcessed = 0;
+thread_local int startTurn = 0;
+
+void BattleEmulator::resetStartTurn() {
+    startTurn = 0;
+}
+
+int BattleEmulator::getStartTurn() {
+    return startTurn;
+}
 
 void BattleEmulator::ResetTurnProcessed() {
     threadTurnProcessed = 0;
@@ -256,6 +265,8 @@ inline void BattleEmulator::processTurn() {
     // ここでturnProcessedをインクリメントする処理を追加
     threadTurnProcessed++;
 }
+
+
 
 //#endif
 
@@ -551,6 +562,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             c == SWEET_BREATH
                         ) {
                             if (damages[exCounter] == -1) {
+                                startTurn = counterJ - 1;
                                 return true;
                             }
 
@@ -668,6 +680,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         if (mode != -1 && mode != -2) {
                             if (action == ATTACK_ALLY || action == MIRACLE_SLASH) {
                                 if (damages[exCounter] == -1) {
+                                    startTurn = counterJ - 1;
                                     return true;
                                 }
                                 //int need = ;

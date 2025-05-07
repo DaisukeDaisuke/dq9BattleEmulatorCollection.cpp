@@ -60,6 +60,9 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
+    int foundTurn = 0;
+    int foundTurnOffset = 0;
+
     const char *version = "v5.0.6_vE_aa";
 
     std::stringstream performanceLogger = std::stringstream();
@@ -654,11 +657,11 @@ namespace {
         delete position;
         delete nowState;
 
+        std::cout << "foundTurn: " << foundTurn << ", " << turns << std::endl;
 #ifdef MINGW_BUILD
-        std::cout << turns << std::endl;
-        dumpTableMain(result1.value(), genome, seed, 0);
+        dumpTableMain(result1.value(), genome, seed, foundTurn);
 #else
-        dumpTableMain(result1.value(), genome, seed, turns);
+        dumpTableMain(result1.value(), genome, seed, foundTurn);
 #endif
 
         return true;
@@ -681,6 +684,7 @@ namespace {
         auto *nowState = new uint64_t(0);
         int maxElement = 350;
         for (uint64_t seed = start; seed < end; ++seed) {
+            BattleEmulator::resetStartTurn();
             lcg::init(seed);
             (*nowState) = 0;
             (*position) = 1;
@@ -695,6 +699,7 @@ namespace {
                 std::cout << seed << std::endl;
                 FoundSeed = seed;
                 foundSeeds++;
+                foundTurn = BattleEmulator::getStartTurn();
             }
         }
         delete position;

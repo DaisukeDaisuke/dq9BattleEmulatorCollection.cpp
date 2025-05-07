@@ -120,7 +120,8 @@ public:
 
     static const char *getActionName(int actionId);
 
-    static int roundCustom(double value);
+    static void resetStartTurn();
+    static int getStartTurn();
 
 private:
     static int ProcessMagicBurst(int *position);
