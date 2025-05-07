@@ -47,7 +47,7 @@ constexpr double ShieldGuardP = 1.0;
 constexpr int baseHP = 93;
 #endif
 constexpr double DragonSlashKaisinnP = kaisinnP / 2;
-constexpr int WooshSlashKaisinnP = kaisinnP / 5;
+constexpr int WooshSlashKaisinnP = 100;
 
 void constexpr inline BattleEmulator::resetCombo(uint64_t *NowState) {
     //(*NowState) &= ~(0xFFF00000000);
@@ -777,6 +777,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
                 baseDamage = static_cast<int>(floor(tmp));
             }
+            tmp = static_cast<double>(baseDamage) * 0.50;
+            baseDamage = static_cast<int>(floor(tmp));
             ProcessRage(position, baseDamage, players, kaisinn); // 適当
             if (kaisinn) {
                 if (!players[1].rage) {
@@ -794,8 +796,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[attacker].specialChargeTurn = 6;
                 }
             }
-            tmp = static_cast<double>(baseDamage) * 0.50;
-            baseDamage = static_cast<int>(floor(tmp));
             break;
         case CRACK_ALLY:
             players[attacker].mp -= 3;
