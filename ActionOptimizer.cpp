@@ -36,7 +36,7 @@ void ActionOptimizer::updateCompromiseScore(Genome &genome) {
 // 並列処理のための関数
 std::pair<int, Genome> ActionOptimizer::RunAlgorithmSingleThread(const Player players[2], uint64_t seed, int turns,
                                                                  int maxGenerations, int actions[], int start,
-                                                                 int end) {
+                                                                 int end, bool Dropbug) {
     BattleEmulator::ResetTurnProcessed();
     auto seed1 = seed;
     auto turns1 = turns;
@@ -52,7 +52,7 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmSingleThread(const Player pl
     result1 = BattleResult();
 
     for (int i = start; i < end; ++i) {
-        Genome candidate = RunAlgorithm(players, seed1, turns1, maxGenerations1, actions, i * 2);
+        Genome candidate = RunAlgorithm(players, seed1, turns1, maxGenerations1, actions, i * 2, Dropbug);
         Player localPlayers1[2] = {players[0], players[1]};
 
         *position = 1;
@@ -81,7 +81,7 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmSingleThread(const Player pl
 
 // メインの並列処理関数
 std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2], uint64_t seed, int turns,
-                                                          int totalIterations, int actions[350], int numThreads) {
+                                                          int totalIterations, int actions[350], int numThreads, bool Dropbug) {
     lcg::init(seed, true);
     int chunkSize = totalIterations / numThreads;
 
@@ -93,7 +93,7 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
         int end = (i == numThreads - 1) ? totalIterations : start + chunkSize;
 
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
-                                     std::cref(players), seed, turns, 2500, actions, start, end));
+                                     std::cref(players), seed, turns, 2500, actions, start, end, Dropbug));
     }
 
     Genome bestGenome = {};
@@ -116,7 +116,7 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
 
 // オレオレアルゴリズム実行
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
-                                     int actions[350], int seedOffset) {
+                                     int actions[350], int seedOffset, bool Dropbug) {
     std::mt19937 rng(seed + seedOffset);
     bool CrackleEnable = (rng() % 2) == 0;
     std::unique_ptr<int> position = std::make_unique<int>(1);
@@ -197,23 +197,39 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         const auto tmpgenomu = currentGenome;
         result->clear(); //メモリ新規確保よりこっちのほうが早い
 
-        BattleEmulator::Main(position.get(), currentGenome.turn - currentGenome.processed, currentGenome.actions,
-                             CopedPlayers,
-                             result, seed,
-                             nullptr, nullptr, -1, nowState.get());
+        if (Dropbug) {
+            BattleEmulator::Main(position.get(), 1, currentGenome.actions,
+                                 CopedPlayers,
+                                 (std::optional<BattleResult> &) std::nullopt, seed,
+                                 nullptr, nullptr, -2, nowState.get());
 
-        if (currentGenome.Initialized && CopedPlayers[0].hp <= 0) {
-            continue;
-        }
 
-        if (CopedPlayers[1].hp <= 0) {
-            currentGenome.fitness += 100;
-            //que.push(currentGenome);
-            if (BaseGenome.turn > currentGenome.turn) {
-                BaseGenome = currentGenome; //最適解を更新
-                found = true;
+            if (currentGenome.Initialized && CopedPlayers[0].hp <= 0) {
+                continue;
             }
-            continue;
+
+            if (CopedPlayers[1].hp <= 0) {
+                currentGenome.fitness += 100;
+                //que.push(currentGenome);
+                if (BaseGenome.turn > currentGenome.turn) {
+                    BaseGenome = currentGenome; //最適解を更新
+                    found = true;
+                }
+                continue;
+            }
+        } else {
+            if (currentGenome.AllyPlayer.hp <= 0) {
+                continue;
+            }
+            if (currentGenome.EnemyPlayer.hp <= 0) {
+                currentGenome.fitness += 100;
+                //que.push(currentGenome);
+                if (BaseGenome.turn > currentGenome.turn) {
+                    BaseGenome = currentGenome; //最適解を更新
+                    found = true;
+                }
+                continue;
+            }
         }
 
         if (BaseGenome.turn < currentGenome.turn) {
