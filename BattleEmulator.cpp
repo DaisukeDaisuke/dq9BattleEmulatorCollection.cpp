@@ -368,7 +368,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 528) {
+        if ((*position) == 666) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -759,7 +759,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         //DEBUG_COUT2((*position));
-        if ((*position) == 176) {
+        if ((*position) == 666) {
             //std::cout << "!!" << std::endl;
         }
 #endif
@@ -869,6 +869,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
                 baseDamage = static_cast<int>(floor(tmp));
             }
+            tmp = static_cast<double>(baseDamage) * 0.75;
+            baseDamage = static_cast<int>(floor(tmp));
             ProcessRage(position, baseDamage, players, kaisinn); // 適当
             if (kaisinn) {
                 if (!players[1].rage) {
@@ -886,8 +888,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[attacker].specialChargeTurn = 6;
                 }
             }
-            tmp = static_cast<double>(baseDamage) * 0.75;
-            baseDamage = static_cast<int>(floor(tmp));
             break;
         case CRACKLE:
             players[attacker].mp -= 8;
