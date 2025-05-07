@@ -182,7 +182,7 @@ namespace {
         printHeader(ss6);
         int currentTurn = -1;
         int eDamage[2] = {-1, -1}, aDamage = -1;
-        bool initiative_tmp = false;
+        bool initiative_tmp, def_f = false;
         std::string eAction[2], aAction, sp, tmpState, ATKTurn1, DEFTurn1, magicMirrorTurn1, specialChargeTurn1, amp1,
                 ahp2,
                 ehp2, amp2, poisonTurn1, SpeedTurn1;
@@ -201,6 +201,7 @@ namespace {
             auto specialChargeTurn = result.scTurn[i];
             auto poisonTurn = result.PoisonTurns[i];
             auto SpeedTurn = result.SpeedTurn[i];
+            auto defenseFlag = result.defenseFlag[i];
             int amp = -1;
             if (i >= 1) {
                 amp = result.amp[i - 1];
@@ -295,6 +296,9 @@ namespace {
                     }
                     if ((action == BattleEmulator::CURE_SLEEPING || action == BattleEmulator::CURE_PARALYSIS)) {
                         sp = "---------------";
+                    }
+                    if (!initiative && defenseFlag && action != BattleEmulator::DEFENCE) {
+                        sp = "Defense !Sleep";
                     }
                 }
             }
@@ -939,11 +943,13 @@ int main(int argc, char *argv[]) {
             */
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 0x416b4f2;
+    uint64_t time1 = 0x416d71f;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
+
+    //ver: v5.0.6_vE_aa, atk: 82, def: 90, seed: 0x416d71f, actions: 25, 25, 50, 25, 25, 61, 50, 61, 61, 27, 27, 25, 50, 25, 61, 25, 56, 61, 25, 61, 50, 53, 25,
 
     //ver: v5.0.5_vD_aa, atk: 82, def: 90, seed: 0x416b4f2, actions: 25, 25, 25, 25, 50, 25, 25, 25, 25, 61, 50, 25, 56, 25, 25, 61, 27, 25, 61, 55, 25, 56, 27,
     //ver: v5.0.5_vC_aa, atk: 82, def: 90, seed: 0x427227d, actions: 25, 35, 35, 25, 59, 50, 25, 50, 50, 25, 56, 25, 25, 25, 25, 50, 61, 25, 61, 56, 61, 61, 58,
@@ -969,7 +975,7 @@ int main(int argc, char *argv[]) {
 
     //AI Warning: This is code related to debug2
         int32_t gene1[350] = {
-            25, 25, 25, 25, 50, 25, 25, 25, 25, 61, 50, 25, 56, 25, 25, 61, 27, 25, 61, 55, 25, 56, 27,
+            25, 25, 50, 25, 25, 61, 50, 61, 61, 27, 27, 25, 50, 25, 61, 25, 56, 61, 25, 61, 50, 53, 25,
             BattleEmulator::ATTACK_ALLY};
         //gene1[19-1] = BattleEmulator::DEFENCE;
         int counter = 0;

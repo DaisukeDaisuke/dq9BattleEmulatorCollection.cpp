@@ -333,6 +333,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
     int exCounter = 0;
     int exCounter1 = 0;
     uint64_t tmpState = -1;
+    int defenseFlag = false;
 
     auto startPos = static_cast<int>(((*NowState) >> 12) & 0xfffff);
     if (startPos != 0) {
@@ -368,7 +369,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 666) {
+        if ((*position) == 514) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -414,7 +415,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     }
                 }
 
-                if (enemyAction[counter] == SWEET_BREATH && players[0].sleeping == true) {
+                if (enemyAction[counter] == SWEET_BREATH && players[0].sleeping) {
                     enemyAction[counter] = KASAP;
                     ActionChanged = true;
                 }
@@ -475,14 +476,20 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         }
 
 
+        if (actionTable == DEFENCE) {
+            players[0].defence = 0.5;
+            defenseFlag = true;
+        } else {
+            defenseFlag = false;
+        }
+
         //途中で解除してもいいように2回チェックする
         if (players[0].sleeping) {
             actionTable = SLEEPING;
+            players[0].defence = 1.0;
+            defenseFlag = false;
         }
 
-        if (actionTable == DEFENCE) {
-            players[0].defence = 0.5;
-        }
 
         // ソートされた結果を出力
         for (int t = 0; t < 2; ++t) {
@@ -504,6 +511,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
                     if (players[0].sleeping) {
                         actionTable = SLEEPING;
+                        players[0].defence = 1.0;
                     }
 
                     if (mode == -1) {
@@ -533,7 +541,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         BattleResult::add(result, c, basedamage, true,
                                           def1, poi, agl, counterJ - 1,
                                           player0_has_initiative, ehp,
-                                          ahp, tmpState, players[0].specialChargeTurn, players[0].mp);
+                                          ahp, tmpState, players[0].specialChargeTurn, players[0].mp, defenseFlag);
                     } else if (mode != -1 && mode != -2) {
                         if (
                             c == ATTACK_ENEMY ||
@@ -592,6 +600,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         (*position) += 1;
                     } else if (players[0].sleeping) {
                         action = SLEEPING;
+                        players[0].defence = 1.0;
 
                         players[0].sleepingTurn--;
                         if (players[0].sleepingTurn <= 0) {
@@ -640,7 +649,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         BattleResult::add(result, action, basedamage, false,
                                           def1, poi, agl, counterJ - 1,
                                           player0_has_initiative, ehp, ahp,
-                                          tmpState, players[0].specialChargeTurn, players[0].mp);
+                                          tmpState, players[0].specialChargeTurn, players[0].mp, defenseFlag);
                     }
                     if (action == HEAL || action == MORE_HEAL || action == MIDHEAL ||
                         action == FULLHEAL || action == SPECIAL_MEDICINE || action == GOSPEL_SONG || action ==
@@ -737,7 +746,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         BattleResult::add(result, action, 0, false,
                                           def1, poi, agl, counterJ - 1,
                                           player0_has_initiative, ehp, ahp,
-                                          tmpState, players[0].specialChargeTurn, players[0].mp);
+                                          tmpState, players[0].specialChargeTurn, players[0].mp, defenseFlag);
                     }
                 }
             }
@@ -759,7 +768,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         //DEBUG_COUT2((*position));
-        if ((*position) == 666) {
+        if ((*position) == 514) {
             //std::cout << "!!" << std::endl;
         }
 #endif
@@ -1160,7 +1169,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
         case BattleEmulator::SKY_ATTACK:
         case BattleEmulator::POISON_ATTACK:
             (*position) += 2;
-            if (players[0].acrobaticStar) {//0x021ec6f8 アクロバットスター
+            if (players[0].acrobaticStar) {
+                //0x021ec6f8 アクロバットスター
                 percent_tmp = lcg::getPercent(position, 100);
                 if (percent_tmp >= 0 && percent_tmp <= 49) {
                     return callAttackFun(ACROBATSTAR_KAIHI, position, players, attacker, defender, NowState);
