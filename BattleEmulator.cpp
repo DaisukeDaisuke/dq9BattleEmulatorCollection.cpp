@@ -676,6 +676,10 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 if (damages[exCounter] == -5) {
                                     exCounter++;
                                 }
+                                if (damages[exCounter] == -1) {
+                                    startTurn = counterJ;
+                                    return true;
+                                }
                             }
                         }
                     } else {
