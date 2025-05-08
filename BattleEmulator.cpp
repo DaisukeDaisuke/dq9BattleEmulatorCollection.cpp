@@ -301,7 +301,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 278) {
+        //THIS DEBUG2 CODE!
+        if ((*position) == 482) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -760,10 +761,14 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //関係ない
             (*position)++; //会心
             (*position)++; //回避
-            FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
-            (*position)++; //不明
+            baseDamage = FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
+            if (baseDamage == 0) {
+                baseDamage = lcg::getPercent(position, 2); //0x021e81a0
+            }
+            if (baseDamage != 0) {
+                (*position)++; //不明 0x021e54fc
+            }
             break;
-
         case WOOSH_ALLY:
             players[attacker].mp -= 3;
             (*position) += 2;
