@@ -63,7 +63,7 @@ namespace {
     int foundTurn = 0;
     int foundTurnOffset = 0;
 
-    const char *version = "v5.0.6_vJ_v2";
+    const char *version = "v5.0.6_vK_v2";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -123,8 +123,8 @@ namespace {
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
-            89, 89.0, 82, 82, 90, 90, 58, 58, 39, 27, // 最初のメンバー
-            27, false, false, 0, false, 0, -1,
+            89, 89.0, 82, 82, 90, 90, 58, 58, 39, 23, // 最初のメンバー
+            23, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
