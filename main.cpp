@@ -63,7 +63,7 @@ namespace {
     int foundTurn = 0;
     int foundTurnOffset = 0;
 
-    const char *version = "v5.0.6_vG_v2";
+    const char *version = "v5.0.6_vI_v2";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -159,14 +159,20 @@ namespace {
                 << std::setw(6) << "ahp"
                 << std::setw(6) << "ehp"
                 << std::setw(6) << "amp"
-
                 << std::setw(6) << "ini"
+#if defined(MINGW_BUILD)
                 << std::setw(6) << "Sle"
                 << std::setw(6) << "DET"
                 << std::setw(6) << "POT"
                 << std::setw(6) << "BOT"
-                << std::setw(6) << "Sct" << "\n";
+                << std::setw(6) << "Sct"
+#endif
+                << "\n";
+#if defined(MINGW_BUILD)
         ss << std::string(153, '-') << "\n"; // 区切り線を出力
+#else
+        ss << std::string(117, '-') << "\n"; // 区切り線を出力
+#endif
     }
 
     std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns);
@@ -235,12 +241,15 @@ namespace {
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
                                 << std::setw(6) << (initiative_tmp ? "yes" : "")
+#if defined(MINGW_BUILD)
                                 << std::setw(6) << ((aAction == "Sleeping" || aAction == "Cure Sleeping") ? "yes" : "")
                                 << std::setw(6) << DEFTurn1
                                 << std::setw(6) << poisonTurn1
                                 << std::setw(6) << SpeedTurn1
                                 << std::setw(6) << specialChargeTurn1
-                                << std::setw(11) << "" << "\n";
+                                << std::setw(11) << ""
+#endif
+                                << "\n";
                     }
                 }
                 // ターンの初期化
@@ -322,12 +331,16 @@ namespace {
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
                     << std::setw(6) << (initiative_tmp ? "yes" : "")
+#if defined(MINGW_BUILD)
                     << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
                     << std::setw(6) << DEFTurn1
                     << std::setw(6) << poisonTurn1
                     << std::setw(6) << SpeedTurn1
                     << std::setw(6) << specialChargeTurn1
-                    << std::setw(11) << "" << "\n";
+                    << std::setw(11) << ""
+#endif
+
+                    << "\n";
         }
 
         return ss6.str();
@@ -920,7 +933,10 @@ namespace {
 }
 
 int main(int argc, char *argv[]) {
-    showHeader();
+    if (argc == 2 && isMatchStrWithTrim(argv[1], "h")) {
+        showHeader();
+        return 0;
+    }
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
