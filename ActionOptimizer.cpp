@@ -373,7 +373,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
 
         //ヒャド
-        if (AllyPlayerPre.mp >= 3 && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
+        if (AllyPlayerPre.mp >= 3+3 && !Bans.is_action_banned(BattleEmulator::CRACK_ALLY, turns)) {
             action = BattleEmulator::CRACK_ALLY;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
@@ -595,7 +595,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
 
 #if defined(BattleEmulatorLV13) || defined(BattleEmulatorLV15)
-        if (AllyPlayerPre.mp >= 3 && !Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
+        if (AllyPlayerPre.mp >= 3+3 && !Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
             action = BattleEmulator::WOOSH_ALLY;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
