@@ -768,6 +768,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (baseDamage != 0) {
                 (*position)++; //不明 0x021e54fc
             }
+            baseDamage = 0;
             break;
         case WOOSH_ALLY:
             players[attacker].mp -= 3;
