@@ -35,7 +35,6 @@ struct ResultStructure {
     }
 
     void print() const {
-        std::cout << "--------------------------" << std::endl;
         std::cout << "[Enemy Damage](" << EdamageCounter << "): ";
         for (int i = 0; i < EdamageCounter; ++i) {
             std::cout << Edamage[i] << " ";

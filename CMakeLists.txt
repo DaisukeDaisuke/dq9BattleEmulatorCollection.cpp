@@ -14,7 +14,7 @@ endif()
 
 # MinGWビルドかMSVCビルドかを判別するフラグを定義
 if(MINGW)
-    add_definitions(-DMINGW_BUILD)
+    dd_definitions(-DMINGW_BUILD)
 elseif(MSVC)
     add_definitions(-DMSVC_BUILD)
 endif()

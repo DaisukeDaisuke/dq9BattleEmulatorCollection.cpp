@@ -194,14 +194,20 @@ namespace {
                 << std::setw(6) << "ahp"
                 << std::setw(6) << "ehp"
                 << std::setw(6) << "amp"
-
                 << std::setw(6) << "ini"
+#if defined(MINGW_BUILD)
                 << std::setw(6) << "Sle"
                 << std::setw(6) << "DET"
                 << std::setw(6) << "POT"
                 << std::setw(6) << "BOT"
-                << std::setw(6) << "Sct" << "\n";
-        ss << std::string(153, '-') << "\n"; // 区切り線を出力
+                << std::setw(6) << "Sct"
+#endif
+        << "\n";
+#if defined(MINGW_BUILD)
+        ss << std::string(155, '-') << "\n"; // 区切り線を出力
+#else
+        ss << std::string(117, '-') << "\n"; // 区切り線を出力
+#endif
     }
 
     std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns);
@@ -260,12 +266,15 @@ namespace {
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
                                 << std::setw(6) << (initiative_tmp ? "yes" : "")
+#if defined(MINGW_BUILD)
                                 << std::setw(6) << ((aAction == "Sleeping" || aAction == "Cure Sleeping") ? "yes" : "")
                                 << std::setw(6) << DEFTurn1
                                 << std::setw(6) << poisonTurn1
                                 << std::setw(6) << SpeedTurn1
                                 << std::setw(6) << specialChargeTurn1
-                                << std::setw(11) << "" << "\n";
+                                << std::setw(11) << ""
+#endif
+                        << "\n";
                     }
                 }
                 // ターンの初期化
@@ -344,12 +353,15 @@ namespace {
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
                     << std::setw(6) << (initiative_tmp ? "yes" : "")
+#if defined(MINGW_BUILD)
                     << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
                     << std::setw(6) << DEFTurn1
                     << std::setw(6) << poisonTurn1
                     << std::setw(6) << SpeedTurn1
                     << std::setw(6) << specialChargeTurn1
-                    << std::setw(11) << "" << "\n";
+                    << std::setw(11) << ""
+#endif
+            << "\n";
         }
 
         return ss6.str();
@@ -488,7 +500,7 @@ namespace {
         std::cout << dumpTable(result1, genome.actions, turns) << std::endl;
 
         std::cout << "ver: "<< version << ", atk: "<< BasePlayers[0].atk << ", def: " << BasePlayers[0].def << ", seed: ";
-        std::cout << "0x" << std::hex << seed << std::dec << ", actions: ";
+        std::cout << "0x" << std::hex << seed << std::endl << std::dec << "actions: ";
 
         for (auto i = 0; i < 100; ++i) {
             if (genome.actions[i] == 0 || genome.actions[i] == -1) {
@@ -833,7 +845,10 @@ namespace {
 }
 
 int main(int argc, char *argv[]) {
-    showHeader();
+    if (argc == 2 && isMatchStrWithTrim(argv[1], "h")) {
+        showHeader();
+        return 0;
+    }
 #if defined(DEBUG)
 
     auto t0 = std::chrono::high_resolution_clock::now();
