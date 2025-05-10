@@ -20,6 +20,8 @@ public:
 
     static int getPercent(int *position, int max);
 
+    static uint64_t getSeed(int *position);
+
     static double floatRand(int *position, double min, double max);
 
     static int intRangeRand(int *position, int min, int max);

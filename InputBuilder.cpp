@@ -45,7 +45,7 @@ void InputBuilder::push(int damage, const char prefix) {
     } else {
         entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
     }
-#elif defined(BattleEmulatorLV15) || defined(BattleEmulatorLV13)
+#elif defined(erusionn_lv21) || defined(BattleEmulatorLV13)
         if (prefix == 'a') {
             entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
         } else {

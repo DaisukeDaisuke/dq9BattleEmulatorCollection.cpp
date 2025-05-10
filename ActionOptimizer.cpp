@@ -114,7 +114,7 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
 #elif defined(BattleEmulatorLV19)
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
                                              std::cref(players), seed, turns, 1500, actions, start, end, Dropbug));
-#elif defined(BattleEmulatorLV15)
+#elif defined(erusionn_lv21)
         futures.push_back(std::async(std::launch::async, RunAlgorithmSingleThread,
                                      std::cref(players), seed, turns, 1500, actions, start, end, Dropbug));
 #endif
@@ -444,7 +444,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 70) {
                     currentGenome.fitness += 30;
                 }
-#elif defined(BattleEmulatorLV15)
+#elif defined(erusionn_lv21)
                 if (visited == 0 && ehp1 - currentGenome.EnemyPlayer.hp > 45) {
                     currentGenome.fitness += 60;
                 }
@@ -566,7 +566,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
 #elif defined(BattleEmulatorLV19)
                 currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
-#elif defined(BattleEmulatorLV15)
+#elif defined(erusionn_lv21)
                 currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 13);
 #endif
             }
@@ -594,7 +594,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             }
         }
 
-#if defined(BattleEmulatorLV13) || defined(BattleEmulatorLV15)
+#if defined(BattleEmulatorLV13) || defined(erusionn_lv21)
         if (AllyPlayerPre.mp >= 3+3 && !Bans.is_action_banned(BattleEmulator::WOOSH_ALLY, turns)) {
             action = BattleEmulator::WOOSH_ALLY;
             if (tmpgenomu.Visited >= 1) {

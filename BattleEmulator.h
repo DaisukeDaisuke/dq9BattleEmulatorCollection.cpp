@@ -106,6 +106,10 @@ public:
     static constexpr int ACROBATSTAR_KAIHI = 69;
     static constexpr int COUNTER = 70;
 
+    static constexpr int DOUBLE_TROUBLE = 80;// 往復びんた
+    static constexpr int ZAMMLE = 81; //ドルクマ
+    static constexpr int CRACKLE_ENEMY = 82; //ヒャダルコ
+
 
     static void ResetTurnProcessed();
 

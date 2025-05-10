@@ -71,18 +71,18 @@ namespace {
     constexpr int THREAD_COUNT = 4;
 #elif defined(BattleEmulatorLV13)
     constexpr int THREAD_COUNT = 5;
-#elif defined(BattleEmulatorLV15)
+#elif defined(erusionn_lv21)
     constexpr int THREAD_COUNT = 5;
 #endif
     // `InputBuilder` インスタンス作成
     InputBuilder builder;
-#if defined(BattleEmulatorLV19)
 
+#if defined(erusionn_lv21)
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
-            103, 103.0, 89, 89, 97, 97, 69, 69, 44, 36, // 最初のメンバー
-            36, false, false, 0, false, 0, -1,
+            143, 143.0, 220, 220, 155, 155, 114, 114, 138, 88, // 最初のメンバー
+            88, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
             false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
@@ -90,49 +90,7 @@ namespace {
 
         // プレイヤー2
         {
-            696, 696.0, 68, 68, 68, 68, 50, 50, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
-
-#elif defined(BattleEmulatorLV13)
-
-    constexpr Player BasePlayers[2] = {
-        // プレイヤー1
-        {
-            79, 79.0, 77, 77, 85, 85, 51, 51, 35, 27, // 最初のメンバー
-            27, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            696, 696.0, 68, 68, 68, 68, 50, 50, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
-        } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-    };
-#elif defined(BattleEmulatorLV15)
-    constexpr Player BasePlayers[2] = {
-        // プレイヤー1
-        {
-            89, 89.0, 82, 82, 90, 90, 58, 58, 39, 23, // 最初のメンバー
-            23, false, false, 0, false, 0, -1,
-            // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
-        }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
-
-        // プレイヤー2
-        {
-            696, 696.0, 68, 68, 68, 68, 50, 50, 0, 255, // 最初のメンバー
+            1680, 1680.0, 160, 160, 170, 170, 125, 125, 0, 255, // 最初のメンバー
             255, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
@@ -641,7 +599,7 @@ namespace {
 #elif defined(BattleEmulatorLV19)
         auto [turnProcessed,genome] =
         ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 1500, gene, numThreads, Dropbug);
-#elif defined(BattleEmulatorLV15)
+#elif defined(erusionn_lv21)
         auto [turnProcessed,genome] =
                 ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads, Dropbug);
 #endif
@@ -964,7 +922,7 @@ int main(int argc, char *argv[]) {
             */
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 0x416d71f;
+    uint64_t time1 = 0x03fead45;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -991,17 +949,20 @@ int main(int argc, char *argv[]) {
         auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
         Player players1[2];
-        //int32_t gene1[350] = {0};
+        int32_t gene1[350] = {0};
         //0x22e2dbaf:
 
     //AI Warning: This is code related to debug2
-        int32_t gene1[350] = {
-            25, 25, 50, 25, 25, 61, 50, 61, 61, 27, 27, 25, 50, 25, 61, 25, 56, 61, 25, 61, 50, 53, 25,
-            BattleEmulator::ATTACK_ALLY};
+        // int32_t gene1[350] = {
+        //     25, 25, 50, 25, 25, 61, 50, 61, 61, 27, 27, 25, 50, 25, 61, 25, 56, 61, 25, 61, 50, 53, 25,
+        //     BattleEmulator::ATTACK_ALLY};
         //gene1[19-1] = BattleEmulator::DEFENCE;
         int counter = 0;
         //
-        // gene1[counter++] = BattleEmulator::ITEM_USE;
+        gene1[counter++] = BattleEmulator::BUFF;
+        gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+        gene1[counter++] = BattleEmulator::BUFF;
+        gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
         // gene1[counter++] = BattleEmulator::ITEM_USE;
         // gene1[counter++] = BattleEmulator::ITEM_USE;
         // gene1[counter++] = BattleEmulator::ITEM_USE;

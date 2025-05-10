@@ -11,6 +11,7 @@
 const int ARRAY_SIZE = 5000;
 
 double precalculatedValues[ARRAY_SIZE]; // 固定メモリ
+uint64_t seeds[ARRAY_SIZE];             // 固定メモリ
 int nowCounter = 1;
 uint64_t now_seed;
 
@@ -21,7 +22,7 @@ uint64_t now_seed;
  * @param init 必要に応じて初期乱数列をすべて生成するかどうかを制御するフラグ、trueに設定すると動的生成が無効になる。
  */
 void lcg::init(uint64_t seed, bool init) {
-    nowCounter = 0;
+    nowCounter = 1;
     now_seed = seed;
 
     if (init) {
@@ -42,7 +43,8 @@ void lcg::GenerateifNeed(int need) {
     }
     for (int i = nowCounter; i < need+2; ++i) {
         now_seed = lcg_rand(now_seed);
-        precalculatedValues[++nowCounter] = calculatePercent(now_seed) * 0.01;
+        precalculatedValues[nowCounter] = calculatePercent(now_seed) * 0.01;
+        seeds[nowCounter++] = now_seed >> 32;
     }
 }
 
@@ -156,4 +158,14 @@ double lcg::floatRand(int *position, double min, double max) {
  */
 int lcg::intRangeRand(int *position, int min, int max) {
     return min + getPercent(position, max - min + 1);
+}
+
+uint64_t lcg::getSeed(int *position) {
+    if (position == nullptr) {
+        throw std::invalid_argument("Null pointer passed to incrementPosition.");
+    }
+    GenerateifNeed((*position));
+    uint64_t result = seeds[*position];
+    (*position)++;
+    return result;
 }
