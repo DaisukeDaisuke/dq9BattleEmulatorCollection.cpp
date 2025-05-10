@@ -49,7 +49,7 @@ namespace {
 
     void help(const char *program_name);
 
-    void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads);
+    bool SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads, bool Dropbug);
 
     uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                                int aActions[350], int damages[350]);
@@ -112,7 +112,7 @@ namespace {
             34, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 0, false, -1
         }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
         // プレイヤー2
@@ -160,7 +160,7 @@ namespace {
                 << std::setw(6) << "amp"
                 << std::setw(6) << "ini"
                 << std::setw(6) << "Sct" << "\n";
-        ss << std::string(90, '-') << "\n"; // 区切り線を出力
+        ss << std::string(99, '-') << "\n"; // 区切り線を出力
     }
 
     std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns);
@@ -403,7 +403,12 @@ namespace {
                 auto seed = BruteForceRequest(BasePlayers, hours, minutes, seconds, result.AactionsCounter, aActions,
                                               damages);
                 if (foundSeeds == 1) {
-                    SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT);
+                    if (!SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT, true)) {
+                        std::cout << "The first search request failed." << std::endl;
+                        if (!SearchRequest(BasePlayers, seed, aActions, THREAD_COUNT, false)) {
+                            std::cout << "The second search request failed" << std::endl;
+                        }
+                    }
                 }
             }
         } catch (const std::runtime_error &e) {
@@ -419,7 +424,7 @@ namespace {
 
 
         std::cout << "ver: "<< version << ", atk: "<< BasePlayers[0].atk << ", def: " << BasePlayers[0].def << ", seed: ";
-        std::cout << "0x" << std::hex << seed << std::dec << ", actions: ";
+        std::cout << "0x" << std::hex << seed << std::dec << std::endl << "actions: ";
 
         for (auto i = 0; i < 100; ++i) {
             if (genome.actions[i] == 0 || genome.actions[i] == -1) {
@@ -447,7 +452,7 @@ namespace {
 
 #if defined(MULTITHREADING)
 
-    void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads) {
+    bool SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], int numThreads, bool Dropbug) {
 #if defined(DEBUG)
 
         auto t0 = std::chrono::high_resolution_clock::now();
@@ -467,7 +472,18 @@ namespace {
         }
 
         auto [turnProcessed,genome] =
-                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads);
+                ActionOptimizer::RunAlgorithmAsync(copiedPlayers, seed, turns, 2000, gene, numThreads, Dropbug);
+
+#if defined(DEBUG)
+        auto t3 = std::chrono::high_resolution_clock::now();
+        auto elapsed_time1 =
+                std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
+        PerformanceDebug("Searcher multi", turnProcessed, static_cast<double>(elapsed_time1), 0);
+#endif
+
+        if (genome.turn >= 100) {
+            return false;
+        }
 
         std::optional<BattleResult> result1;
         result1 = BattleResult();
@@ -490,13 +506,7 @@ namespace {
         dumpTableMain(result1.value(), genome, seed, turns);
 #endif
 
-#if defined(DEBUG)
-
-        auto t3 = std::chrono::high_resolution_clock::now();
-        auto elapsed_time1 =
-                std::chrono::duration_cast<std::chrono::microseconds>(t3 - t0).count();
-        PerformanceDebug("Searcher multi", turnProcessed, static_cast<double>(elapsed_time1), 0);
-#endif
+        return true;
     }
 #elif NO_MULTITHREADING
 
@@ -761,7 +771,10 @@ namespace {
 }
 
 int main(int argc, char *argv[]) {
-    showHeader();
+    if (argc == 2 && isMatchStrWithTrim(argv[1], "h")) {
+        showHeader();
+        return 0;
+    }
 #if defined(DEBUG)
 
     auto t0 = std::chrono::high_resolution_clock::now();
