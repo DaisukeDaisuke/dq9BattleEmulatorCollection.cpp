@@ -393,7 +393,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 130) {
+        if ((*position) == 183) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -451,7 +451,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     (*position) += 2; //0x0216139c && 0x021613b0
                     continue;
                 }
-                if (enemyAction[counter] == DOUBLE_TROUBLE || enemyAction[counter] == ZAMMLE) {
+                if (enemyAction[counter] == DOUBLE_TROUBLE || enemyAction[counter] == ZAMMLE || enemyAction[counter] == ATTACK_ENEMY) {
                     (*position)++; //0x02156874
                 }
             } else if (state == TYPE_2B) {
@@ -466,6 +466,9 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 if (enemyAction[counter] == ATTACK_ENEMY) {
                     (*position)++; //0x02156874
                     (*position) += 2; //0x0216139c && 0x021613b0
+                }
+                if (enemyAction[counter] == DOUBLE_TROUBLE || enemyAction[counter] == ATTACK_ENEMY) {
+                    (*position)++; //0x02156874
                 }
             }
             if (counter == 0) {
@@ -819,7 +822,7 @@ double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
 constexpr int proportionTable2[9] = {90, 90, 64, 32, 16, 8, 4, 2, 1}; //最後の項目を調べるのは手動　P:\lua\isilyudaru\hissatuteki.lua
 // double proportionTable1[9] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2, 0.1};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
 constexpr double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5}; //一部の敵は特殊テンションテーブルを倍率として使う
-constexpr double TensionLevel = (1+(Enemy_level/10.0));
+constexpr int TensionLevel = static_cast<int>(floor(1+(Enemy_level/10.0)));
 
 /*
 <?php
@@ -895,15 +898,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                         }
                         baseDamage = 0;
                     } else {
-                        tmp = baseDamage * 0.75;
+                        tmp = static_cast<int>(floor(baseDamage * 0.75));
 
-                        //テンションがある場合、この時点でオフセットが計算されて、最低4ダメージが保証されて下の0x021e81a0でダメージがある判定になる。
-                        //1*(1+(30/10))で4ダメージが保証されるけど、事前に計算して定数にしとく。
                         if (players[attacker].TensionLevel != 0) {
                             //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
                             tmp *= Enemy_TensionTable[players[attacker].TensionLevel - 1];
                             tmp += (players[attacker].TensionLevel * TensionLevel);
-                            players[attacker].TensionLevel = 0;
                         }
 
                         baseDamage = static_cast<int>(floor(tmp));
@@ -942,6 +942,10 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     (*position)++; //0x021ec6f8
                 }
                 totalDamage += baseDamage;
+            }
+
+            if (players[attacker].TensionLevel != 0) {
+                players[attacker].TensionLevel = 0;
             }
 
             resetCombo(NowState);

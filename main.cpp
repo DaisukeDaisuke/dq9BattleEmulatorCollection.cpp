@@ -963,6 +963,7 @@ int main(int argc, char *argv[]) {
         gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
         gene1[counter++] = BattleEmulator::BUFF;
         gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+        gene1[counter++] = BattleEmulator::DOUBLE_UP;
         // gene1[counter++] = BattleEmulator::ITEM_USE;
         // gene1[counter++] = BattleEmulator::ITEM_USE;
         // gene1[counter++] = BattleEmulator::ITEM_USE;
