@@ -7,6 +7,12 @@
 #include <utility>
 #include <initializer_list>
 
+/**
+ * 属性値を定義する列挙型です。
+ *
+ * 各列挙値は、装備品が軽減する属性に関連するものであり、
+ * 耐性値や効果の計算などで利用されます。
+ */
 enum class Attribute {
     Fire,
     Ice,
@@ -19,10 +25,33 @@ enum class Attribute {
 };
 
 struct Equipment {
+    /**
+     * 装備品の名前を表します。
+     *
+     * @note この変数はconstとして定義されているため、インスタンス生成後に変更することはできません。
+     * @note この値は装備品の一意性判定や識別に利用されることを想定しています。
+     */
     const std::string_view name;
+    /**
+     * 装備品の各属性に対する耐性値を格納する配列です。
+     * 配列の各インデックスは、Attribute列挙型の各属性に対応します。
+     *
+     * @note 初期化されていない場合、全ての耐性値は0になります。
+     * @note 配列のサイズはAttribute::AttributeCountに従い、すべての属性について耐性値を保持できます。
+     */
     std::array<int, static_cast<int>(Attribute::AttributeCount)> resistances;
 
-    // C++20ではconstexprのループも利用可能
+
+    /**
+     * 装備品の名前と初期耐性値を設定するコンストラクタです。
+     *
+     * @param inputName 装備品の名前
+     * @param initList 初期耐性のリスト (属性と耐性値のペアのリスト)
+     *
+     * @return このコンストラクタはクラスインスタンスの生成時に呼び出され、装備名と対応する耐性値の配列を初期化します
+     *
+     * @note 初期化リスト内の属性値は列挙型Attributeに従い、それを元に耐性配列を初期化します。
+     */
     constexpr Equipment(std::string_view inputName, std::initializer_list<std::pair<Attribute, int> > initList)
         : name(inputName), resistances{} {
         for (auto entry: initList) {
@@ -64,39 +93,70 @@ constexpr std::array<Equipment, 3> allEquipments = {
     DarkShield, EtherealArmour, EnchantedGloves
 };
 
-constexpr int PrivateCalculateTotalResistance(Attribute attribute) {
-    int totalResistance = 100;
-    for (const auto &equipment: allEquipments) {
-        totalResistance -= equipment.resistances[static_cast<size_t>(attribute)];
+/**
+ * 指定された属性について装備全体の耐性倍率を計算します。
+ *
+ * @param attribute 耐性倍率を計算する対象の属性
+ * @return 指定された属性に基づく総合的な耐性倍率を小数点以下2桁の精度で返します
+ *
+ * @note この関数はconstexprとして実行されるため、コンパイル時計算にも使用できます。
+ * @attention 計算結果は1000倍された値で返され、後続の処理で任意精度計算に利用されます。
+ */
+constexpr double PrivateCalculateTotalResistance(Attribute attribute) {//指定された倍率の
+    int totalResistance = 100;//100 = 0%軽減
+    for (const auto &equipment: allEquipments) {//各装備について
+        totalResistance -= equipment.resistances[static_cast<size_t>(attribute)];//軽減率を引く
     }
-    return totalResistance;
+    return totalResistance * 1000;//実行時に小数点以下2桁の任意精度計算処理をするので1000倍にする
 }
 
 class Equipments {
 private:
-    // クラス外の関数を利用して配列を初期化
-    inline static constexpr std::array<int, static_cast<size_t>(Attribute::AttributeCount)> resistances = []() constexpr {
-        std::array<int, static_cast<size_t>(Attribute::AttributeCount)> res{};
-        for (size_t i = 0; i < res.size(); ++i) {
-            res[i] = PrivateCalculateTotalResistance(static_cast<Attribute>(i));
+    /**
+     * 各属性に対する耐性倍率を事前に計算し、配列に格納します。
+     *
+     * @return 属性ごとの事前計算された耐性倍率の配列
+     *
+     * @note この配列はstd::arrayとして表現され、コンパイル時に評価されます。
+     * @attention 耐性倍率には高精度な計算が行われ、結果は各属性に対応したインデックスに格納されます。
+     */
+    inline static constexpr std::array<double, static_cast<size_t>(Attribute::AttributeCount)> resistances = []() constexpr {
+        std::array<double, static_cast<size_t>(Attribute::AttributeCount)> res{};//exeに組み込めるようにstd::arrayを使う
+        for (size_t i = 0; i < res.size(); ++i) {//各属性について
+            res[i] = PrivateCalculateTotalResistance(static_cast<Attribute>(i));//任意精度計算処理に使う軽減倍率を計算
         }
-        return res;
+        return res;//軽減倍率をexeに埋め込む
     }();
 
-public:
-    // ダメージ軽減用の関数。
-    // 闇属性の場合のみ、倍率 0.73 (整数として 73, 100倍して保存) を用いて軽減処理を行います。
-    // コンパイル時定数展開が可能な constexpr 関数です。
-    static constexpr int applyDamageReduction(const int damage, const Attribute attr) {
-        int multiplier = calculateTotalResistance(attr);
-        int scaledDamage = damage * 100;
-        return (scaledDamage * multiplier) / 10000;
+
+    /**
+     * 指定された属性に基づいて、事前に計算された耐性倍率を取得します。
+     *
+     * @param attribute 取得対象の属性
+     * @return 指定された属性に対して事前に計算された耐性倍率
+     *
+     * @note 耐性倍率は小数点以下2桁の精度で保持されます。
+     * @attention この関数は静的でconstexprであり、実行時でなくコンパイル時計算として使用できます。
+     */
+    inline static constexpr double calculateTotalResistance(const Attribute attribute) {
+        return resistances[static_cast<size_t>(attribute)];//事前に計算された、任意精度計算処理(小数点以下2桁精度)に使う属性の軽減率を取得
     }
 
-
-    // resistances 配列から対象の属性に対応する値を返す関数
-    inline static constexpr int calculateTotalResistance(const Attribute attribute) {
-        return resistances[static_cast<size_t>(attribute)];
+public:
+    /**
+     * 与えられたダメージ値に基づき属性ごとのダメージ軽減を適用します。
+     *
+     * @param damage 元のダメージ値
+     * @param attr 適用対象の属性
+     * @return 属性耐性に基づき軽減された最終的なダメージ値
+     *
+     * @note 属性による耐性倍率は小数点以下の2桁精度で計算されます。
+     * @attention この関数は静的かつconstexprであり、コンパイル時計算が可能ですが、
+     * 属性に対応する耐性倍率の事前定義が必要です。
+     */
+    static constexpr double applyDamageReduction(const double damage, const Attribute attr) {
+        const double multiplier = calculateTotalResistance(attr);//事前に計算されたint方式の倍率を取得
+        return damage * multiplier / 100000.0;//小数点以下2桁の任意精度計算処理
     }
 };
 

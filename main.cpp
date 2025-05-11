@@ -1007,7 +1007,7 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
     //
     gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
+    gene1[counter++] = BattleEmulator::DEFENCE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;

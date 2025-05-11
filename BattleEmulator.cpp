@@ -104,8 +104,9 @@ double BattleEmulator::processCombo(int32_t Id, double damage, uint64_t *NowStat
             ++comboCounter;
         }
         // updateがfalseの場合は、実際のカウンターに変動させず、現在の値に対して1回分追加した扱いにする
-        const auto effectiveCombo = update ? static_cast<int>(comboCounter)
-                                    : static_cast<int>(comboCounter) + 1;
+        const auto effectiveCombo = update
+                                        ? static_cast<int>(comboCounter)
+                                        : static_cast<int>(comboCounter) + 1;
         if (effectiveCombo == 2) {
             damage *= 1.2;
         } else if (effectiveCombo == 3) {
@@ -400,7 +401,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 404) {
+        if ((*position) == 87) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -1057,20 +1058,21 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp = baseDamage * Enemy_TensionTable[players[attacker].TensionLevel - 1];
                 tmp += (players[attacker].TensionLevel * TensionLevel);
                 players[attacker].TensionLevel = 0;
-                baseDamage = static_cast<int>(floor(tmp));
+            } else {
+                tmp = static_cast<double>(baseDamage);
             }
 
-            baseDamage = Equipments::applyDamageReduction(baseDamage, Attribute::Darkness);
+            tmp = Equipments::applyDamageReduction(tmp, Attribute::Darkness);
 
             if (!players[0].paralysis && !players[0].sleeping) {
-                tmp = baseDamage * players[defender].defence;
+                tmp *= players[defender].defence;
             }
-            baseDamage = static_cast<int>(floor(tmp));
 
             if (players[defender].TensionLevel == 4) {
-                tmp = baseDamage * 0.5;
-                baseDamage = static_cast<int>(floor(tmp));
+                tmp *= 0.5;
             }
+
+            baseDamage = static_cast<int>(floor(tmp));
 
             (*position)++; // 0x021e54fc
             process7A8(position, baseDamage, players, defender);
@@ -1273,11 +1275,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp = baseDamage * Enemy_TensionTable[players[attacker].TensionLevel - 1];
                 tmp += (players[attacker].TensionLevel * TensionLevel);
                 players[attacker].TensionLevel = 0;
-                baseDamage = static_cast<int>(floor(tmp));
+            } else {
+                tmp = static_cast<double>(baseDamage);
             }
 
-            baseDamage = Equipments::applyDamageReduction(baseDamage, Attribute::Ice);
-
+            tmp = Equipments::applyDamageReduction(tmp, Attribute::Ice);
             if (!tate) {
                 (*position)++; //武器固有の処理 0x021e54fc
             } else {
@@ -1285,14 +1287,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
 
             if (!players[0].paralysis && !players[0].sleeping) {
-                tmp = baseDamage * players[defender].defence;
+                tmp *= players[defender].defence;
             }
-            baseDamage = static_cast<int>(floor(tmp));
-
             if (players[defender].TensionLevel == 4) {
-                tmp = baseDamage * 0.5;
-                baseDamage = static_cast<int>(floor(tmp));
+                tmp *= 0.5;
             }
+
+            baseDamage = static_cast<int>(floor(tmp));
 
             process7A8(position, baseDamage, players, defender);
             resetCombo(NowState);
