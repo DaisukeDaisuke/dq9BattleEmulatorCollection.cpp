@@ -1173,9 +1173,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //不明
             (*position)++; //会心
             (*position)++; //ニセ回避 0x02157f58
-            if (players[attacker].TensionLevel == 4) {
-                std::cout << "TensionLevel = 4" << std::endl;
-            }
             FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
             if (players[attacker].TensionLevel < 3 || (players[attacker].TensionLevel == 3 && lcg::getPercent(position, 2) == 0)) {
                 //0x02087fb4 テンション

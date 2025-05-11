@@ -897,52 +897,6 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-#if !defined(DEBUG2)
-
-
-    const uint64_t totalIterations = 100000000; // 実行回数：10万回
-    const int counter = 8;                   // 8ターン実行
-
-    // gene1: 8個分BattleEmulator::SPECIAL_MEDICINEをセット
-    int gene1[350];
-    gene1[0] = BattleEmulator::BUFF;
-    for (int i = 1; i < 9; i++) {
-        gene1[i] = BattleEmulator::SPECIAL_MEDICINE;
-    }
-
-
-    // 各シードでBattleEmulator::Mainを実行
-    for (uint64_t seed = 0; seed < totalIterations; seed++) {
-        // position1: 毎回newして1で初期化（unique_ptr利用）
-        std::unique_ptr<int> position1 = std::make_unique<int>(1);
-        // NowState: 毎回newして1で初期化（unique_ptr利用）
-        std::unique_ptr<uint64_t> NowState = std::make_unique<uint64_t>(0);
-
-        lcg::init(seed);
-
-        // players1: basePlayerをコピーして利用（ここでは2人分の配列と仮定）
-        Player players1[2];
-        players1[0] = BasePlayers[0];
-        players1[1] = BasePlayers[1];
-
-        BattleEmulator::Main(
-            position1.get(),
-            9,
-            gene1,
-            players1,
-            (std::optional<BattleResult>&) std::nullopt,
-            seed,
-            nullptr,
-            nullptr,
-            -2,
-            NowState.get()
-        );
-    }
-
-
-    return 0;
-#endif
-
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
@@ -968,7 +922,7 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
 
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 667;
+    uint64_t time1 = 35490;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -1007,13 +961,13 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
     //
     gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::DEFENCE;
     // gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
     // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
