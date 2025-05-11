@@ -987,6 +987,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
                 baseDamage = static_cast<int>(floor(tmp));
 
+                if (players[defender].TensionLevel == 4) {
+                    tmp = baseDamage * 0.5;
+                    baseDamage = static_cast<int>(floor(tmp));
+                }
+
                 if (!kaihi) {
                     ProcessRage(position, baseDamage, players, kaisinn);
                     (*position)++; //目を覚ました
@@ -1067,7 +1072,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = static_cast<int>(floor(tmp));
             }
 
-            //TODO: テンション
             (*position)++; // 0x021e54fc
             process7A8(position, baseDamage, players, defender);
             break;
@@ -1557,6 +1561,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
 
             baseDamage = static_cast<int>(floor(tmp));
+
+            if (players[defender].TensionLevel == 4) {
+                tmp = baseDamage * 0.5;
+                baseDamage = static_cast<int>(floor(tmp));
+            }
 
             ProcessRage(position, baseDamage, players, kaisinn); //不定消費は謎
             (*position)++; //目を覚ました

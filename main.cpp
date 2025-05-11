@@ -968,7 +968,7 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
 
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 405;
+    uint64_t time1 = 667;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -1007,7 +1007,7 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
     //
     gene1[counter++] = BattleEmulator::BUFF;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
