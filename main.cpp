@@ -937,7 +937,6 @@ int main(int argc, char *argv[]) {
             -2,
             NowState.get()
         );
-        std::cout << *(position1.get()) << std::endl;
     }
 
 
@@ -969,7 +968,7 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
 
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 122;
+    uint64_t time1 = 405;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -1014,9 +1013,8 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
     // gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
     // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
     // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
@@ -1031,10 +1029,11 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
 
     std::stringstream ss1;
     ss1 << time1 << " ";
-
+    std::cout << (*position1) << std::endl;
     if (dummy1.has_value()) {
         std::cout << dumpTable(dummy1.value(), gene1, -1) << std::endl;
     }
+
     //}
     delete position1;
     delete NowState;

@@ -400,7 +400,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 136) {
+        if ((*position) == 404) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -463,8 +463,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     (*position)++; //0x02156874
                 }
             } else if (state == TYPE_2B) {
-                int test = FUN_0208aecc(position, NowState);
-                enemyAction[counter] = AttackTable2B[test];
+                int roll = FUN_0208aecc(position, NowState);
+                enemyAction[counter] = AttackTable2B[roll];
                 if (enemyAction[counter] == SWITCH_2A) {
                     (*NowState) &= ~0xff;
                     (*NowState) |= TYPE_2A;
@@ -472,6 +472,15 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     preAction = 0;
                     continue;
                 }
+
+                if (enemyAction[counter] == PSYCHE_UP && players[1].TensionLevel == 4) {
+                    if (roll == 1) {
+                        enemyAction[counter] = CRACKLE_ENEMY;
+                    } else if (roll == 3) {
+                        enemyAction[counter] = DOUBLE_TROUBLE;
+                    }
+                }
+
                 if (enemyAction[counter] == ATTACK_ENEMY) {
                     (*position)++; //0x02156874
                     (*position) += 2; //0x0216139c && 0x021613b0
@@ -1158,13 +1167,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //不明
             (*position)++; //会心
             (*position)++; //ニセ回避 0x02157f58
+            if (players[attacker].TensionLevel == 4) {
+                std::cout << "TensionLevel = 4" << std::endl;
+            }
             FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
             if (players[attacker].TensionLevel < 3 || (players[attacker].TensionLevel == 3 && lcg::getPercent(position, 2) == 0)) {
                 //0x02087fb4 テンション
                 players[attacker].TensionLevel++;
-            }
-            if (players[attacker].TensionLevel == 4) {
-                std::cout << "TensionLevel = 4" << std::endl;
             }
             baseDamage = 0;
             resetCombo(NowState);
