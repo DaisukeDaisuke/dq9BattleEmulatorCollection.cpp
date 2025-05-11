@@ -96,6 +96,7 @@ public:
     static constexpr int DRAGON_SLASH = 59; //ドラゴン切り
     static constexpr int ITEM_USE = 60; //ドラゴン切り
     static constexpr int CRACK_ALLY = 61;
+    static constexpr int PSYCHE_UP_ALLY = 62;
 
     //病魔
     static constexpr int POISON_ATTACK = 65; // 毒攻撃

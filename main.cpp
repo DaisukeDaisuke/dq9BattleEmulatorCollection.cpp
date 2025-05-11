@@ -337,7 +337,7 @@ namespace {
 #elif defined(OPTIMIZATION_O2_ENABLED)
         std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (Optimized for O2), Build date: " << buildDate << ", " << buildTime  << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #elif defined(NO_OPTIMIZATION)
-        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime   << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
+        std::cout << "dq9 Ragin' Contagion battle emulator " << version << " (No optimization), Build date: " << buildDate << ", " << buildTime << " UTC/GMT, Compiler: " << compiler << multiThreading << std::endl;
 #else
         std::cout << "dq9 Corvus battle emulator" << version << " (Unknown build configuration), Build date: " << buildDate << ", " << buildTime   << " UTC, Compiler: " << compiler << std::endl;
         << ", " << buildTime << std::endl;
@@ -550,7 +550,7 @@ namespace {
 
         std::cout << "ver: " << version << ", atk: " << BasePlayers[0].atk << ", def: " << BasePlayers[0].def <<
                 ", seed: ";
-        std::cout << "0x" << std::hex << seed << std::dec << std::endl <<"actions: ";
+        std::cout << "0x" << std::hex << seed << std::dec << std::endl << "actions: ";
 
         for (auto i = 0; i < 100; ++i) {
             if (genome.actions[i] == 0 || genome.actions[i] == -1) {
@@ -905,21 +905,21 @@ int main(int argc, char *argv[]) {
 
 
 #ifdef DEBUG2
-        //time1 = 0x199114b2;
-        //time1 = 0x226d97a6;
-        //time1 = 0x1c2a9bda;
-        //time1 = 0x1aa6c05d;
-        //3838815720
-        //3839393442
+    //time1 = 0x199114b2;
+    //time1 = 0x226d97a6;
+    //time1 = 0x1c2a9bda;
+    //time1 = 0x1aa6c05d;
+    //3838815720
+    //3839393442
 
-        /*
-            *3836431220
-            3838263295
-            3838361070
-            3838815720
-            3839393442
-            3840264243
-            */
+    /*
+        *3836431220
+        3838263295
+        3838361070
+        3838815720
+        3839393442
+        3840264243
+        */
 
     //AI Warning: This is code related to debug2
     uint64_t time1 = 0x03fead45;
@@ -946,61 +946,46 @@ int main(int argc, char *argv[]) {
                                      合計 6Byte
     */
 
-        auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
+    auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
-        Player players1[2];
-        int32_t gene1[350] = {0};
-        //0x22e2dbaf:
+    Player players1[2];
+    int32_t gene1[350] = {0};
+    //0x22e2dbaf:
 
     //AI Warning: This is code related to debug2
-        // int32_t gene1[350] = {
-        //     25, 25, 50, 25, 25, 61, 50, 61, 61, 27, 27, 25, 50, 25, 61, 25, 56, 61, 25, 61, 50, 53, 25,
-        //     BattleEmulator::ATTACK_ALLY};
-        //gene1[19-1] = BattleEmulator::DEFENCE;
-        int counter = 0;
-        //
-        gene1[counter++] = BattleEmulator::BUFF;
-        gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-        gene1[counter++] = BattleEmulator::BUFF;
-        gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-        gene1[counter++] = BattleEmulator::DOUBLE_UP;
-        // gene1[counter++] = BattleEmulator::ITEM_USE;
-        // gene1[counter++] = BattleEmulator::ITEM_USE;
-        // gene1[counter++] = BattleEmulator::ITEM_USE;
-        // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-        // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-        // gene1[counter++] = BattleEmulator::CRACKLE;
-        // gene1[counter++] = BattleEmulator::CRACKLE;
-        // gene1[counter++] = BattleEmulator::CRACKLE;
-        // gene1[counter++] = BattleEmulator::CRACKLE;
-        // gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
-        // gene1[counter++] = BattleEmulator::MIRACLE_SLASH;
+    // int32_t gene1[350] = {
+    //     25, 25, 50, 25, 25, 61, 50, 61, 61, 27, 27, 25, 50, 25, 61, 25, 56, 61, 25, 61, 50, 53, 25,
+    //     BattleEmulator::ATTACK_ALLY};
+    //gene1[19-1] = BattleEmulator::DEFENCE;
+    int counter = 0;
+    //
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
+    gene1[counter++] = BattleEmulator::MIDHEAL;
+    gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
+    gene1[counter++] = BattleEmulator::CRACKLE;
 
-        //for (int i = 0; i < 10; ++i) {
-        (*NowState) = 0;
-        (*position1) = 1;
-        std::optional<BattleResult> dummy1;
-        dummy1 = BattleResult();
-        std::memcpy(players1, BasePlayers, sizeof(players1));
-        BattleEmulator::Main(position1, (counter == 0 ? 1000 : counter), gene1, players1, dummy1, time1, dummy, dummy, -1,
-                             NowState);
+    (*NowState) = 0;
+    (*position1) = 1;
+    std::optional<BattleResult> dummy1;
+    dummy1 = BattleResult();
+    std::memcpy(players1, BasePlayers, sizeof(players1));
+    BattleEmulator::Main(position1, (counter == 0 ? 1000 : counter), gene1, players1, dummy1, time1, dummy, dummy, -1,
+                         NowState);
 
-        std::stringstream ss1;
-        ss1 << time1 << " ";
+    std::stringstream ss1;
+    ss1 << time1 << " ";
 
-        if (dummy1.has_value()) {
-            std::cout << dumpTable(dummy1.value(), gene1, -1) << std::endl;
-        }
-        //}
-        delete position1;
-        delete NowState;
+    if (dummy1.has_value()) {
+        std::cout << dumpTable(dummy1.value(), gene1, -1) << std::endl;
+    }
+    //}
+    delete position1;
+    delete NowState;
 
-        return 0;
+    return 0;
 #endif
 
 #ifdef DEBUG3
