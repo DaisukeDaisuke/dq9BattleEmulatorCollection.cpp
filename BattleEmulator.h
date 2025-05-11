@@ -143,7 +143,7 @@ private:
 
     static void resetCombo(uint64_t *NowState);
 
-    static double processCombo(int32_t Id, double damage, uint64_t *NowState);
+    static double processCombo(int32_t Id, double damage, uint64_t *NowState, bool update);
 
     static int FUN_0207564c(int *position, int atk, int def);
 

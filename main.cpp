@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
+#include <memory>
 
 #include "lcg.h"
 #include "BattleEmulator.h"
@@ -895,6 +896,54 @@ int main(int argc, char *argv[]) {
         showHeader();
         return 0;
     }
+
+#if !defined(DEBUG2)
+
+
+    const uint64_t totalIterations = 100000000; // 実行回数：10万回
+    const int counter = 8;                   // 8ターン実行
+
+    // gene1: 8個分BattleEmulator::SPECIAL_MEDICINEをセット
+    int gene1[350];
+    gene1[0] = BattleEmulator::BUFF;
+    for (int i = 1; i < 9; i++) {
+        gene1[i] = BattleEmulator::SPECIAL_MEDICINE;
+    }
+
+
+    // 各シードでBattleEmulator::Mainを実行
+    for (uint64_t seed = 0; seed < totalIterations; seed++) {
+        // position1: 毎回newして1で初期化（unique_ptr利用）
+        std::unique_ptr<int> position1 = std::make_unique<int>(1);
+        // NowState: 毎回newして1で初期化（unique_ptr利用）
+        std::unique_ptr<uint64_t> NowState = std::make_unique<uint64_t>(0);
+
+        lcg::init(seed);
+
+        // players1: basePlayerをコピーして利用（ここでは2人分の配列と仮定）
+        Player players1[2];
+        players1[0] = BasePlayers[0];
+        players1[1] = BasePlayers[1];
+
+        BattleEmulator::Main(
+            position1.get(),
+            9,
+            gene1,
+            players1,
+            (std::optional<BattleResult>&) std::nullopt,
+            seed,
+            nullptr,
+            nullptr,
+            -2,
+            NowState.get()
+        );
+        std::cout << *(position1.get()) << std::endl;
+    }
+
+
+    return 0;
+#endif
+
 #ifdef DEBUG
     auto t0 = std::chrono::high_resolution_clock::now();
 #endif
@@ -913,14 +962,14 @@ int main(int argc, char *argv[]) {
     //3839393442
 
     /*
-    ver: v5.0.6_vK_v2, atk: 220, def: 155, seed: 0x1b56552
-actions: 30, 50, 62, 62, 50, 62, 62, 30, 50, 33, 34, 34,
+    ver: v5.0.6_vK_v2, atk: 220, def: 155, seed: 0x20b2420
+actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
         */
 
 
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 0x1b56552;
+    uint64_t time1 = 55;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -947,19 +996,27 @@ actions: 30, 50, 62, 62, 50, 62, 62, 30, 50, 33, 34, 34,
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    //int32_t gene1[350] = {0};
+    int32_t gene1[350] = {0};
     //0x22e2dbaf:
 
     //AI Warning: This is code related to debug2
-    int32_t gene1[350] = {
-        30, 50, 62, 62, 50, 62, 62, 30, 50, 33, 34, 34,
-        BattleEmulator::ATTACK_ALLY};
+    // int32_t gene1[350] = {
+    //     30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
+    //     BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    // gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     // gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
     // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
     // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
@@ -986,7 +1043,7 @@ actions: 30, 50, 62, 62, 50, 62, 62, 30, 50, 33, 34, 34,
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x01b56552;
+    uint64_t seed = 0x01b34242;
 
     int actions[350] = {
         BattleEmulator::BUFF,

@@ -92,37 +92,38 @@ constexpr auto proportionTable3 = makeProportionTable3();
  *
  * @return コンボの結果として増幅されたダメージ値。
  */
-double BattleEmulator::processCombo(int32_t Id, double damage, uint64_t *NowState) {
+double BattleEmulator::processCombo(int32_t Id, double damage, uint64_t *NowState, bool update) {
+    // 上位32〜39ビット：前回の攻撃ID（0xffマスク）
+    // 上位40〜43ビット：コンボカウンター（0xfマスク）
     auto previousAttack = ((*NowState) >> 32) & 0xff;
     auto comboCounter = ((*NowState) >> 40) & 0xf;
-    if (previousAttack != 0) {
-        if (previousAttack == Id) {
-            comboCounter++;
-            switch (comboCounter) {
-                case 2:
-                    damage *= 1.2;
-                    break;
-                case 3:
-                    damage *= 1.5;
-                    break;
-                default:
-                    damage *= 2.0;
-                    break;
-            }
-        } else {
-            previousAttack = Id;
-            comboCounter = 1;
+
+    if (previousAttack != 0 && previousAttack == Id) {
+        // 同一攻撃の場合
+        if (update) {
+            ++comboCounter;
         }
-    } else {
+        // updateがfalseの場合は、実際のカウンターに変動させず、現在の値に対して1回分追加した扱いにする
+        const auto effectiveCombo = update ? static_cast<int>(comboCounter)
+                                    : static_cast<int>(comboCounter) + 1;
+        if (effectiveCombo == 2) {
+            damage *= 1.2;
+        } else if (effectiveCombo == 3) {
+            damage *= 1.5;
+        } else if (effectiveCombo >= 4) {
+            damage *= 2.0;
+        }
+    } else if (update) {
+        // 異なる攻撃の場合、updateがtrueなら新しい攻撃情報として設定
         previousAttack = Id;
         comboCounter = 1;
     }
+
     resetCombo(NowState);
     (*NowState) |= (previousAttack << 32);
     (*NowState) |= (comboCounter << 40);
     return damage;
 }
-
 
 /**
  * @brief 指定されたアクションIDに対応するアクション名を取得します。
@@ -399,7 +400,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 110) {
+        if ((*position) == 246) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -439,7 +440,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     } else if (enemyAction[1] == ZAMMLE) {
                         enemyAction[1] = DOUBLE_TROUBLE;
                     } else if (enemyAction[1] == CRACKLE_ENEMY) {
-                        enemyAction[1] = DOUBLE_TROUBLE;
+                        enemyAction[1] = SWITCH_2B;
                     } else if (enemyAction[1] == SWEET_BREATH) {
                         enemyAction[1] = KASAP;
                     }
@@ -905,6 +906,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
                 tmp *= Ally_TensionTable[players[attacker].TensionLevel - 1];
                 tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
+                players[attacker].TensionLevel = 0;
             }
             baseDamage = static_cast<int>(floor(tmp));
 
@@ -928,7 +930,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (!players[0].paralysis) {
                 if (!players[attacker].specialCharge && lcg::getPercent(position, 100) < 1) {
                     players[attacker].specialCharge = true;
-                    players[attacker].specialChargeTurn = 8;
+                    players[attacker].specialChargeTurn = 6;
                 }
             }
             resetCombo(NowState);
@@ -1091,7 +1093,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                         }
                         baseDamage = 0;
                     } else {
-                        tmp = static_cast<int>(floor(baseDamage * 0.75));
+                        tmp = floor(baseDamage * 0.75);
+
+                        if (baseDamage != 0) {
+                            tmp = processCombo(Id & 0xffff, tmp, NowState, i == 1);
+                            tmp = floor(tmp);
+                        }
 
                         if (players[attacker].TensionLevel != 0) {
                             //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
@@ -1145,8 +1152,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (players[attacker].TensionLevel != 0) {
                 players[attacker].TensionLevel = 0;
             }
-
-            resetCombo(NowState);
             return totalDamage;
         case PSYCHE_UP:
             (*position) += 2;
@@ -1157,6 +1162,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (players[attacker].TensionLevel < 3 || (players[attacker].TensionLevel == 3 && lcg::getPercent(position, 2) == 0)) {
                 //0x02087fb4 テンション
                 players[attacker].TensionLevel++;
+            }
+            if (players[attacker].TensionLevel == 4) {
+                std::cout << "TensionLevel = 4" << std::endl;
             }
             baseDamage = 0;
             resetCombo(NowState);
@@ -1401,7 +1409,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
                 if (baseDamage != 0) {
                     tmp = static_cast<double>(baseDamage);
-                    tmp = processCombo(Id & 0xffff, tmp, NowState);
+                    tmp = processCombo(Id & 0xffff, tmp, NowState, true);
                     baseDamage = static_cast<int>(floor(tmp));
                 }
 
@@ -1427,8 +1435,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
             }
             process7A8(position, baseDamage, players, defender);
-            players[attacker].TensionLevel = 0;
-
             break;
         case BattleEmulator::HEAL:
             players[attacker].mp -= 2;
