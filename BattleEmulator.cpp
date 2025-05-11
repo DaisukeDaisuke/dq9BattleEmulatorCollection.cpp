@@ -250,6 +250,8 @@ const char *BattleEmulator::getActionName(int actionId) {
             return "Double Trouble";
         case ZAMMLE:
             return "Zammlle";
+        case INACTIVE_ENEMY:
+            return "Inactive";
         default:
             return "Unknown Action";
     }
@@ -397,7 +399,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 646) {
+        if ((*position) == 110) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -420,8 +422,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
         auto counter = 0;
         int enemyAction[2] = {0, 0};
+        int preAction = 0;
         while (counter != 2) {
-            int preAction = 0;
             // const int table[6] = {
             //     ATTACK_ENEMY, POISON_ATTACK, ATTACK_ENEMY, DECELERATLE, KASAP,
             //     SWEET_BREATH
@@ -431,7 +433,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 enemyAction[counter] = ProcessEnemyRandomAction44(position);
                 //do {
                 auto ActionChanged = false;
-                if (counter == 1 && enemyAction[0] == enemyAction[1]) {
+                if (preAction != 0 && counter == 1 && enemyAction[0] == enemyAction[1]) {
                     if (enemyAction[1] == DOUBLE_TROUBLE) {
                         enemyAction[1] = ATTACK_ENEMY;
                     } else if (enemyAction[1] == ZAMMLE) {
@@ -453,6 +455,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     (*NowState) &= ~0xff;
                     (*NowState) |= TYPE_2B;
                     (*position) += 2; //0x0216139c && 0x021613b0
+                    preAction = 0;
                     continue;
                 }
                 if (enemyAction[counter] == DOUBLE_TROUBLE || enemyAction[counter] == ZAMMLE) {
@@ -465,6 +468,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     (*NowState) &= ~0xff;
                     (*NowState) |= TYPE_2A;
                     (*position) += 2; //0x0216139c && 0x021613b0
+                    preAction = 0;
                     continue;
                 }
                 if (enemyAction[counter] == ATTACK_ENEMY) {
@@ -478,6 +482,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
             if (counter == 0) {
                 (*position)++; //0x02160d64
             }
+            preAction = enemyAction[counter];
             counter++;
         }
 
@@ -505,6 +510,10 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
             defenseFlag = false;
         }
 
+        if (!players[0].paralysis && actionTable == BattleEmulator::MERCURIAL_THRUST) {
+            player0_has_initiative = true;
+        }
+
         // ソートされた結果を出力
         for (int t = 0; t < 2; ++t) {
             if (!Player::isPlayerAlive(players[1])) {
@@ -525,7 +534,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         int mitore = lcg::getPercent(position, 100); //0x02158964
                         if (mitore < 90) {
                             c = INACTIVE_ENEMY;
-                            (*position)++; //0x02158964 ?
                         }
                     }
                     (*position)++; //0x02159b10
@@ -864,6 +872,21 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     auto attackCount = 0;
     bool defenseFlag = false; //防御した場合0x021e81a0のほうが優先度高いらしい。なんで
     switch (Id & 0xffff) {
+        case BattleEmulator::INACTIVE_ENEMY:
+            (*position) += 2;
+            (*position)++; //関係ない
+            (*position)++; //会心
+            (*position)++; //回避
+            baseDamage = FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
+            if (baseDamage == 0) {
+                baseDamage = lcg::getPercent(position, 2); //0x021e81a0
+            }
+            if (baseDamage != 0) {
+                (*position)++; //不明 0x021e54fc
+            }
+            players[attacker].TensionLevel = 0;
+            baseDamage = 0;
+            break;
         case MIDHEAL:
             players[attacker].mp -= 4;
             (*position) += 2;
@@ -1011,6 +1034,16 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; // 会心
             (*position)++; // 回避
             baseDamage = FUN_021e8458_typeD(position, 15.0, 40.0);
+
+            //テンションのほうが先
+            if (players[attacker].TensionLevel != 0) {
+                //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
+                tmp = baseDamage * Enemy_TensionTable[players[attacker].TensionLevel - 1];
+                tmp += (players[attacker].TensionLevel * TensionLevel);
+                players[attacker].TensionLevel = 0;
+                baseDamage = static_cast<int>(floor(tmp));
+            }
+
             baseDamage = Equipments::applyDamageReduction(baseDamage, Attribute::Darkness);
 
             if (!players[0].paralysis && !players[0].sleeping) {
@@ -1074,12 +1107,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                                 defenseFlag = true;
                             }
                         }
-
-                        if (baseDamage != 0) {
-                            (*position)++; //目を覚ました
-                            (*position)++; //不明
-                        }
-
                         tmp = static_cast<double>(baseDamage);
                         if (!defenseFlag && !players[0].paralysis && !players[0].sleeping) {
                             tmp = tmp * players[defender].defence;
@@ -1089,6 +1116,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                         if (players[defender].TensionLevel == 4) {
                             tmp = baseDamage * 0.5;
                             baseDamage = static_cast<int>(floor(tmp));
+                        }
+
+                        if (baseDamage != 0) {
+                            (*position)++; //目を覚ました
+                            (*position)++; //不明
                         }
 
 
@@ -1213,7 +1245,18 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++; //偽回避 0x02157f58
             baseDamage = FUN_021e8458_typeD(position, 8, 33);
+
+            //テンションのほうが先
+            if (players[attacker].TensionLevel != 0) {
+                //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
+                tmp = baseDamage * Enemy_TensionTable[players[attacker].TensionLevel - 1];
+                tmp += (players[attacker].TensionLevel * TensionLevel);
+                players[attacker].TensionLevel = 0;
+                baseDamage = static_cast<int>(floor(tmp));
+            }
+
             baseDamage = Equipments::applyDamageReduction(baseDamage, Attribute::Ice);
+
             if (!tate) {
                 (*position)++; //武器固有の処理 0x021e54fc
             } else {
@@ -1452,7 +1495,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             percent_tmp = lcg::getPercent(position, 0x2710);
             if (
                 ((Id & 0xffff) == BattleEmulator::ATTACK_ALLY && percent_tmp < kaisinnP) ||
-                ((Id & 0xffff) == BattleEmulator::DRAGON_SLASH && percent_tmp < DragonSlashKaisinnP)
+                ((Id & 0xffff) == BattleEmulator::DRAGON_SLASH && percent_tmp < DragonSlashKaisinnP) ||
+                ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST && percent_tmp < DragonSlashKaisinnP)
             ) {
                 kaisinn = true;
             }
@@ -1475,7 +1519,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = 0;
             }
 
-            tmp = static_cast<double>(baseDamage);
+            if ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST) {
+                tmp = floor(baseDamage * 0.75);
+            } else {
+                tmp = static_cast<double>(baseDamage);
+            }
 
             if (kaisinn) {
                 //0x020759ec

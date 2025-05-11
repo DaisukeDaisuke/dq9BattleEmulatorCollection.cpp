@@ -913,16 +913,14 @@ int main(int argc, char *argv[]) {
     //3839393442
 
     /*
-        *3836431220
-        3838263295
-        3838361070
-        3838815720
-        3839393442
-        3840264243
+    ver: v5.0.6_vK_v2, atk: 220, def: 155, seed: 0x1b56552
+actions: 30, 50, 62, 62, 50, 62, 62, 30, 50, 33, 34, 34,
         */
 
+
+
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 0x03fead45;
+    uint64_t time1 = 0x1b56552;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -949,23 +947,22 @@ int main(int argc, char *argv[]) {
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
+    //int32_t gene1[350] = {0};
     //0x22e2dbaf:
 
     //AI Warning: This is code related to debug2
-    // int32_t gene1[350] = {
-    //     25, 25, 50, 25, 25, 61, 50, 61, 61, 27, 27, 25, 50, 25, 61, 25, 56, 61, 25, 61, 50, 53, 25,
-    //     BattleEmulator::ATTACK_ALLY};
+    int32_t gene1[350] = {
+        30, 50, 62, 62, 50, 62, 62, 30, 50, 33, 34, 34,
+        BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
-    gene1[counter++] = BattleEmulator::MIDHEAL;
-    gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
-    gene1[counter++] = BattleEmulator::CRACKLE;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
+    // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
+    // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
 
     (*NowState) = 0;
     (*position1) = 1;
@@ -989,15 +986,13 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 70094041;
+    uint64_t seed = 0x01b56552;
 
     int actions[350] = {
-        BattleEmulator::ATTACK_ALLY,
-        BattleEmulator::ATTACK_ALLY,
-        BattleEmulator::SPECIAL_MEDICINE,
+        BattleEmulator::BUFF,
         -1,
     };
-    SearchRequest(BasePlayers, seed, actions, THREAD_COUNT);
+    SearchRequest(BasePlayers, seed, actions, THREAD_COUNT, true);
 
     std::cout << performanceLogger.rdbuf() << std::endl;
 
