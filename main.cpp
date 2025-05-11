@@ -969,7 +969,7 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
 
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 55;
+    uint64_t time1 = 122;
 
     int dummy[100];
     lcg::init(time1, false);

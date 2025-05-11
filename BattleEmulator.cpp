@@ -400,7 +400,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 246) {
+        if ((*position) == 136) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -1373,14 +1373,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (tate || kaihi) {
                 baseDamage = 0;
             } else {
-                if ((Id & 0xffff) == POISON_ATTACK) {
-                    if (lcg::getPercent(position, 100) < 12) {
-                        //0x021e3978 毒
-                        players[defender].PoisonEnable = true;
-                        players[defender].PoisonTurn = 0;
-                    }
-                }
-
                 tmp = static_cast<double>(baseDamage);
                 if ((Id & 0xffff) == BattleEmulator::SKY_ATTACK) {
                     tmp = floor(tmp * 1.5);
@@ -1392,7 +1384,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
                     tmp *= Enemy_TensionTable[players[attacker].TensionLevel - 1];
                     tmp += (players[attacker].TensionLevel * 4); //4 = 1*(1+(30/10))
-                    players[attacker].TensionLevel = 0;
                 }
 
                 baseDamage = static_cast<int>(floor(tmp));
@@ -1433,6 +1424,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[0].sleeping = false;
                     players[0].sleepingTurn = -1;
                 }
+            }
+            if (players[attacker].TensionLevel != 0) {
+                players[attacker].TensionLevel = 0;
             }
             process7A8(position, baseDamage, players, defender);
             break;
