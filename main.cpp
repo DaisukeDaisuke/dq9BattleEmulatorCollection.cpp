@@ -646,11 +646,10 @@ namespace {
      * @param copiedPlayers バトルに使用するプレイヤーデータ（コピーされた配列）
      * @param start シード探索の開始位置
      * @param end シード探索の終了位置
-     * @param turns バトルの最大ターン数
      * @param gene バトルシミュレーションに使用する遺伝子データの配列
      * @param damages バトル中に発生するダメージを記録する配列
      */
-    void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t end, int turns, int gene[350],
+    void BruteForceMainLoop(const Player copiedPlayers[2], uint64_t start, uint64_t end, int gene[350],
                             int damages[350]) {
         int *position = new int(1);
         auto *nowState = new uint64_t(0);
@@ -741,7 +740,7 @@ namespace {
                                      合計 6Byte
         */
 
-        BruteForceMainLoop(copiedPlayers, time1, time2, turns, gene, damages);
+        BruteForceMainLoop(copiedPlayers, time1, time2, gene, damages);
 
         std::cout << std::endl << "found: " << foundSeeds << std::endl;
 

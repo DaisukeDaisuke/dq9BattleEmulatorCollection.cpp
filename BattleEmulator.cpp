@@ -425,15 +425,10 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         int enemyAction[2] = {0, 0};
         int preAction = 0;
         while (counter != 2) {
-            // const int table[6] = {
-            //     ATTACK_ENEMY, POISON_ATTACK, ATTACK_ENEMY, DECELERATLE, KASAP,
-            //     SWEET_BREATH
-            // };
+            
             uint8_t state = (*NowState) & 0xf;
             if (state == TYPE_2A) {
                 enemyAction[counter] = ProcessEnemyRandomAction44(position);
-                //do {
-                auto ActionChanged = false;
                 if (preAction != 0 && counter == 1 && enemyAction[0] == enemyAction[1]) {
                     if (enemyAction[1] == DOUBLE_TROUBLE) {
                         enemyAction[1] = ATTACK_ENEMY;
@@ -445,8 +440,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         enemyAction[1] = KASAP;
                     }
                 }
-                //break;
-                //} while (true);
 
                 if (enemyAction[counter] == ATTACK_ENEMY) {
                     (*position)++; //0x02156874
