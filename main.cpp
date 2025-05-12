@@ -120,15 +120,13 @@ namespace {
                 << std::setw(6) << "amp"
                 << std::setw(6) << "ini"
 #if defined(MINGW_BUILD)
-                << std::setw(6) << "Sle"
                 << std::setw(6) << "DET"
-                << std::setw(6) << "POT"
-                << std::setw(6) << "BOT"
+                << std::setw(6) << "TAB"
                 << std::setw(6) << "Sct"
 #endif
                 << "\n";
 #if defined(MINGW_BUILD)
-        ss << std::string(153, '-') << "\n"; // 区切り線を出力
+        ss << std::string(135, '-') << "\n"; // 区切り線を出力
 #else
         ss << std::string(117, '-') << "\n"; // 区切り線を出力
 #endif
@@ -151,9 +149,9 @@ namespace {
         int currentTurn = -1;
         int eDamage[2] = {-1, -1}, aDamage = -1;
         bool initiative_tmp, def_f = false;
-        std::string eAction[2], aAction, sp, tmpState, ATKTurn1, DEFTurn1, magicMirrorTurn1, specialChargeTurn1, amp1,
+        std::string eAction[2], aAction, sp, tmpState, DEFTurn1, specialChargeTurn1,
                 ahp2,
-                ehp2, amp2, poisonTurn1, SpeedTurn1;
+                ehp2, amp2, poisonTurn1, SpeedTurn1, tmp_state;
         auto counter = 0;
         // データのループ
         for (int i = 0; i < result.position; ++i) {
@@ -201,10 +199,8 @@ namespace {
                                 << std::setw(6) << amp2
                                 << std::setw(6) << (initiative_tmp ? "yes" : "")
 #if defined(MINGW_BUILD)
-                                << std::setw(6) << ((aAction == "Sleeping" || aAction == "Cure Sleeping") ? "yes" : "")
                                 << std::setw(6) << DEFTurn1
-                                << std::setw(6) << poisonTurn1
-                                << std::setw(6) << SpeedTurn1
+                                << std::setw(6) << tmp_state
                                 << std::setw(6) << specialChargeTurn1
                                 << std::setw(11) << ""
 #endif
@@ -222,12 +218,11 @@ namespace {
                 sp = "";
                 initiative_tmp = false;
                 counter = 0;
-                ATKTurn1 = "";
                 DEFTurn1 = "";
                 poisonTurn1 = "";
                 SpeedTurn1 = "";
-                magicMirrorTurn1 = "";
                 specialChargeTurn1 = "";
+                tmp_state = "";
             }
 
             // 敵か味方の行動を適切な変数に格納
@@ -236,6 +231,7 @@ namespace {
                 eDamage[counter] = damage;
                 counter++;
                 ahp2 = std::to_string(ahp1);
+
             } else {
                 ehp2 = std::to_string(ehp1);
                 amp2 = std::to_string(amp);
@@ -254,11 +250,14 @@ namespace {
                 if (specialChargeTurn > 0) {
                     specialChargeTurn1 = std::to_string(specialChargeTurn);
                 }
-
-                amp1 = std::to_string(amp);
-
                 initiative_tmp = initiative;
                 sp = specialAction;
+
+                if (state == BattleEmulator::TYPE_2A) {
+                    tmp_state = "A";
+                }else if (state == BattleEmulator::TYPE_2B) {
+                    tmp_state = "B";
+                }
 
                 if (eAction[0] != "magic Burst" && eAction[1] != "magic Burst") {
                     if (!initiative && (action == BattleEmulator::TURN_SKIPPED || action == BattleEmulator::PARALYSIS ||
@@ -291,10 +290,8 @@ namespace {
                     << std::setw(6) << amp2
                     << std::setw(6) << (initiative_tmp ? "yes" : "")
 #if defined(MINGW_BUILD)
-                    << std::setw(6) << ((aAction == "Sleeping") ? "yes" : "")
                     << std::setw(6) << DEFTurn1
-                    << std::setw(6) << poisonTurn1
-                    << std::setw(6) << SpeedTurn1
+                    << std::setw(6) << tmp_state
                     << std::setw(6) << specialChargeTurn1
                     << std::setw(11) << ""
 #endif
