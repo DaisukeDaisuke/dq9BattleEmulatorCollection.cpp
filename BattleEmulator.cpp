@@ -363,8 +363,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
     bool player0_has_initiative = false;
     int genePosition = 0;
     int exCounter = 0;
-    int exCounter1 = 0;
-    uint64_t tmpState = -1;
+    uint64_t tmpState = -1ull;
     int defenseFlag = false;
 
     auto startPos = static_cast<int>(((*NowState) >> 12) & 0xfffff);
@@ -384,7 +383,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         }
         //現在ターンを保存
         (*NowState) &= ~0xFFFFF000;
-        (*NowState) |= (counterJ << 12);
+        (*NowState) |= (static_cast<uint64_t>(counterJ) << 12);
 
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
@@ -847,9 +846,8 @@ constexpr int proportionTable2[9] = {90, 90, 64, 32, 16, 8, 4, 2, 1}; //最後�
 constexpr double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5};
 constexpr double Ally_TensionTable[4] = {1.5, 2.5, 4.0, 6.0};
 
-constexpr int TensionLevel = static_cast<int>(floor(1 + (Enemy_level / 10.0)));
-constexpr int Ally_TensionLevel = static_cast<int>(floor(1 + (Ally_Level / 10.0)));
-
+constexpr int TensionLevel = 1 + static_cast<int>(Enemy_level / 10.0);
+constexpr int Ally_TensionLevel = 1 + static_cast<int>(Ally_Level / 10.0);
 /*
 <?php
 $base = 103;
@@ -994,7 +992,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
 
                 if (!kaihi) {
-                    ProcessRage(position, baseDamage, players, kaisinn);
+                    ProcessRage(position, baseDamage, players);
                     (*position)++; //目を覚ました
                     (*position)++; //不明 0x021e54fc
                 } else {
@@ -1565,7 +1563,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = static_cast<int>(floor(tmp));
             }
 
-            ProcessRage(position, baseDamage, players, kaisinn); //不定消費は謎
+            ProcessRage(position, baseDamage, players); //不定消費は謎
             (*position)++; //目を覚ました
             (*position)++; //不明
             if (kaisinn) {
@@ -1729,7 +1727,7 @@ void BattleEmulator::RecalculateBuff(Player *players) {
     }
 }
 
-void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players, bool kaisinn) {
+void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players) {
     //多分ジャダーマだけ
     // if (kaisinn) {
     //     return;

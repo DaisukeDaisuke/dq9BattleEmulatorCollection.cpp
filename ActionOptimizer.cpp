@@ -190,7 +190,6 @@ std::pair<int, Genome> ActionOptimizer::RunAlgorithmAsync(const Player players[2
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
                                      int actions[350], int seedOffset, bool Dropbug) {
     std::mt19937 rng(seed + seedOffset);
-    bool CrackleEnable = (rng() % 2) == 0;
     std::unique_ptr<int> position = std::make_unique<int>(1);
     std::unique_ptr<uint64_t> nowState = std::make_unique<uint64_t>(0);
     auto counter = 0;
@@ -203,13 +202,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         genome.actions[i] = actions[i];
     }
     auto action = -1;
-    auto Aactions = -1;
-    // auto Adamage = -1;
-    // int Eactions[2] = {-1, -1};
-    // int Edamage[2] = {-1, -1};
-    auto counter1 = 0;
-    //std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
-    //std::priority_queue<Genome> que;
     HeapQueue que(300);
 
     genome = {};

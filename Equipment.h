@@ -155,7 +155,7 @@ public:
      * 属性に対応する耐性倍率の事前定義が必要です。
      */
     static constexpr double applyDamageReduction(const double damage, const Attribute attr) {
-        const double multiplier = calculateTotalResistance(attr);//事前に計算されたint方式の倍率を取得
+        const double multiplier = calculateTotalResistance(attr);//事前に計算されたdouble(ただし自然数)方式の倍率を取得
         return damage * multiplier / 100000.0;//小数点以下2桁の任意精度計算処理
     }
 };
