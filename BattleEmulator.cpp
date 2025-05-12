@@ -528,7 +528,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
             int basedamage = 0;
             if ((t == 0 && !player0_has_initiative) || (t == 1 && player0_has_initiative)) {
-                auto counterstore = -1;
                 for (int c: enemyAction) {
                     //--------start_FUN_02158dfc-------
                     if (lcg::getPercent(position, 100) < mitoreP) {
@@ -614,7 +613,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                             }
                         }
                     }
-
 
                     Player::reduceHp(players[0], basedamage);
 

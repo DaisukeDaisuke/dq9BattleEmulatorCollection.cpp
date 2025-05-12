@@ -47,20 +47,20 @@ public:
 
     int position = 0;
     int turn = 0;
-    int actions[1000] = {};
-    int damages[1000] = {};
-    int isEnemy[1000] = {};
-    int BuffTurnss[1000] = {};
-    int PoisonTurns[1000] = {};
-    int SpeedTurn[1000] = {};
-    int turns[1000] = {};
-    bool initiative[1000] = {};
-    int ehp[1000] = {};
-    int ahp[1000] = {};
-    int scTurn[1000] = {};
-    int amp[1000] = {};
-    uint64_t state[1000] = {};
-    bool defenseFlag[1000] = {};
+    int actions[400] = {};
+    int damages[400] = {};
+    int isEnemy[400] = {};
+    int BuffTurnss[400] = {};
+    int PoisonTurns[400] = {};
+    int SpeedTurn[400] = {};
+    int turns[400] = {};
+    bool initiative[400] = {};
+    int ehp[400] = {};
+    int ahp[400] = {};
+    int scTurn[400] = {};
+    int amp[400] = {};
+    uint64_t state[400] = {};
+    bool defenseFlag[400] = {};
 };
 
 #endif //NEWDIRECTORY_BATTLERESULT_H

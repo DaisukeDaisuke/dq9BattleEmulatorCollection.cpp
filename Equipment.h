@@ -88,7 +88,16 @@ constexpr Equipment EnchantedGloves("Enchanted gloves", {
                                         {Attribute::Darkness, 7},
                                     });
 
-// 同様に、配列も inline 化
+
+/**
+ * すべての装備品を格納する定数配列です。
+ *
+ * 配列内には、DarkShield、EtherealArmour、EnchantedGlovesの3つの装備品オブジェクトが含まれます。
+ * 各装備品はそれぞれの名前と初期耐性値を持ち、ゲーム内の特性や計算に使用されます。
+ *
+ * @note この配列はconstexprとして定義されているため、コンパイル時に初期化され、実行時に変更することはできません。
+ * @note 配列内の順序は、装備品管理や計算処理で一貫性を保つために重要です。
+ */
 constexpr std::array<Equipment, 3> allEquipments = {
     DarkShield, EtherealArmour, EnchantedGloves
 };

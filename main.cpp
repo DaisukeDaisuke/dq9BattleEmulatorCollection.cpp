@@ -64,7 +64,7 @@ namespace {
     int foundTurn = 0;
     int foundTurnOffset = 0;
 
-    const char *version = "v5.0.6_vK_v2";
+    const char *version = "v8.0.6_vG_v2";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -918,7 +918,7 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
 
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 35490;
+    uint64_t time1 = 0x050b6067;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -956,14 +956,14 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
     int counter = 0;
     //
     gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
     gene1[counter++] = BattleEmulator::DEFENCE;
     // gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
     // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
@@ -992,7 +992,7 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x01b34242;
+    uint64_t seed = 0x050b6067;
 
     int actions[350] = {
         BattleEmulator::BUFF,

@@ -295,7 +295,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
 
         auto baseFitness = tmpgenomu.fitness;
-        const auto AllyPlayer = CopedPlayers[0];
         auto AllyPlayerPre = tmpgenomu.AllyPlayer;
 
         currentGenome.Initialized = true;
@@ -362,7 +361,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             que.push(currentGenome);
         }
 
-        if (AllyPlayerPre.TensionLevel <= 3 && !Bans.is_action_banned(BattleEmulator::PSYCHE_UP_ALLY, turns)) {
+        if (tmpgenomu.EnemyPlayer.hp > 180 && AllyPlayerPre.TensionLevel <= 3 && !Bans.is_action_banned(BattleEmulator::PSYCHE_UP_ALLY, turns)) {
             action = BattleEmulator::PSYCHE_UP_ALLY;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
