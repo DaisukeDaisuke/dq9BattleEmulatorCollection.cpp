@@ -363,7 +363,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
     bool player0_has_initiative = false;
     int genePosition = 0;
     int exCounter = 0;
-    uint64_t tmpState = -1ull;
+    uint64_t tmpState = 0ull;
     int defenseFlag = false;
 
     auto startPos = static_cast<int>(((*NowState) >> 12) & 0xfffff);
@@ -425,7 +425,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         int enemyAction[2] = {0, 0};
         int preAction = 0;
         while (counter != 2) {
-            
+
             uint8_t state = (*NowState) & 0xf;
             if (state == TYPE_2A) {
                 enemyAction[counter] = ProcessEnemyRandomAction44(position);

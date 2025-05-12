@@ -75,6 +75,8 @@ elseif(MSVC)
 
     target_link_options(ebe_lv21_v2 PRIVATE /INCREMENTAL:NO /DEBUG)
 
+    target_compile_options(ebe_lv21_v2 PRIVATE /utf-8)
+
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 endif()

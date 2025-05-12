@@ -39,7 +39,7 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState) 
  * @param NowState 現在の状態を格納するポインタ。カメラの状態を管理するために使用され、内部の「カウンタ」に関連する部分を更新します。
  */
 void camera::onFreeCameraMove(int *position, const int action, const int param5, uint64_t * NowState) {
-    auto counter = ((*NowState) >> 8) & 0xf;
+    auto counter = static_cast<int>(((*NowState) >> 8) & 0xf);
     do {
         if (param5 == 0) {
             (*position)++;
@@ -77,5 +77,5 @@ void camera::onFreeCameraMove(int *position, const int action, const int param5,
         }
     } while (false);
     (*NowState) &= ~0xf00;
-    (*NowState) |= (counter << 8);
+    (*NowState) |= (static_cast<uint64_t>(counter) << 8);
 }
