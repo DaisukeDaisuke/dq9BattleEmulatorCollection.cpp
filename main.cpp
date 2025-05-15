@@ -62,7 +62,7 @@ namespace {
 
     uint64_t FoundSeed = 0;
 
-    const char *version = "v7.0.4_vJ_v2";
+    const char *version = "v7.0.4_vK_v2";
 
     std::stringstream performanceLogger = std::stringstream();
 
@@ -786,18 +786,12 @@ int main(int argc, char *argv[]) {
 
 
 #if defined(DEBUG2)
-    //seed: 0x1b433d8, actions: 25, 25, 50, 59, 50, 56, 53, 57, 57, 25, 25, 53, 50, 25, 59, 50, 58, 56, 25, 25, 57, 50, 53, 25, 56, 25, 59, 25,
+    //THIS DEBUG CODE!
     uint64_t time1 = 0x4161c0b;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
-
-    /*
-    ver: v7.0.4_vJ_v2, atk: 125, def: 93, seed: 0x4161c0b
-actions: 25, 25, 25, 50, 25, 50, 58, 50, 57, 25, 50, 25, 50, 25, 56, 57, 57, 59, 53, 50, 25, 56, 25, 25, 61, 59, 59,
-     */
-    //0x22f09d67: 25, 25, 25, 57, 57, 25, 57, 54, 56, 25, 25, 25, 25,
     /*
         *NowStateの各ビットの使用状況は下記の通りである。
         +-+-+-+-+-+-+-+-+- (* NowState) -+-+-+-+-+-+-+-+-+
