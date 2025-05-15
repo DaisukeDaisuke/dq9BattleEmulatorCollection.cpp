@@ -46,7 +46,7 @@ constexpr double kaisinnP = 500;
 constexpr double ShieldGuardP = 1.0;
 constexpr int baseHP = 93;
 #endif
-constexpr double DragonSlashKaisinnP = kaisinnP / 2;
+constexpr double DragonSlashKaisinnP = 100;
 constexpr double WooshSlashKaisinnP = kaisinnP / 5;
 
 void constexpr inline BattleEmulator::resetCombo(uint64_t *NowState) {
@@ -306,7 +306,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #if defined(DEBUG2)
 
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 758) {
+        if ((*position) == 844) {
             std::cout << "!!" << std::endl;
         }
 #endif
