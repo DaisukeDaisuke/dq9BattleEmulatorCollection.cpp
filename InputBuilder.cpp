@@ -19,14 +19,18 @@ void InputBuilder::push(int damage, const char prefix) {
     InputEntry entry;
     entry.damage = damage;
 
-    if (prefix == 'd') {
-        entry.candidates.push_back(BattleEmulator::SPECIAL_ANTIDOTE);
-    }else if (damage == -5) {
-        entry.candidates.push_back(BattleEmulator::SPECIAL_MEDICINE);
-    } else if (damage == -2) {
-        entry.candidates.push_back(BattleEmulator::DECELERATLE);
-    } else if (damage == -3) {
-        entry.candidates.push_back(BattleEmulator::KASAP);
+    if (prefix == PREFIX_PSYCHE_UP_ENEMY) {
+        entry.candidates.push_back(BattleEmulator::PSYCHE_UP);
+    } else if (prefix == PREFIX_BUFF_ALLY) {
+        entry.candidates.push_back(BattleEmulator::BUFF);
+    } else if (prefix == PREFIX_SPECIAL_MEDICINE) {
+        if (damage != TYPE_PRE_SPECIAL_MEDICINE) {
+            entry.candidates.push_back(BattleEmulator::SPECIAL_MEDICINE);
+        }else {
+            entry.candidates.push_back(BattleEmulator::UNKNOWN_ACTION);
+        }
+    } else if (prefix == PREFIX_PSYCHE_UP_ALLY) {
+        entry.candidates.push_back(BattleEmulator::PSYCHE_UP_ALLY);
     } else if (damage == -4) {
         entry.candidates.push_back(BattleEmulator::SWEET_BREATH);
     } else if (damage == 0) {
@@ -49,7 +53,7 @@ void InputBuilder::push(int damage, const char prefix) {
         if (prefix == 'a') {
             entry.candidates.push_back(BattleEmulator::ATTACK_ALLY);
         } else {
-            entry.candidates.push_back(BattleEmulator::ATTACK_ENEMY);
+            entry.candidates.push_back(BattleEmulator::UNKNOWN_ACTION);
         }
 #endif
 
@@ -103,16 +107,15 @@ void InputBuilder::generateCombinations(size_t index, ResultStructure current, s
         return;
     }
 
+
     // 入力の順番情報を保持するため、各入力のダメージを1度だけ追加
-    if (inputs[index].damage != -16) {
-        current.AII_damage[current.AII_damageCounter++] = inputs[index].damage;
-    }
+    current.AII_damage[current.AII_damageCounter++] = inputs[index].damage;
 
     const InputEntry &entry = inputs[index];
     for (int candidate: entry.candidates) {
         ResultStructure next = current; // 既にAII_damageが追加済み
-        if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::KASAP || candidate ==
-            BattleEmulator::DECELERATLE || candidate == BattleEmulator::SWEET_BREATH) {
+        if (candidate == BattleEmulator::ATTACK_ENEMY || candidate == BattleEmulator::PSYCHE_UP || candidate ==
+            BattleEmulator::UNKNOWN_ACTION || candidate == BattleEmulator::SWEET_BREATH) {
             next.Edamage[next.EdamageCounter++] = entry.damage;
         } else {
             next.Aactions[next.AactionsCounter++] = candidate;

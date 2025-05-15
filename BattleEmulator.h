@@ -23,6 +23,7 @@ public:
     //0は配列の初期であり、永久欠番とする
 
     //2A
+    static constexpr int UNKNOWN_ACTION = 0;
     static constexpr int ATTACK_ENEMY = 1;
     static constexpr int ULTRA_HIGH_SPEED_COMBO = 2;
     static constexpr int SWITCH_2B = 3;

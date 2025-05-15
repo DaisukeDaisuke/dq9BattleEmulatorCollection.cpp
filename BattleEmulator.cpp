@@ -16,6 +16,7 @@
 #include "debug.h"
 #include "BattleResult.h"
 #include "Equipment.h"
+#include "InputBuilder.h"
 
 
 thread_local int preHP[3] = {0, 0, 0};
@@ -425,7 +426,6 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         int enemyAction[2] = {0, 0};
         int preAction = 0;
         while (counter != 2) {
-
             uint8_t state = (*NowState) & 0xf;
             if (state == TYPE_2A) {
                 enemyAction[counter] = ProcessEnemyRandomAction44(position);
@@ -579,28 +579,18 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     } else if (mode != -1 && mode != -2) {
                         if (
                             c == ATTACK_ENEMY ||
-                            c == POISON_ATTACK ||
-                            c == KASAP ||
-                            c == DECELERATLE ||
-                            c == SWEET_BREATH
+                            c == PSYCHE_UP ||
+                            c == CRACKLE_ENEMY ||
+                            c == ZAMMLE ||
+                            c == DOUBLE_TROUBLE
                         ) {
                             if (damages[exCounter] == -1) {
                                 startTurn = counterJ;
                                 return true;
                             }
 
-                            if (damages[exCounter] == -3) {
-                                if (c != KASAP) {
-                                    return false;
-                                }
-                                exCounter++;
-                            } else if (damages[exCounter] == -2) {
-                                if (c != DECELERATLE) {
-                                    return false;
-                                }
-                                exCounter++;
-                            } else if (damages[exCounter] == -4) {
-                                if (c != SWEET_BREATH) {
+                            if (damages[exCounter] == InputBuilder::TYPE_PSYCHE_UP_ENEMY) {
+                                if (c != PSYCHE_UP) {
                                     return false;
                                 }
                                 exCounter++;
@@ -693,11 +683,18 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     if (action == HEAL || action == MORE_HEAL || action == MIDHEAL ||
                         action == FULLHEAL || action == SPECIAL_MEDICINE || action == GOSPEL_SONG || action ==
                         SPECIAL_ANTIDOTE) {
-                        Player::heal(players[0], basedamage);
                         if (action == SPECIAL_MEDICINE || action == SPECIAL_ANTIDOTE) {
                             if (mode != -1 && mode != -2) {
-                                if (damages[exCounter] == -5) {
-                                    exCounter++;
+                                if (damages[exCounter] != InputBuilder::TYPE_PRE_SPECIAL_MEDICINE) {
+                                    return false;
+                                }
+                                exCounter++;
+
+                                int currentDamage = damages[exCounter++];
+                                if (currentDamage != InputBuilder::TYPE_SPECIAL_MEDICINE &&
+                                    currentDamage != basedamage &&
+                                    currentDamage != (static_cast<int>(players[0].maxHp) - players[0].hp)) {
+                                    return false;
                                 }
                                 if (damages[exCounter] == -1) {
                                     startTurn = counterJ;
@@ -705,11 +702,30 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                 }
                             }
                         }
+                        Player::heal(players[0], basedamage);
                     } else {
                         Player::reduceHp(players[1], basedamage);
 
                         if (mode != -1 && mode != -2) {
-                            if (action == ATTACK_ALLY || action == MIRACLE_SLASH) {
+                            if (damages[exCounter] == InputBuilder::TYPE_PSYCHE_UP_ALLY) {
+                                if (action != PSYCHE_UP_ALLY) {
+                                    return false;
+                                }
+                                exCounter++;
+                                if (damages[exCounter] == -1) {
+                                    startTurn = counterJ;
+                                    return true;
+                                }
+                            } else if (damages[exCounter] == InputBuilder::TYPE_BUFF_ALLY) {
+                                if (action != BUFF) {
+                                    return false;
+                                }
+                                exCounter++;
+                                if (damages[exCounter] == -1) {
+                                    startTurn = counterJ;
+                                    return true;
+                                }
+                            } else if (action == ATTACK_ALLY || action == MIRACLE_SLASH) {
                                 if (damages[exCounter] == -1) {
                                     startTurn = counterJ;
                                     return true;
@@ -855,6 +871,21 @@ echo implode(", ", $results);
 */
 
 
+/**
+ * @brief 各種バトルアクションを実行する関数。
+ *
+ * この関数は、指定された特技や行動 (Id) に基づいて、バトル中の攻撃や回復などの
+ * 各種アクションを実行します。アクションの結果に応じてプレイヤーのステータス、
+ * 立ち位置、特殊効果などが変更されます。
+ *
+ * @param Id 行動の種類を示す32ビット整数。各ケースに対応した特定のアクションを示します。
+ * @param position 現在のlcgの位置を保持するポジションへのポインタ。
+ * @param players プレイヤーデータを保持するPlayer構造体の配列。
+ * @param attacker 攻撃者のインデックス (0または1)。
+ * @param defender 防御者のインデックス (0または1)。
+ * @param NowState 現在のバトル状態を保持する64ビット整数へのポインタ。
+ * @return 実行した行動による最終的なダメージ総量を返します。
+ */
 int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender,
                                   uint64_t *NowState) {
     for (int j = 0; j < 2; ++j) {
@@ -862,6 +893,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     }
     int baseDamage = 0;
     double tmp = 0;
+    double tmp1 = 0;
     bool kaisinn = false;
     bool hasKaisinn = false;
     bool kaihi = false;
@@ -964,15 +996,23 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
 
                 tmp = floor(baseDamage * 0.5);
-                if (kaisinn) {
-                    //0x020759ec
-                    tmp = tmp * lcg::floatRand(position, 1.5, 2.0);
+
+                if (kaisinn == true) {
+                    tmp1 = tmp * lcg::floatRand(position, 1.5, 2.0);
                 }
 
                 if (players[attacker].TensionLevel != 0) {
                     //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
                     tmp *= Ally_TensionTable[players[attacker].TensionLevel - 1];
                     tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
+                }
+
+                if (kaisinn) {
+                    if (tmp * 1.2000 <= tmp1) {
+                        tmp = tmp1;
+                    }else {
+                        tmp *= 1.2000;
+                    }
                 }
 
                 baseDamage = static_cast<int>(floor(tmp));
@@ -1386,6 +1426,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     tmp += (players[attacker].TensionLevel * 4); //4 = 1*(1+(30/10))
                 }
 
+
+
                 baseDamage = static_cast<int>(floor(tmp));
 
 
@@ -1501,6 +1543,8 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 kaisinn = true;
             }
 
+            kaisinn = true;
+
             //みかわし(相手)
             if ((Id & 0xffff) != ITEM_USE && !players[0].paralysis) {
                 // if (lcg::getPercent(position, 100) < -1) {
@@ -1528,9 +1572,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (kaisinn) {
                 //0x020759ec
                 if ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST || (Id & 0xffff) == BattleEmulator::MIRACLE_SLASH || (Id & 0xffff) == DRAGON_SLASH) {
-                    tmp *= lcg::floatRand(position, 1.5, 2.0);
+                    tmp1 *= lcg::floatRand(position, 1.5, 2.0);
                 } else {
-                    tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
+                    tmp1 = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
                 }
             }
 
@@ -1545,6 +1589,14 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp *= Ally_TensionTable[players[attacker].TensionLevel - 1];
                 tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
                 players[attacker].TensionLevel = 0;
+            }
+
+            if (kaisinn) {
+                if (tmp * 1.2000 <= tmp1) {
+                    tmp = tmp1;
+                }else {
+                    tmp *= 1.2000;
+                }
             }
 
             baseDamage = static_cast<int>(floor(tmp));

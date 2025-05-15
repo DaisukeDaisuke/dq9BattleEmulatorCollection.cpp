@@ -397,87 +397,39 @@ namespace {
      *         引数の個数が不十分または他のエラーが発生した場合はfalseを返します。
      */
     NOINLINE bool ProcessInputBuilder(const int argc, char *argv[]) {
-        // 最初の3件は時間情報のため、最低でも4件必要
-        if (argc < 4) {
-            return false;
-        }
-
-        // 行動引数は argv[4] 以降
-        int totalActions = argc - 4;
-        // 1ターンあたりの上限行動数（3件）
-        const int actionsPerTurn = 3;
-
-        // ターン数は、totalActions を actionsPerTurn で割った商＋余りがあれば1ターンとして計上
-        int turns = totalActions / actionsPerTurn;
-        int remainder = totalActions % actionsPerTurn;
-        if (remainder > 0) {
-            turns++;
-        }
-
-        int enemyConsecutive = 0; // 複数ターンにわたる敵連続行動数
-        int tokenIndex = 4; // 最初の行動引数の位置
-
-        for (int turn = 0; turn < turns; turn++) {
-            bool allyPresent = false; // このターンに味方行動があるかのフラグ
-            int enemyActions = 0; // このターン内の敵の行動数
-
-            // 現ターンの行動数（最後のターンは3未満の場合があるので調整）
-            int actionsThisTurn = actionsPerTurn;
-            if ((turn == turns - 1) && (remainder > 0)) {
-                actionsThisTurn = remainder;
+        // 4番目以降の引数を `push()` に入れる
+        for (int i = 4; i < argc; ++i) {
+            if (isMatchStrWithTrim(argv[i], "t") || isMatchStrWithTrim(argv[i], "p")) {
+                builder.push(InputBuilder::TYPE_PSYCHE_UP_ENEMY, InputBuilder::PREFIX_PSYCHE_UP_ENEMY);
+                continue;
             }
-
-            // 現ターン分のトークンを処理
-            for (int j = 0; j < actionsThisTurn; j++) {
-                const char *token = argv[tokenIndex++];
-                bool isActionAlly = false;
-
-                if (isMatchStrWithTrim(token, "h") || isMatchStrWithTrim(token, "ah")) {
-                    // 回復は明示的な味方行動
-                    builder.push(-5, 'n');
-                    allyPresent = true;
-                } else if (isMatchStrWithTrim(token, "d") || isMatchStrWithTrim(token, "D")) {
-                    // 回復は明示的な味方行動
-                    builder.push(-5, 'd');
-                    allyPresent = true;
-                } else if (isMatchStrWithTrim(token, "a") || isMatchStrWithTrim(token, "s")) {
-                    // ここでは基本的に敵側行動として扱う
-                    builder.push(-4, 'n');
-                    enemyActions++;
-                } else if (isMatchStrWithTrim(token, "b") || isMatchStrWithTrim(token, "d")) {
-                    builder.push(-2, 'n');
-                    enemyActions++;
-                } else if (isMatchStrWithTrim(token, "r") || isMatchStrWithTrim(token, "k")) {
-                    builder.push(-3, 'n');
-                    enemyActions++;
-                } else {
-                    // 上記以外は toABCint による分解処理
-                    auto [prefix, tmp] = toABCint(token);
-                    builder.push(tmp, prefix);
-                    // 味方行動の条件（今回は prefix == 'a' が味方とする）
-                    if (prefix == 'a') {
-                        isActionAlly = true;
-                        allyPresent = true;
-                    } else {
-                        enemyActions++;
-                    }
+            if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "s")) {
+                builder.push(InputBuilder::TYPE_BUFF_ALLY, InputBuilder::PREFIX_BUFF_ALLY);
+                continue;
+            }
+            if (isMatchStrWithTrim(argv[i], "h") || isMatchStrWithTrim(argv[i], "d")) {
+                builder.push(InputBuilder::TYPE_PRE_SPECIAL_MEDICINE, InputBuilder::PREFIX_SPECIAL_MEDICINE);
+                builder.push(InputBuilder::TYPE_SPECIAL_MEDICINE, InputBuilder::PREFIX_SPECIAL_MEDICINE);
+                continue;
+            }
+            if (isMatchStrWithTrim(argv[i], "at") || isMatchStrWithTrim(argv[i], "AP")) {
+                builder.push(InputBuilder::TYPE_PSYCHE_UP_ALLY, InputBuilder::PREFIX_PSYCHE_UP_ALLY);
+                continue;
+            }
+            auto [prefix, damage] = toABCint(argv[i]);
+            if (damage >= 0) {
+                if (prefix == 'a') {
+                    builder.push(-6, 't'); //攻撃フォローアップ
                 }
-            } // 1ターン分の処理終了
-
-            if (allyPresent) {
-                // 味方の行動が1件でもあれば、敵連続カウントはリセット
-                enemyConsecutive = 0;
+                if (prefix == 'h') {
+                    builder.push(InputBuilder::TYPE_PRE_SPECIAL_MEDICINE, InputBuilder::PREFIX_SPECIAL_MEDICINE); //攻撃フォローアップ
+                }
+                builder.push(damage, prefix);
             } else {
-                // このターン内の敵行動数を累積
-                enemyConsecutive += enemyActions;
-                // 連続敵行動が3件以上の場合、眠り判定を行う
-                while (enemyConsecutive >= 3) {
-                    builder.push(-16, 'm');
-                    enemyConsecutive -= 3;
-                }
+                std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
+                return false;
             }
         }
-
         return true;
     }
 
@@ -714,6 +666,10 @@ namespace {
         auto time2 = static_cast<uint64_t>(floor((totalSeconds + 8.5) * (1 / 0.125155)));
         time2 = time2 << 16;
         int32_t gene[350] = {0};
+        time1 = 0x1000;
+        time2 = 0x1001;
+
+
         for (int i = 0; i < 350; ++i) {
             gene[i] = aActions[i];
             if (aActions[i] == -1) {
@@ -793,7 +749,6 @@ namespace {
         if (str == nullptr) throw std::invalid_argument("Input is null");
 
         size_t len = std::strlen(str);
-        if (len > 4) throw std::length_error("Input exceeds maximum allowed length (4)");
 
         // 先頭がアルファベットの場合
         if (len >= 2 && std::isalpha(static_cast<unsigned char>(str[0]))) {
@@ -918,11 +873,16 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
 
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 0x050b6067;
+    uint64_t time1 = 0x1000;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
+
+    /*
+    ver: v8.0.6_vG_v2, atk: 220, def: 155, seed: 0x1000
+actions: 30, 30, 50, 62, 53, 62, 62, 62, 33, 34,
+    */
 
     //ver: v5.0.6_vE_aa, atk: 82, def: 90, seed: 0x416d71f, actions: 25, 25, 50, 25, 25, 61, 50, 61, 61, 27, 27, 25, 50, 25, 61, 25, 56, 61, 25, 61, 50, 53, 25,
 
@@ -945,26 +905,26 @@ actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    int32_t gene1[350] = {0};
+    //int32_t gene1[350] = {0};
     //0x22e2dbaf:
 
     //AI Warning: This is code related to debug2
-    // int32_t gene1[350] = {
-    //     30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
-    //     BattleEmulator::ATTACK_ALLY};
+    int32_t gene1[350] = {
+        30, 30, 50, 62, 53, 62, 62, 62, 33,  BattleEmulator::ATTACK_ALLY,
+        BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     //
-    gene1[counter++] = BattleEmulator::BUFF;
-    gene1[counter++] = BattleEmulator::DEFENCE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
-    gene1[counter++] = BattleEmulator::DEFENCE;
+    // gene1[counter++] = BattleEmulator::BUFF;
+    // gene1[counter++] = BattleEmulator::DEFENCE;
+    // gene1[counter++] = BattleEmulator::DEFENCE;
+    // gene1[counter++] = BattleEmulator::DEFENCE;
+    // gene1[counter++] = BattleEmulator::DEFENCE;
+    // gene1[counter++] = BattleEmulator::DEFENCE;
+    // gene1[counter++] = BattleEmulator::DEFENCE;
+    // gene1[counter++] = BattleEmulator::DEFENCE;
+    // gene1[counter++] = BattleEmulator::DEFENCE;
+    // gene1[counter++] = BattleEmulator::DEFENCE;
     // gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
     // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
     // gene1[counter++] = BattleEmulator::MERCURIAL_THRUST;
