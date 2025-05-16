@@ -368,19 +368,11 @@ namespace {
      */
     void help(const char *program_name) {
         std::cout << "Usage: " << program_name << " h m s [actions...]" << std::endl;
-        std::cout << "tables" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::KASAP) << R"(:   "r" or "k")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SPECIAL_MEDICINE) << R"(:   "h")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::DECELERATLE) << R"(: "b" or "d")" << std::endl;
-        std::cout << BattleEmulator::getActionName(BattleEmulator::SWEET_BREATH) << R"(:      "a" or "s")" << std::endl;
         std::cout << "WARNING: Please input 0 damage attacks (such as shield guard) correctly" << std::endl;
-        std::cout << "example: " << program_name << " 0 3 54 a85 9 a a26 10 10 10 b a26" << std::endl;
-        std::cout << "example: " << program_name << " 0 3 19 a21 11 14 a84 a 12" << std::endl;
-        // std::cout << "example: " << program_name << " 0 2 26 26 r 21 32 r b b 22 35 b 23 36 0 22 h" << std::endl;
 
-        printShortcutTableHeader();
-        printShortcutEntry("A", "Attack Ally");
-        printShortcutEntry("A", BattleEmulator::getActionName(BattleEmulator::MIRACLE_SLASH));
+        // printShortcutTableHeader();
+        // printShortcutEntry("A", "Attack Ally");
+        // printShortcutEntry("A", BattleEmulator::getActionName(BattleEmulator::MIRACLE_SLASH));
 
 
         std::cerr << "error: Not enough argc!!" << std::endl;
@@ -403,11 +395,11 @@ namespace {
                 builder.push(InputBuilder::TYPE_PSYCHE_UP_ENEMY, InputBuilder::PREFIX_PSYCHE_UP_ENEMY);
                 continue;
             }
-            if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "s")) {
+            if (isMatchStrWithTrim(argv[i], "b") || isMatchStrWithTrim(argv[i], "s") || isMatchStrWithTrim(argv[i], "ab") || isMatchStrWithTrim(argv[i], "as")) {
                 builder.push(InputBuilder::TYPE_BUFF_ALLY, InputBuilder::PREFIX_BUFF_ALLY);
                 continue;
             }
-            if (isMatchStrWithTrim(argv[i], "h") || isMatchStrWithTrim(argv[i], "d")) {
+            if (isMatchStrWithTrim(argv[i], "h") || isMatchStrWithTrim(argv[i], "d") || isMatchStrWithTrim(argv[i], "ah") || isMatchStrWithTrim(argv[i], "ad")) {
                 builder.push(InputBuilder::TYPE_PRE_SPECIAL_MEDICINE, InputBuilder::PREFIX_SPECIAL_MEDICINE);
                 builder.push(InputBuilder::TYPE_SPECIAL_MEDICINE, InputBuilder::PREFIX_SPECIAL_MEDICINE);
                 continue;
@@ -417,18 +409,13 @@ namespace {
                 continue;
             }
             auto [prefix, damage] = toABCint(argv[i]);
-            if (damage >= 0) {
-                if (prefix == 'a') {
-                    builder.push(-6, 't'); //攻撃フォローアップ
-                }
-                if (prefix == 'h') {
-                    builder.push(InputBuilder::TYPE_PRE_SPECIAL_MEDICINE, InputBuilder::PREFIX_SPECIAL_MEDICINE); //攻撃フォローアップ
-                }
-                builder.push(damage, prefix);
-            } else {
-                std::cerr << "Invalid damage value at argv[" << i << "]" << std::endl;
-                return false;
+            if (prefix == 'a' || prefix == InputBuilder::PREFIX_MULTITHRUST) {
+                builder.push(-6, 't'); //攻撃フォローアップ
             }
+            if (prefix == 'h') {
+                builder.push(InputBuilder::TYPE_PRE_SPECIAL_MEDICINE, InputBuilder::PREFIX_SPECIAL_MEDICINE); //攻撃フォローアップ
+            }
+            builder.push(damage, prefix);
         }
         return true;
     }
@@ -666,8 +653,8 @@ namespace {
         auto time2 = static_cast<uint64_t>(floor((totalSeconds + 8.5) * (1 / 0.125155)));
         time2 = time2 << 16;
         int32_t gene[350] = {0};
-        time1 = 0x1000;
-        time2 = 0x1001;
+        time1 = 0x1001;
+        time2 = 0x1002;
 
 
         for (int i = 0; i < 350; ++i) {
@@ -866,14 +853,14 @@ int main(int argc, char *argv[]) {
     //3839393442
 
     /*
-    ver: v5.0.6_vK_v2, atk: 220, def: 155, seed: 0x20b2420
-actions: 30, 50, 62, 30, 62, 50, 62, 50, 33, 62, 34,
+    ver: v8.0.6_vG_v2, atk: 220, def: 155, seed: 0x1001
+actions: 30, 25, 30, 62, 62, 50, 62, 62, 33, 30, 34,
         */
 
 
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 0x1000;
+    uint64_t time1 = 0x1001;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -905,18 +892,25 @@ actions: 30, 30, 50, 62, 53, 62, 62, 62, 33, 34,
     auto *NowState = new uint64_t(0); //エミュレーターの内部ステートを表すint
 
     Player players1[2];
-    //int32_t gene1[350] = {0};
+
     //0x22e2dbaf:
 
     //AI Warning: This is code related to debug2
-    int32_t gene1[350] = {
-        30, 30, 50, 62, 53, 62, 62, 62, 33,  BattleEmulator::ATTACK_ALLY,
-        BattleEmulator::ATTACK_ALLY};
+    // int32_t gene1[350] = {
+    //     30, 25, 30, 62, 62, 50, 62, 62, 33, 30, 34,
+    //     BattleEmulator::ATTACK_ALLY};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
-    //
-    // gene1[counter++] = BattleEmulator::BUFF;
-    // gene1[counter++] = BattleEmulator::DEFENCE;
+    int32_t gene1[350] = {0};
+     gene1[counter++] = BattleEmulator::BUFF;
+     gene1[counter++] = BattleEmulator::BUFF;
+     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
+     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
     // gene1[counter++] = BattleEmulator::DEFENCE;
     // gene1[counter++] = BattleEmulator::DEFENCE;
     // gene1[counter++] = BattleEmulator::DEFENCE;

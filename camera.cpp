@@ -51,9 +51,6 @@ void camera::onFreeCameraMove(int *position, const int action, const int param5,
             if (ret == 0 || counter == 5) {
                 counter = 0;
                 (*position) += 1;
-                if (action == BattleEmulator::ATTACK_ALLY){
-                    (*position)+=2;
-                }
             } else {
                 counter++;
             }
@@ -62,18 +59,11 @@ void camera::onFreeCameraMove(int *position, const int action, const int param5,
             if (counter == 0) {
                 (*position)++;//引数5が1なら強制的に実行
                 counter = 0;
-                if (action == BattleEmulator::ATTACK_ALLY){
-                    (*position)+=2;
-                }
                 break;
             }
             (*position)++;
             counter = 0;
             (*position)++;
-            if (action == BattleEmulator::ATTACK_ALLY){
-                (*position)+=2;
-            }
-
         }
     } while (false);
     (*NowState) &= ~0xf00;

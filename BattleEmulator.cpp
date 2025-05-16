@@ -401,7 +401,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         std::cout << "c: " << counterJ << ", " << (*position) << std::endl;
-        if ((*position) == 87) {
+        if ((*position) == 48) {
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -725,12 +725,15 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                                     startTurn = counterJ;
                                     return true;
                                 }
-                            } else if (action == ATTACK_ALLY || action == MIRACLE_SLASH) {
+                            } else if (action == ATTACK_ALLY || action == MIRACLE_SLASH || action == MULTITHRUST) {
                                 if (damages[exCounter] == -1) {
                                     startTurn = counterJ;
                                     return true;
                                 }
                                 //int need = ;
+                                if (damages[exCounter++] != -6) {
+                                    return false;
+                                }
                                 if (damages[exCounter++] != basedamage) {
                                     return false;
                                 }
@@ -1309,7 +1312,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (!tate) {
                 (*position)++; //武器固有の処理 0x021e54fc
             } else {
-                baseDamage = 0;
+                tmp = 0.0;
             }
 
             if (!players[0].paralysis && !players[0].sleeping) {
@@ -1542,8 +1545,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             ) {
                 kaisinn = true;
             }
-
-            kaisinn = true;
 
             //みかわし(相手)
             if ((Id & 0xffff) != ITEM_USE && !players[0].paralysis) {
