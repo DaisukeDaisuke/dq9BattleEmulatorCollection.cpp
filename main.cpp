@@ -653,8 +653,6 @@ namespace {
         auto time2 = static_cast<uint64_t>(floor((totalSeconds + 8.5) * (1 / 0.125155)));
         time2 = time2 << 16;
         int32_t gene[350] = {0};
-        time1 = 0x1001;
-        time2 = 0x1002;
 
 
         for (int i = 0; i < 350; ++i) {
