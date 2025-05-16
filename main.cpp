@@ -655,6 +655,8 @@ namespace {
         int32_t gene[350] = {0};
 
 
+    std::cout << std::endl;
+
         for (int i = 0; i < 350; ++i) {
             gene[i] = aActions[i];
             if (aActions[i] == -1) {
