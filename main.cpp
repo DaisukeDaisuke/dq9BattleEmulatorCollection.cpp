@@ -266,7 +266,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v1.0.16";
+const std::string version = "v1.0.17a";
 void showHeader() {
 #ifdef BUILD_DATE
     const std::string buildDate = BUILD_DATE;
