@@ -60,6 +60,7 @@ void updateCompromiseScore(Genome &genome) {
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
                                      int actions[350], int seedOffset) {
     std::mt19937 rng(seed + seedOffset);
+    auto tension_enable = (rng() % 2) != 0;
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
     auto counter = 0;
@@ -81,10 +82,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     int Eactions[2] = {-1, -1};
     int Edamage[2] = {-1, -1};
     auto counter1 = 0;
-    auto processed = 0;
-    auto Initialized = false;
-    auto backToPasted = false;
-    auto Past = turns;
     //std::priority_queue<Genome, std::vector<Genome>, std::greater<> > que;
     HeapQueue que(300);
 
@@ -284,25 +281,21 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
             continue;
         }
 
-        auto AllyPlayer = CopedPlayers[0];
-        auto EnemyPlayer = CopedPlayers[1];
-
-
         auto AllyPlayerPre = tmpgenomu.AllyPlayer;
-        auto EnemyPlayerPre = tmpgenomu.EnemyPlayer;
+        //auto EnemyPlayerPre = tmpgenomu.EnemyPlayer;
 
         currentGenome.Initialized = true;
         //if (!skip) {
 
-        //いまのところ無効化しとく
-        if (false && !Bans.is_action_banned(BattleEmulator::SPECIAL_MEDICINE, turns) && AllyPlayerPre.SpecialMedicineCount
+        //50%の確率でテンションを上げる行動有効化して、テンションシステムに依存しない最適解も生成できるようにする。
+        if (tension_enable && !Bans.is_action_banned(BattleEmulator::SPECIAL_MEDICINE, turns) && AllyPlayerPre.SpecialMedicineCount
             > 0) {
             action = BattleEmulator::SPECIAL_MEDICINE;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 4 + static_cast<int>(rng() % 6);
+                currentGenome.fitness = baseFitness + 1;
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -327,7 +320,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         }
 
         //味方のテンションを上げる攻撃
-        if (AllyPlayerPre.TensionLevel <= 3 && !Bans.is_action_banned(BattleEmulator::PSYCHE_UP_ALLY, turns)) {
+        if (tension_enable && AllyPlayerPre.TensionLevel <= 3 && !Bans.is_action_banned(BattleEmulator::PSYCHE_UP_ALLY, turns)) {
             action = BattleEmulator::PSYCHE_UP_ALLY;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
