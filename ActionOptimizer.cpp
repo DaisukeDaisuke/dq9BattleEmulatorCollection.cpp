@@ -333,7 +333,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 8 + static_cast<int>(rng() % 13);
+                currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 10);
             }
             currentGenome.actions[turns - 1] = action;
 
