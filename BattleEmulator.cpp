@@ -21,6 +21,10 @@ int preHP[3] = {0, 0, 0};
 bool player0_has_initiative = false;
 bool TiggerSkyAttack = false;
 
+constexpr int Ally_Level = 50;
+constexpr double Ally_TensionTable[4] = {1.5, 2.5, 4.0, 6.0};
+constexpr int Ally_TensionLevel = 1 + static_cast<int>(Ally_Level / 10.0);
+
 
 void inline BattleEmulator::resetCombo(uint64_t *NowState) {
     (*NowState) &= ~(0xFFF00000000);
@@ -143,6 +147,10 @@ std::string BattleEmulator::getActionName(int actionId) {
             return "gospel song";
         case BattleEmulator::FLEE_ALLY:
             return "Flee";
+        case PSYCHE_UP_ALLY:
+            return "Psyche up";
+        case SPECIAL_MEDICINE:
+            return "Special Medicine";
         default:
             return "Unknown Action";
     }
@@ -732,7 +740,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     }
     actions[actionsPosition++] = Id;
     int baseDamage = 0;
-    double tmp = 0;
+    double tmp, tmp1 = 0;
     bool kaisinn = false;
     bool hasKaisinn = false;
     bool kaihi = false;
@@ -743,6 +751,27 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
     auto attackCount = 0;
     bool defenseFlag = false; //防御した場合0x021e81a0のほうが優先度高いらしい。なんで
     switch (Id & 0xffff) {
+        case PSYCHE_UP_ALLY:
+            (*position) += 2;
+            (*position)++; // 0x021ec6f8
+            (*position)++; // 0x02158584 会心
+            (*position)++; // 0x02157f58 偽回避
+            FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
+            if (players[attacker].TensionLevel < 3 || (players[attacker].TensionLevel == 3 && lcg::getPercent(position, 2) == 0)) {
+                //0x02087fb4 テンション
+                players[attacker].TensionLevel++;
+            }
+            if (!players[0].specialCharge && !players[0].sleeping && !players[0].paralysis) {
+                (*position)++; //0x021ed7a8 必殺チャージ(敵) 0%
+                if (lcg::getPercent(position, 100) < 1) {
+                    //0x021edaf4
+                    players[attacker].specialCharge = true;
+                    players[attacker].specialChargeTurn = 8;
+                }
+            }
+            baseDamage = 0;
+            resetCombo(NowState);
+            break;
         case GOSPEL_SONG:
             (*position) += 2;
             (*position)++; //0x02158584 会心
@@ -1058,9 +1087,29 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = FUN_021e8458_typeD(position, 10, CalculateMidHealBase(players));
             if (kaisinn) {
-                tmp *= lcg::floatRand(position, 1.5, 2.0); //TODO
-                baseDamage = static_cast<int>(floor(tmp));
+                tmp1 *= lcg::floatRand(position, 1.5, 2.0); //TODO
+            } else {
+                tmp1 = baseDamage;
             }
+
+
+            if (players[attacker].TensionLevel != 0) {
+                //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
+                tmp *= Ally_TensionTable[players[attacker].TensionLevel - 1];
+                tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
+                players[attacker].TensionLevel = 0;
+            }
+
+            if (kaisinn) {
+                if (tmp * 1.2000 <= tmp1) {
+                    tmp = tmp1;
+                } else {
+                    tmp *= 1.2000;
+                }
+            }
+
+            baseDamage = static_cast<int>(floor(tmp));
+
             (*position)++; //不明
             if (!players[attacker].specialCharge) {
                 (*position)++; //関係ない
@@ -1169,10 +1218,24 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
 
                 tmp = floor(baseDamage * 0.5);
-                if (kaisinn) {
-                    //0x020759ec
-                    tmp = tmp * lcg::floatRand(position, 1.5, 2.0);
+                if (kaisinn == true) {
+                    tmp1 = tmp * lcg::floatRand(position, 1.5, 2.0);
                 }
+
+                if (players[attacker].TensionLevel != 0) {
+                    //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
+                    tmp *= Ally_TensionTable[players[attacker].TensionLevel - 1];
+                    tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
+                }
+
+                if (kaisinn) {
+                    if (tmp * 1.2000 <= tmp1) {
+                        tmp = tmp1;
+                    } else {
+                        tmp *= 1.2000;
+                    }
+                }
+
                 //ここの小数点以下は引き継がれる
                 tmp = tmp * 1.25; //1.25倍は雷属性になってるから
                 baseDamage = static_cast<int>(floor(tmp));
@@ -1202,6 +1265,9 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
         //0x021ec6f8が多分の残りの攻撃回数だけ発生する
 
+            if (players[attacker].TensionLevel != 0) {
+                players[attacker].TensionLevel = 0;
+            }
             resetCombo(NowState);
             return totalDamage;
         case MERA_ZOMA:
@@ -1323,9 +1389,26 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             baseDamage = FUN_021e8458_typeD(position, 20, CalculateMoreHealBase(players));
             if (kaisinn) {
-                tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0); //TODO
-                baseDamage = static_cast<int>(floor(tmp));
+                tmp1 = baseDamage * lcg::floatRand(position, 1.5, 2.0); //TODO
+            } else {
+                tmp1 = baseDamage;
             }
+
+            if (players[attacker].TensionLevel != 0) {
+                //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
+                tmp *= Ally_TensionTable[players[attacker].TensionLevel - 1];
+                tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
+                players[attacker].TensionLevel = 0;
+            }
+
+            if (kaisinn) {
+                if (tmp * 1.2000 <= tmp1) {
+                    tmp = tmp1;
+                } else {
+                    tmp *= 1.2000;
+                }
+            }
+
             (*position)++; //不明
             if (!players[attacker].specialCharge) {
                 (*position)++; //関係ない
@@ -1843,9 +1926,24 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (kaisinn) {
                 //0x020759ec
                 if ((Id & 0xffff) == BattleEmulator::MERCURIAL_THRUST) {
-                    tmp *= lcg::floatRand(position, 1.5, 2.0);
+                    tmp1 *= lcg::floatRand(position, 1.5, 2.0);
                 } else {
-                    tmp = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
+                    tmp1 = OffensivePower * lcg::floatRand(position, 0.95, 1.05);
+                }
+            }
+
+            if (players[attacker].TensionLevel != 0) {
+                //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
+                tmp *= Ally_TensionTable[players[attacker].TensionLevel - 1];
+                tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
+                players[attacker].TensionLevel = 0;
+            }
+
+            if (kaisinn) {
+                if (tmp * 1.2000 <= tmp1) {
+                    tmp = tmp1;
+                } else {
+                    tmp *= 1.2000;
                 }
             }
 

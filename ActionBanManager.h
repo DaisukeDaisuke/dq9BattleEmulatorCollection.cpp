@@ -35,7 +35,7 @@ public:
 
     // 指定されたターン範囲内で行動がBANされているかをチェック
     bool is_action_banned(int action, int current_turn, int lookback_turns = 0) const {
-        if (action < 25 || action > 54) {
+        if (action < 25 || action > 70) {
             std::cerr << "Invalid action value (must be between 25 and 51): " << action  << "\n";
             return false;
         }
