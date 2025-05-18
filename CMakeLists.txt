@@ -41,7 +41,6 @@ add_executable(newDirectory main.cpp
         debug.cpp
         debug.h
         BattleResult.h
-        AnalyzeData.h
         Equipment.h
         ActionOptimizer.cpp
         ActionOptimizer.h
