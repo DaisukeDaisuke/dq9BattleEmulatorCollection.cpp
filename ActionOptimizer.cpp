@@ -329,7 +329,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 if (AllyPlayerPre.TensionLevel == 0) {
                     currentGenome.fitness = baseFitness + 8 + static_cast<int>(rng() % 8);
                 } else {
-                    currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 16);
+                    currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 10);
                 }
             }
             currentGenome.actions[turns - 1] = action;
