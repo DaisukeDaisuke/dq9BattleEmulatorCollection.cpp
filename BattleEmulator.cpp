@@ -24,7 +24,7 @@ bool TiggerSkyAttack = false;
 constexpr int Ally_Level = 50;
 constexpr double Ally_TensionTable[4] = {1.5, 2.5, 4.0, 6.0};
 constexpr int Ally_TensionLevel = 1 + static_cast<int>(Ally_Level / 10.0);
-
+constexpr int shieldGuardP = 9;//盾ガード率 9%
 
 void inline BattleEmulator::resetCombo(uint64_t *NowState) {
     (*NowState) &= ~(0xFFF00000000);
@@ -1175,7 +1175,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //0x021ec6f8 不明
             if (!players[0].paralysis && !players[0].sleeping) {
                 //TODO
-                if (lcg::getPercent(position, 100) < 11) {
+                if (lcg::getPercent(position, 100) < shieldGuardP) {
                     //盾ガード 0x021586fc
                     tate = true;
                 }
@@ -1311,7 +1311,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 ProcessRage(position, baseDamage, players);
             } else {
                 if (!players[0].paralysis && !players[0].sleeping) {
-                    if (lcg::getPercent(position, 100) < 11) {
+                    if (lcg::getPercent(position, 100) < shieldGuardP) {
                         //TODO 盾の条件調べる
                         tate = true;
                     }
@@ -1491,7 +1491,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 if (lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
-                if (!kaihi && lcg::getPercent(position, 100) < 11) {
+                if (!kaihi && lcg::getPercent(position, 100) < shieldGuardP) {
                     tate = true;
                 }
             }
@@ -1594,7 +1594,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                             // = 10%
                             kaihi = true;
                         }
-                        if (!kaihi && lcg::getPercent(position, 100) < 11) {
+                        if (!kaihi && lcg::getPercent(position, 100) < shieldGuardP) {
                             //TODO 盾の条件調べる 盾ガード
                             tate = true;
                         }
@@ -1794,7 +1794,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 if (lcg::getPercent(position, 100) < 2) {
                     kaihi = true;
                 }
-                if (!kaihi && lcg::getPercent(position, 100) < 11) {
+                if (!kaihi && lcg::getPercent(position, 100) < shieldGuardP) {
                     tate = true;
                 }
             }
