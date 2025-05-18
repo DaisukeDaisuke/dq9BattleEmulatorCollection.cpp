@@ -33,7 +33,7 @@ void updateCompromiseScore(Genome &genome) {
 
 // オレオレアルゴリズム実行
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
-                                     int actions[350], int seedOffset) {
+                                     int actions[350], int seedOffset, bool dropBug) {
     std::mt19937 rng(seed + seedOffset);
     auto tension_enable = (rng() % 2) != 0;
     auto *position = new int(1);
@@ -111,24 +111,40 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         auto tmpgenomu = currentGenome;
 
 
-        result->clear();
-        BattleEmulator::Main(position, currentGenome.turn - currentGenome.processed, currentGenome.actions,
-                             CopedPlayers,
-                             result, seed,
-                             nullptr, nullptr, -1, nowState);
+        //探索放棄バグをトリガーしていいか？ true = はい, 偽 = いいえ
+        if (dropBug) {
+            result->clear();
+            BattleEmulator::Main(position, currentGenome.turn - currentGenome.processed, currentGenome.actions,
+                                 CopedPlayers,
+                                 result, seed,
+                                 nullptr, nullptr, -1, nowState);
 
-        if (currentGenome.turn >= 35) {
-            continue;
-        }
+            if (currentGenome.turn >= 35) {
+                continue;
+            }
 
-        if (currentGenome.Initialized && CopedPlayers[0].hp <= 0) {
-            continue;
-        }
+            if (currentGenome.Initialized && CopedPlayers[0].hp <= 0) {
+                continue;
+            }
 
-        if (CopedPlayers[1].hp <= 0) {
-            currentGenome.fitness += 100;
-            que.push(currentGenome);
-            break;
+            if (CopedPlayers[1].hp <= 0) {
+                currentGenome.fitness += 100;
+                que.push(currentGenome);
+                break;
+            }
+        } else {
+            if (currentGenome.turn >= 35) {
+                continue;
+            }
+
+            if (currentGenome.AllyPlayer.hp <= 0) {
+                continue;
+            }
+            if (currentGenome.EnemyPlayer.hp <= 0) {
+                currentGenome.fitness += 100;
+                que.push(currentGenome);
+                break;
+            }
         }
 
         counter1 = 0;

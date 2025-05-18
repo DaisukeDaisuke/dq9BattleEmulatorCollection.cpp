@@ -26,7 +26,7 @@ std::string rtrim(const std::string &s);
 
 std::string trim(const std::string &s);
 
-void SearchRequest(const Player copiedPlayers[2], uint64_t seed, int turns, const int aActions[350]);
+bool SearchRequest(const Player copiedPlayers[2], uint64_t seed, int turns, const int aActions[350], bool dropbug);
 
 uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                            int eActions[350],
@@ -457,7 +457,7 @@ int main() {
     return 0;
 }
 
-void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]) {
+bool SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], bool dropbug) {
     int32_t gene[350] = {0};
     auto turns = 0;
     for (int i = 0; i < 350; ++i) {
@@ -483,7 +483,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     auto *nowState = new uint64_t(0);
 
     for (int i = 0; i < 2000; ++i) {
-        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 2500, gene, i * 2);
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 2500, gene, i * 2, dropbug);
 
         Player players[2];
         players[0] = copiedPlayers[0];
@@ -509,6 +509,11 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     delete position;
     delete nowState;
 
+    //探索失敗したかどうか？
+    if (maxTurns >= 100) {
+        return false;
+    }
+
     std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
 
     std::cout << "0x" << std::hex << seed << std::dec << ": ";
@@ -520,6 +525,8 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
         std::cout << bestGenome.actions[i] << ", ";
     }
     std::cout << std::endl;
+    //探索成功
+    return true;
 }
 
 // ブルートフォースリクエスト関数
@@ -690,7 +697,12 @@ void mainLoop(const Player copiedPlayers[2]) {
 
             auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
             if (foundSeeds == 1) {
-                SearchRequest(copiedPlayers, seed, aActions);
+                if (!SearchRequest(copiedPlayers, seed, aActions, true)) {
+                    std::cout << "First search request failed!" << std::endl;
+                    if (!SearchRequest(copiedPlayers, seed, aActions, false)) {
+                        std::cout << "Second search request failed!" << std::endl;
+                    }
+                }
             }
             continue;
         }
