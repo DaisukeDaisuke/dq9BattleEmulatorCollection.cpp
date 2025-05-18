@@ -338,8 +338,6 @@ int main() {
 
 #ifdef DEBUG2
     //THIS DEBUG CODE!
-    //0x9adcc97: 31, 46, 30, 30, 33, 38, 34, 50, 34, 30, 62, 62, 62, 53, 31, 53, 33, 62, 34, 34,
-    //0x99d3cdb: 31, 30, 30, 33, 34, 30, 31, 34, 34, 31, 33, 34, 31, 34,
     //THIS DEBUG CODE
     uint64_t time1 = 0x9adcc97;
 
@@ -770,12 +768,6 @@ void mainLoop(const Player copiedPlayers[2]) {
                 << std::endl;
     }
 }
-
-//void processResult(const Player *copiedPlayers, const uint64_t seed,
-//                   const std::string input) {
-//
-//    return;
-//}
 
 int toint(char *str) {
     try {

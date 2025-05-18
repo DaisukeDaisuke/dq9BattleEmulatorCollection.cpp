@@ -23,22 +23,13 @@ void camera::Main(int *position, const int32_t actions[5], uint64_t * NowState, 
             onFreeCameraMove(position, after, 1, NowState);
             continue;
         }
-        // }else
-/*        if (before == BattleEmulator::SKY_ATTACK&&after == BattleEmulator::MERA_ZOMA){//寝てる必要ないの???? isSleeping
-            //寝ていて、スカイアタックで起きず、メラゾーマされるとparam5がtrueになる。マジで謎
-            onFreeCameraMove(position, after, 1, NowState);
-        }else *//*if (!preemptive1&&before == BattleEmulator::MERA_ZOMA&&after == BattleEmulator::SKY_ATTACK){//寝てる必要ないの???? isSleeping
-            //暫定
-            onFreeCameraMove(position, after, 1, NowState);
-        }else*/ if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
+        if (after == BattleEmulator::ATTACK_ALLY||after == BattleEmulator::SKY_ATTACK||after == BattleEmulator::MERA_ZOMA) {
             onFreeCameraMove(position, after, preemptive ? 1 : 0, NowState);
         }else if(after == BattleEmulator::MERCURIAL_THRUST){
             (*position)++;//追尾カメラ
         }
         if (after != BattleEmulator::ATTACK_ALLY) {//味方の攻撃→上空だとフリーカメラが特異点の挙動する
-            //if (!(before == BattleEmulator::ATTACK_ALLY&&after == BattleEmulator::SKY_ATTACK)) { // TODO: 攻撃→スカイアタック→メラゾーマの場合、ガチもんの不定消費が発生する。これは回避しなければならない。
-                preemptive = false;
-            //}
+            preemptive = false;
         }
         before = after;
     }
