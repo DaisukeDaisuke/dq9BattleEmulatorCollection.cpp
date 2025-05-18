@@ -267,6 +267,7 @@ std::string normalDump(AnalyzeData data) {
 }
 
 const std::string version = "v1.0.17b";
+
 void showHeader() {
 #ifdef BUILD_DATE
     const std::string buildDate = BUILD_DATE;
@@ -337,9 +338,10 @@ int main() {
 
 #ifdef DEBUG2
     //THIS DEBUG CODE!
+    //0x9adcc97: 31, 46, 30, 30, 33, 38, 34, 50, 34, 30, 62, 62, 62, 53, 31, 53, 33, 62, 34, 34,
     //0x99d3cdb: 31, 30, 30, 33, 34, 30, 31, 34, 34, 31, 33, 34, 31, 34,
     //THIS DEBUG CODE
-    uint64_t time1 = 0x99d3cdb;
+    uint64_t time1 = 0x9adcc97;
 
     int dummy[100];
     lcg::init(time1);
@@ -362,7 +364,7 @@ int main() {
     Player players1[2];
     //int32_t gene1[350] = {0};
     //THIS DEBUG CODE!
-    int32_t gene1[350] = { 31, 30, 30, 33, 34, 30, 31, 34, 34, 31, 33, 34, 31, 34, };
+    int32_t gene1[350] = { 31, 46, 30, 30, 33, 38, 34, 50, 34, 30, 62, 62, 62, 53, 31, 53, 33, 62, 34, 34,  };
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 

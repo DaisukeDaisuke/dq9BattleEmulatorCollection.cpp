@@ -326,7 +326,11 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.fitness = baseFitness; // 固定値に
                 currentGenome.Visited = 0;
             } else {
-                currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 10);
+                if (AllyPlayerPre.TensionLevel == 0) {
+                    currentGenome.fitness = baseFitness + 8 + static_cast<int>(rng() % 8);
+                } else {
+                    currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 16);
+                }
             }
             currentGenome.actions[turns - 1] = action;
 
@@ -463,6 +467,8 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 (*position) = tmpgenomu.position;
                 (*nowState) = tmpgenomu.state;
 
+                auto prehp = tmpgenomu.EnemyPlayer.hp;
+
                 BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                      CopedPlayers,
                                      (std::optional<BattleResult> &) std::nullopt, seed,
@@ -473,7 +479,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.processed = turns;
                 currentGenome.AllyPlayer = CopedPlayers[0];
                 currentGenome.EnemyPlayer = CopedPlayers[1];
-
 
                 que.push(currentGenome);
             }
