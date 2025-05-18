@@ -35,7 +35,7 @@ void updateCompromiseScore(Genome &genome) {
 Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int turns, int maxGenerations,
                                      int actions[350], int seedOffset, bool dropBug) {
     std::mt19937 rng(seed + seedOffset);
-    auto tension_enable = (rng() % 2) != 0;
+    auto tension_enable = true;
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
     auto counter = 0;
@@ -311,9 +311,9 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 currentGenome.Visited = 0;
             } else {
                 if (AllyPlayerPre.TensionLevel == 0) {
-                    currentGenome.fitness = baseFitness + 8 + static_cast<int>(rng() % 8);
+                    currentGenome.fitness = baseFitness + 7 + static_cast<int>(rng() % 6);
                 } else {
-                    currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 10);
+                    currentGenome.fitness = baseFitness + 10 + static_cast<int>(rng() % 16);
                 }
             }
             currentGenome.actions[turns - 1] = action;
