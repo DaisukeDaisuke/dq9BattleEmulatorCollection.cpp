@@ -602,20 +602,15 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 17;
-    //std::cout << totalSeconds << std::endl;
-    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 15) * (1 / 0.12515)));
+    //数字は探索範囲(秒)
+    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 30) * (1 / 0.12515)));
     time1 = time1 << 16;
     std::cout << time1 << std::endl;
 
-    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 15) * (1 / 0.125155)));
+    //数字は探索範囲(秒)
+    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 30) * (1 / 0.125155)));
     time2 = time2 << 16;
     std::cout << time2 << std::endl;
-    ////
-    //    time1 = 0;
-    //    time2 = 4294967296;
-    ////    time1 = 0x04b8d631 - 100000;
-    ////    time2 = 0x04b8d631 + 100000;
-    //
     int32_t gene[350] = {0};
     for (int i = 0; i < 350; ++i) {
         gene[i] = aActions[i];
