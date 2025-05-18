@@ -1063,7 +1063,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; // 0x02157f58 偽回避
             baseDamage = FUN_0207564c(position, players[attacker].defaultATK, players[attacker].def);
             if (baseDamage == 0) {
-                (*position)++;//1a8
+                (*position)++; //1a8
             }
             if (players[attacker].TensionLevel < 3 || (players[attacker].TensionLevel == 3 && lcg::getPercent(position, 2) == 0)) {
                 //0x02087fb4 テンション
