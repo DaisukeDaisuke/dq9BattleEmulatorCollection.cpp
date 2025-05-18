@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
-#include <queue>
 
 #include "lcg.h"
 #include "BattleEmulator.h"
@@ -501,22 +500,6 @@ int main() {
     return 0;
 }
 
-constexpr int32_t actions1[100] = {
-    BattleEmulator::BUFF,
-    BattleEmulator::MAGIC_MIRROR,
-    BattleEmulator::MORE_HEAL,
-    BattleEmulator::DOUBLE_UP,
-    BattleEmulator::MULTITHRUST,
-    BattleEmulator::MIDHEAL,
-    BattleEmulator::FULLHEAL,
-    BattleEmulator::DEFENDING_CHAMPION,
-    BattleEmulator::SAGE_ELIXIR,
-    BattleEmulator::ELFIN_ELIXIR,
-    BattleEmulator::SPECIAL_MEDICINE,
-    BattleEmulator::ATTACK_ALLY,
-    BattleEmulator::DEFENCE,
-};
-
 void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]) {
     int32_t gene[350] = {0};
     auto turns = 0;
@@ -535,8 +518,6 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     BattleResult bestResult;
     Genome bestGenome;
     int maxTurns = INT_MAX - 1;
-
-    priority_queue<Genome> que;
 
     std::optional<BattleResult> result1;
     result1 = BattleResult();

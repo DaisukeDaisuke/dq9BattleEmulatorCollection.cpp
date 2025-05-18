@@ -5,8 +5,6 @@
 #include "ActionOptimizer.h"
 #include <vector>
 #include <random>
-#include <functional>
-#include <queue>
 #include "BattleEmulator.h"
 #include "Genome.h"
 #include "ActionBanManager.h"
