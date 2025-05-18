@@ -203,7 +203,8 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
-        if ((*position) == 147) {
+        //THIS DEBUG CODE!
+        if ((*position) == 812) { //THIS DEBUG CODE!
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -1163,6 +1164,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             if (!players[0].paralysis) {
                 players[0].sleeping = true;
                 players[0].sleepingTurn = 2;
+                players[0].TensionLevel = 0;
             }
             baseDamage = 0;
             resetCombo(NowState);
@@ -1621,20 +1623,21 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                                 defenseFlag = true;
                             }
                         }
+                        tmp = static_cast<double>(baseDamage);
+                        if (players[defender].TensionLevel == 4) {
+                            tmp *= 0.5;
+                        }
+
+                        if (!defenseFlag && !players[0].paralysis && !players[0].sleeping) {
+                            tmp = tmp * players[defender].defence;
+                        }
+                        baseDamage = static_cast<int>(floor(tmp));
 
                         if (baseDamage != 0) {
                             (*position)++; //目を覚ました
                             (*position)++; //不明
                         }
 
-                        tmp = static_cast<double>(baseDamage);
-                        if (players[defender].TensionLevel == 4) {
-                            tmp *= 0.5;
-                        }
-                        if (!defenseFlag && !players[0].paralysis && !players[0].sleeping) {
-                            tmp = tmp * players[defender].defence;
-                        }
-                        baseDamage = static_cast<int>(floor(tmp));
 
                         if (baseDamage != 0 && players[0].sleeping) {
                             players[0].sleeping = false;
@@ -1764,6 +1767,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 players[defender].paralysisLevel++;
                 players[0].sleeping = false;
                 players[0].sleepingTurn = -1;
+                players[0].TensionLevel = 0;
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);
                 if (baseDamage == 0) {
                     baseDamage = lcg::getPercent(position, 2); // 0x021e81a0

@@ -336,11 +336,9 @@ int main() {
 
 
 #ifdef DEBUG2
-    //time1 = 0x199114b2;
-    //time1 = 0x226d97a6;
-    //time1 = 0x1c2a9bda;
-    //time1 = 0x1aa6c05d;
-    uint64_t time1 = 15512133729;
+    //0x9adcc97: 31, 46, 30, 30, 62, 38, 33, 30, 62, 62, 62, 31, 30, 53, 62, 53, 33, 30, 34,
+    //THIS DEBUG CODE
+    uint64_t time1 = 0x9adcc97;
 
     int dummy[100];
     lcg::init(time1);
@@ -363,7 +361,8 @@ int main() {
 
     Player players1[2];
     //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {30, 31, 30, 33, 34, 31, 30, 31, 38, 31, 30, 30, 31, 30, 31, 34, 33, 34, 31, 34, 31, 30, 31, 33, 34, 34,};
+    //THIS DEBUG CODE!
+    int32_t gene1[350] = {31, 46, 30, 30, 62, 38, 33, 30, 62, 62, 62, 31, 30, 53, 62, 53, 33, 30, 34,};
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
@@ -604,11 +603,11 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 17;
     //std::cout << totalSeconds << std::endl;
-    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 30) * (1 / 0.12515)));
+    auto time1 = static_cast<uint64_t>(floor((totalSeconds - 15) * (1 / 0.12515)));
     time1 = time1 << 16;
     std::cout << time1 << std::endl;
 
-    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 30) * (1 / 0.125155)));
+    auto time2 = static_cast<uint64_t>(floor((totalSeconds + 15) * (1 / 0.125155)));
     time2 = time2 << 16;
     std::cout << time2 << std::endl;
     ////
