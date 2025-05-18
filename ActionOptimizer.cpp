@@ -3,7 +3,6 @@
 //
 
 #include "ActionOptimizer.h"
-#include <vector>
 #include <random>
 #include "BattleEmulator.h"
 #include "Genome.h"

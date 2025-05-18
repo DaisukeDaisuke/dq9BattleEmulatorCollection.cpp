@@ -2,7 +2,6 @@
 // Created by Owner on 2024/02/06.
 //
 
-#include <vector>
 #include "camera.h"
 #include "BattleEmulator.h"
 #include "lcg.h"
