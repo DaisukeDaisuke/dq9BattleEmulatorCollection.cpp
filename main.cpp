@@ -266,7 +266,7 @@ std::string normalDump(AnalyzeData data) {
     return ss.str();
 }
 
-const std::string version = "v1.0.17a";
+const std::string version = "v1.0.17b";
 void showHeader() {
 #ifdef BUILD_DATE
     const std::string buildDate = BUILD_DATE;
@@ -357,7 +357,6 @@ int main() {
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                                  合計 6Byte
 */
-
     auto *NowState = new uint64_t(0);//エミュレーターの内部ステートを表すint
 
     Player players1[2];
