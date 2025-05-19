@@ -1002,7 +1002,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             tmp = baseDamage * Equipments::calculateTotalResistance(Attribute::Darkness);
 
             if (players[defender].TensionLevel == 4) {
-                tmp *= baseDamage * 0.5;
+                tmp *= 0.5;
             }
 
             if (!players[0].paralysis && !players[0].sleeping) {
