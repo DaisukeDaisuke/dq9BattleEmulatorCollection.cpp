@@ -35,21 +35,21 @@ jobs:
     - name: Rename the executable file
       run: |
         $source = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/newDirectory.exe"
-        $destination = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
+        $destination = "${{github.workspace}}/build/${{env.BUILD_TYPE}}/cbe.exe"
         Rename-Item -Path $source -NewName $destination
 
     - name: echo SHA256
-      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
+      run: Get-FileHash -Algorithm SHA256 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/cbe.exe"
 
     - name: echo SHA1
-      run: Get-FileHash -Algorithm SHA1 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe"
+      run: Get-FileHash -Algorithm SHA1 -Path "${{github.workspace}}/build/${{env.BUILD_TYPE}}/cbe.exe"
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.4.3
       with:
         # Artifact name
-        name: vs_be
+        name: cbe_v
         path: |
-          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/vs_be.exe
+          ${{github.workspace}}/build/${{env.BUILD_TYPE}}/cbe.exe
           ${{github.workspace}}/build/${{env.BUILD_TYPE}}/newDirectory.pdb
 
