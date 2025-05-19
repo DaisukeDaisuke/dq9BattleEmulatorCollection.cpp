@@ -1551,13 +1551,12 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             //みかわし(相手)
             if ((Id & 0xffff) != ITEM_USE && !players[0].paralysis) {
-                // if (lcg::getPercent(position, 100) < -1) {
-                //     kaihi = true;
-                // }
-                (*position)++; //0x021587b0 みかわし
-                //if (!kaihi) {
-                (*position)++; //盾ガード(幼女は盾を持っていないので0%)
-                //}
+                if (lcg::getPercent(position, 100) < 2) {
+                    kaihi = true;
+                }
+                if (!kaihi) {
+                    (*position)++; //盾ガード(幼女は盾を持っていないので0%)
+                }
             }
 
             (*position)++; //回避
@@ -1610,9 +1609,13 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 baseDamage = static_cast<int>(floor(tmp));
             }
 
-            ProcessRage(position, baseDamage, players); //不定消費は謎
-            (*position)++; //目を覚ました
-            (*position)++; //不明
+            if (!kaihi) {
+                ProcessRage(position, baseDamage, players);
+                (*position)++; //目を覚ました
+                (*position)++; //不明
+            } else {
+                baseDamage = 0;
+            }
             if (kaisinn) {
                 if (!players[1].rage) {
                     (*position)++; //会心時特殊処理　0x021e54fc
