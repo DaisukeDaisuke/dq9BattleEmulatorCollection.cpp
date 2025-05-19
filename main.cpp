@@ -82,20 +82,20 @@ namespace {
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
-            143, 143.0, 220, 220, 155, 155, 114, 114, 138, 88, // 最初のメンバー
-            88, false, false, 0, false, 0, -1,
+            131, 131.0, 205, 205, 146, 146, 105, 105, 105, 79, // 最初のメンバー
+            79, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
-            6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+            8, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1, false
         }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
         // プレイヤー2
         {
-            1680, 1680.0, 160, 160, 170, 170, 125, 125, 0, 255, // 最初のメンバー
-            255, false, false, 0, false, 0, -1,
+            1276, 1276.0, 200, 200, 158, 158, 85, 85, 0, 40, // 最初のメンバー
+            40, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
+            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1, false
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 #endif
@@ -111,24 +111,24 @@ namespace {
                 << std::setw(18) << "sp"
                 << std::setw(18) << "aAct"
                 << std::setw(18) << "eAct1"
-                << std::setw(18) << "eAct2"
+                //<< std::setw(18) << "eAct2"
                 << std::setw(6) << "aD"
                 << std::setw(6) << "eD1"
-                << std::setw(6) << "eD2"
+                //<< std::setw(6) << "eD2"
                 << std::setw(6) << "ahp"
                 << std::setw(6) << "ehp"
                 << std::setw(6) << "amp"
                 << std::setw(6) << "ini"
 #if defined(MINGW_BUILD)
                 << std::setw(6) << "DET"
-                << std::setw(6) << "TAB"
+                //<< std::setw(6) << "TAB"
                 << std::setw(6) << "Sct"
 #endif
                 << "\n";
 #if defined(MINGW_BUILD)
-        ss << std::string(135, '-') << "\n"; // 区切り線を出力
+        ss << std::string(110, '-') << "\n"; // 区切り線を出力
 #else
-        ss << std::string(117, '-') << "\n"; // 区切り線を出力
+        ss << std::string(100, '-') << "\n"; // 区切り線を出力
 #endif
     }
 
@@ -190,17 +190,17 @@ namespace {
                                 << std::setw(18) << sp
                                 << std::setw(18) << aAction
                                 << std::setw(18) << eAction[0]
-                                << std::setw(18) << eAction[1]
+                                //<< std::setw(18) << eAction[1]
                                 << std::setw(6) << aDamage
                                 << std::setw(6) << eDamage[0]
-                                << std::setw(6) << eDamage[1]
+                                //<< std::setw(6) << eDamage[1]
                                 << std::setw(6) << ahp2
                                 << std::setw(6) << ehp2
                                 << std::setw(6) << amp2
                                 << std::setw(6) << (initiative_tmp ? "yes" : "")
 #if defined(MINGW_BUILD)
                                 << std::setw(6) << DEFTurn1
-                                << std::setw(6) << tmp_state
+                                //<< std::setw(6) << tmp_state
                                 << std::setw(6) << specialChargeTurn1
                                 << std::setw(11) << ""
 #endif
@@ -231,7 +231,6 @@ namespace {
                 eDamage[counter] = damage;
                 counter++;
                 ahp2 = std::to_string(ahp1);
-
             } else {
                 ehp2 = std::to_string(ehp1);
                 amp2 = std::to_string(amp);
@@ -255,7 +254,7 @@ namespace {
 
                 if (state == BattleEmulator::TYPE_2A) {
                     tmp_state = "A";
-                }else if (state == BattleEmulator::TYPE_2B) {
+                } else if (state == BattleEmulator::TYPE_2B) {
                     tmp_state = "B";
                 }
 
@@ -281,17 +280,17 @@ namespace {
                     << std::setw(18) << sp
                     << std::setw(18) << aAction
                     << std::setw(18) << eAction[0]
-                    << std::setw(18) << eAction[1]
+                    //<< std::setw(18) << eAction[1]
                     << std::setw(6) << aDamage
                     << std::setw(6) << eDamage[0]
-                    << std::setw(6) << eDamage[1]
+                    //<< std::setw(6) << eDamage[1]
                     << std::setw(6) << ahp2
                     << std::setw(6) << ehp2
                     << std::setw(6) << amp2
                     << std::setw(6) << (initiative_tmp ? "yes" : "")
 #if defined(MINGW_BUILD)
                     << std::setw(6) << DEFTurn1
-                    << std::setw(6) << tmp_state
+                    //<< std::setw(6) << tmp_state
                     << std::setw(6) << specialChargeTurn1
                     << std::setw(11) << ""
 #endif
@@ -855,9 +854,8 @@ actions: 30, 25, 30, 62, 62, 50, 62, 62, 33, 30, 34,
         */
 
 
-
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 0x1001;
+    uint64_t time1 = 0x0abf7373;
 
     int dummy[100];
     lcg::init(time1, false);
@@ -899,15 +897,23 @@ actions: 30, 30, 50, 62, 53, 62, 62, 62, 33, 34,
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
     int32_t gene1[350] = {0};
-     gene1[counter++] = BattleEmulator::BUFF;
-     gene1[counter++] = BattleEmulator::BUFF;
-     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
-     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-     gene1[counter++] = BattleEmulator::ATTACK_ALLY;
-     gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
+    gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
+    gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
+    gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::BUFF;
+    gene1[counter++] = BattleEmulator::SPECIAL_MEDICINE;
+    gene1[counter++] = BattleEmulator::PSYCHE_UP_ALLY;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
+    gene1[counter++] = BattleEmulator::DEFENCE;
     // gene1[counter++] = BattleEmulator::DEFENCE;
     // gene1[counter++] = BattleEmulator::DEFENCE;
     // gene1[counter++] = BattleEmulator::DEFENCE;
