@@ -949,7 +949,7 @@ actions: 30, 30, 50, 62, 53, 62, 62, 62, 33, 34,
 #endif
 
 #ifdef DEBUG3
-    uint64_t seed = 0x050b6067;
+    uint64_t seed = 0x1000;
 
     int actions[350] = {
         BattleEmulator::BUFF,
