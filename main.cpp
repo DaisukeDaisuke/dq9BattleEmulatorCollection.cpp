@@ -233,7 +233,7 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
     return ss6.str();
 }
 
-const std::string version = "v1.0.17c";
+const std::string version = "v1.0.17d";
 
 void showHeader() {
 #ifdef BUILD_DATE
