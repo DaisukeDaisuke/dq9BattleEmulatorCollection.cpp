@@ -999,7 +999,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                         hasKaisinn = true;
                     }
                 }
-                (*position)++;//みかわし
+                (*position)++; //みかわし
                 (*position)++; //盾ガード 0x021586fc 0%
                 (*position)++; //ニセ回避 0x02157f58 100%
                 baseDamage = FUN_0207564c(position, players[attacker].atk, players[defender].def);

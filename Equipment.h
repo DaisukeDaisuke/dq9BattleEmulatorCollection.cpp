@@ -90,9 +90,9 @@ constexpr Equipment EnchantedGloves("Magic gloves", {
 
 //レッドタイツ
 constexpr Equipment RedTights("Red tights", {
-                                        {Attribute::Fire, 7},
-                                        {Attribute::ThunderExplosion, 7},
-                                    });
+                                  {Attribute::Fire, 7},
+                                  {Attribute::ThunderExplosion, 7},
+                              });
 
 
 //ゴームのながぐつ
