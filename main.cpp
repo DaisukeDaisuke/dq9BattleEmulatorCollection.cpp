@@ -1,15 +1,12 @@
 #include <iostream>
 #include <cstring>
 #include <cmath>
-#include <vector>
 #include <iomanip>
 #include <sstream>
 #include <fstream>
-#include <queue>
 
 #include "lcg.h"
 #include "BattleEmulator.h"
-#include "AnalyzeData.h"
 #include "debug.h"
 #include "ActionOptimizer.h"
 
@@ -29,7 +26,7 @@ std::string rtrim(const std::string &s);
 
 std::string trim(const std::string &s);
 
-void SearchRequest(const Player copiedPlayers[2], uint64_t seed, int turns, const int aActions[350]);
+bool SearchRequest(const Player copiedPlayers[2], uint64_t seed, int turns, const int aActions[350], bool dropbug);
 
 uint64_t BruteForceRequest(const Player copiedPlayers[2], int hours, int minutes, int seconds, int turns,
                            int eActions[350],
@@ -41,7 +38,6 @@ void mainLoop(const Player copiedPlayers[2]);
 using namespace std;
 
 int foundSeeds = 0;
-std::vector<AnalyzeData> analyzeDataMap;
 
 uint64_t FoundSeed = 0;
 
@@ -237,36 +233,8 @@ std::string dumpTable(BattleResult &result, int32_t gene[350], int PastTurns) {
     return ss6.str();
 }
 
-std::string normalDump(AnalyzeData data);
+const std::string version = "v1.0.17d";
 
-std::string normalDump(AnalyzeData data) {
-    int counter = 0;
-    BattleResult result = *data.getBattleResult();
-    std::stringstream ss;
-    for (int i = 0; i < result.position; ++i) {
-        auto action = result.actions[i];
-        auto damage = result.damages[i];
-        if (action == BattleEmulator::HEAL || action == BattleEmulator::MEDICINAL_HERBS) {
-            ss << "h ";
-            counter++;
-        } else if (damage != 0) {
-            ss << damage << " ";
-        }
-        if (counter == 10) {
-            ss << std::endl;
-            counter = 0;
-        }
-    }
-    auto turn = result.turn + 1;
-    if (data.getWinStatus()) {
-        ss << "W " << turn;
-    } else {
-        ss << "L " << turn;
-    }
-    return ss.str();
-}
-
-const std::string version = "v1.0.16";
 void showHeader() {
 #ifdef BUILD_DATE
     const std::string buildDate = BUILD_DATE;
@@ -306,10 +274,6 @@ void showHeader() {
 //int main(int argc, char *argv[]) {
 int main() {
     showHeader();
-#ifdef DEBUG
-    auto t0 = std::chrono::high_resolution_clock::now();
-#endif
-
 
     //https://zenn.dev/reputeless/books/standard-cpp-for-competitive-programming/viewer/library-ios-iomanip#3.1-c-%E8%A8%80%E8%AA%9E%E3%81%AE%E5%85%A5%E5%87%BA%E5%8A%9B%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%E3%83%A0%E3%81%A8%E3%81%AE%E5%90%8C%E6%9C%9F%E3%82%92%E7%84%A1%E5%8A%B9%E3%81%AB%E3%81%99%E3%82%8B
     //std::cin.tie(0)->sync_with_stdio(0);
@@ -336,11 +300,9 @@ int main() {
 
 
 #ifdef DEBUG2
-    //time1 = 0x199114b2;
-    //time1 = 0x226d97a6;
-    //time1 = 0x1c2a9bda;
-    //time1 = 0x1aa6c05d;
-    uint64_t time1 = 15512133729;
+    //THIS DEBUG CODE!
+    //THIS DEBUG CODE
+    uint64_t time1 = 0x9adcc97;
 
     int dummy[100];
     lcg::init(time1);
@@ -358,12 +320,12 @@ int main() {
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                                  合計 6Byte
 */
-
     auto *NowState = new uint64_t(0);//エミュレーターの内部ステートを表すint
 
     Player players1[2];
     //int32_t gene1[350] = {0};
-    int32_t gene1[350] = {30, 31, 30, 33, 34, 31, 30, 31, 38, 31, 30, 30, 31, 30, 31, 34, 33, 34, 31, 34, 31, 30, 31, 33, 34, 34,};
+    //THIS DEBUG CODE!
+    int32_t gene1[350] = { 31, 46, 30, 30, 33, 38, 34, 50, 34, 30, 62, 62, 62, 53, 31, 53, 33, 62, 34, 34,  };
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
@@ -492,33 +454,10 @@ int main() {
 
     mainLoop(copiedPlayers);
     return 0;
-
-#ifdef DEBUG
-    auto t1 = std::chrono::high_resolution_clock::now();
-    auto elapsed_time =
-            std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-    std::cout << "elapsed time: " << double(elapsed_time) / 1000 << " ms" << std::endl;
-#endif
     return 0;
 }
 
-constexpr int32_t actions1[100] = {
-    BattleEmulator::BUFF,
-    BattleEmulator::MAGIC_MIRROR,
-    BattleEmulator::MORE_HEAL,
-    BattleEmulator::DOUBLE_UP,
-    BattleEmulator::MULTITHRUST,
-    BattleEmulator::MIDHEAL,
-    BattleEmulator::FULLHEAL,
-    BattleEmulator::DEFENDING_CHAMPION,
-    BattleEmulator::SAGE_ELIXIR,
-    BattleEmulator::ELFIN_ELIXIR,
-    BattleEmulator::SPECIAL_MEDICINE,
-    BattleEmulator::ATTACK_ALLY,
-    BattleEmulator::DEFENCE,
-};
-
-void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350]) {
+bool SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActions[350], bool dropbug) {
     int32_t gene[350] = {0};
     auto turns = 0;
     for (int i = 0; i < 350; ++i) {
@@ -537,16 +476,14 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     Genome bestGenome;
     int maxTurns = INT_MAX - 1;
 
-    priority_queue<Genome> que;
-
     std::optional<BattleResult> result1;
     result1 = BattleResult();
 
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
 
-    for (int i = 0; i < 1200; ++i) {
-        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 5000, gene, i * 2);
+    for (int i = 0; i < 2000; ++i) {
+        auto genome = ActionOptimizer::RunAlgorithm(copiedPlayers, seed, turns, 2500, gene, i * 2, dropbug);
 
         Player players[2];
         players[0] = copiedPlayers[0];
@@ -572,6 +509,11 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
     delete position;
     delete nowState;
 
+    //探索失敗したかどうか？
+    if (maxTurns >= 100) {
+        return false;
+    }
+
     std::cout << dumpTable(bestResult, bestGenome.actions, 0) << std::endl;
 
     std::cout << "0x" << std::hex << seed << std::dec << ": ";
@@ -583,6 +525,8 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
         std::cout << bestGenome.actions[i] << ", ";
     }
     std::cout << std::endl;
+    //探索成功
+    return true;
 }
 
 // ブルートフォースリクエスト関数
@@ -603,20 +547,15 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
 
     int totalSeconds = hours * 3600 + minutes * 60 + seconds;
     totalSeconds = totalSeconds - 17;
-    //std::cout << totalSeconds << std::endl;
+    //数字は探索範囲(秒)
     auto time1 = static_cast<uint64_t>(floor((totalSeconds - 30) * (1 / 0.12515)));
     time1 = time1 << 16;
     std::cout << time1 << std::endl;
 
+    //数字は探索範囲(秒)
     auto time2 = static_cast<uint64_t>(floor((totalSeconds + 30) * (1 / 0.125155)));
     time2 = time2 << 16;
     std::cout << time2 << std::endl;
-    ////
-    //    time1 = 0;
-    //    time2 = 4294967296;
-    ////    time1 = 0x04b8d631 - 100000;
-    ////    time2 = 0x04b8d631 + 100000;
-    //
     int32_t gene[350] = {0};
     for (int i = 0; i < 350; ++i) {
         gene[i] = aActions[i];
@@ -663,7 +602,7 @@ void SearchRequest(const Player copiedPlayers[2], uint64_t seed, const int aActi
                                                nowState);
         if (resultBool) {
             //std::cout << seed << ", " << st << std::endl;
-            std::cout << seed << std::endl;
+            std::cout << std::hex << seed << std::dec << std::endl;
             FoundSeed = seed;
             foundSeeds++;
         }
@@ -758,7 +697,12 @@ void mainLoop(const Player copiedPlayers[2]) {
 
             auto seed = BruteForceRequest(copiedPlayers, hours, minutes, seconds, turns, eActions, aActions, damages);
             if (foundSeeds == 1) {
-                SearchRequest(copiedPlayers, seed, aActions);
+                if (!SearchRequest(copiedPlayers, seed, aActions, true)) {
+                    std::cout << "First search request failed!" << std::endl;
+                    if (!SearchRequest(copiedPlayers, seed, aActions, false)) {
+                        std::cout << "Second search request failed!" << std::endl;
+                    }
+                }
             }
             continue;
         }
@@ -774,12 +718,6 @@ void mainLoop(const Player copiedPlayers[2]) {
                 << std::endl;
     }
 }
-
-//void processResult(const Player *copiedPlayers, const uint64_t seed,
-//                   const std::string input) {
-//
-//    return;
-//}
 
 int toint(char *str) {
     try {
