@@ -451,8 +451,6 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 (*position) = tmpgenomu.position;
                 (*nowState) = tmpgenomu.state;
 
-                auto prehp = tmpgenomu.EnemyPlayer.hp;
-
                 BattleEmulator::Main(position, tmpgenomu.turn - tmpgenomu.processed, currentGenome.actions,
                                      CopedPlayers,
                                      (std::optional<BattleResult> &) std::nullopt, seed,
