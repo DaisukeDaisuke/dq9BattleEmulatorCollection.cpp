@@ -1109,9 +1109,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             if (players[attacker].TensionLevel != 0) {
                 //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
-                tmp *= Ally_TensionTable[players[attacker].TensionLevel - 1];
+                tmp = baseDamage * Ally_TensionTable[players[attacker].TensionLevel - 1];
                 tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
                 players[attacker].TensionLevel = 0;
+            }else {
+                tmp = baseDamage;
             }
 
             if (kaisinn) {
