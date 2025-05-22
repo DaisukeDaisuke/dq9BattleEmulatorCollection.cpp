@@ -183,7 +183,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
         TiggerSkyAttack = false;
         //現在ターンを保存
         (*NowState) &= ~0xFFFFF000;
-        (*NowState) |= (counterJ << 12);
+        (*NowState) |= (static_cast<uint64_t>(counterJ) << 12ULL);
 
         if (players[0].dirtySpecialCharge) {
             players[0].specialCharge = false;
@@ -1112,7 +1112,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp = baseDamage * Ally_TensionTable[players[attacker].TensionLevel - 1];
                 tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
                 players[attacker].TensionLevel = 0;
-            }else {
+            } else {
                 tmp = baseDamage;
             }
 
