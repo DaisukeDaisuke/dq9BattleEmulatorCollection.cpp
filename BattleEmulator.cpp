@@ -23,7 +23,7 @@ bool TiggerSkyAttack = false;
 constexpr int Ally_Level = 50;
 constexpr double Ally_TensionTable[4] = {1.5, 2.5, 4.0, 6.0};
 constexpr int Ally_TensionLevel = 1 + static_cast<int>(Ally_Level / 10.0);
-constexpr int shieldGuardP = 9;//盾ガード率 9%
+constexpr int shieldGuardP = 9; //盾ガード率 9%
 
 void inline BattleEmulator::resetCombo(uint64_t *NowState) {
     (*NowState) &= ~(0xFFF00000000);
@@ -1421,9 +1421,11 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
 
             if (players[attacker].TensionLevel != 0) {
                 //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
-                tmp *= Ally_TensionTable[players[attacker].TensionLevel - 1];
+                tmp = baseDamage * Ally_TensionTable[players[attacker].TensionLevel - 1];
                 tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
                 players[attacker].TensionLevel = 0;
+            } else {
+                tmp = baseDamage;
             }
 
             if (kaisinn) {
@@ -1433,6 +1435,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     tmp *= 1.2000;
                 }
             }
+            baseDamage = static_cast<int>(floor(tmp));
 
             (*position)++; //不明
             if (!players[attacker].specialCharge) {
@@ -1906,9 +1909,28 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; //回避
             baseDamage = FUN_021e8458_typeD(position, 5, 35);
             if (kaisinn) {
-                tmp = baseDamage * lcg::floatRand(position, 1.5, 2.0);
-                baseDamage = static_cast<int>(floor(tmp));
+                tmp1 = baseDamage * lcg::floatRand(position, 1.5, 2.0); //TODO
+            } else {
+                tmp1 = baseDamage;
             }
+
+            if (players[attacker].TensionLevel != 0) {
+                //TODO ダメージが正しいか調べる 特殊県産式の引数も調べる https://dragonquest9.com/?%E3%83%80%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6#tension
+                tmp = baseDamage * Ally_TensionTable[players[attacker].TensionLevel - 1];
+                tmp += (players[attacker].TensionLevel * Ally_TensionLevel);
+                players[attacker].TensionLevel = 0;
+            } else {
+                tmp = baseDamage;
+            }
+
+            if (kaisinn) {
+                if (tmp * 1.2000 <= tmp1) {
+                    tmp = tmp1;
+                } else {
+                    tmp *= 1.2000;
+                }
+            }
+            baseDamage = static_cast<int>(floor(tmp));
             (*position)++; //不明
             if (!players[attacker].specialCharge) {
                 (*position)++; //関係ない
