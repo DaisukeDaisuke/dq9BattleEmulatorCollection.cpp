@@ -39,6 +39,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
     auto *position = new int(1);
     auto *nowState = new uint64_t(0);
     auto counter = 0;
+    auto initTurn = turns;//探索開始ターン
     Genome genome;
     ActionBanManager Bans;
     for (int i = 0; i < 350; ++i) {
@@ -119,7 +120,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  result, seed,
                                  nullptr, nullptr, -1, nowState);
 
-            if (currentGenome.turn >= (turns + 30)) {
+            if (currentGenome.turn >= (initTurn + 30)) {
                 continue;
             }
 
@@ -133,7 +134,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 break;
             }
         } else {
-            if (currentGenome.turn >= (turns + 30)) {
+            if (currentGenome.turn >= (initTurn + 30)) {
                 continue;
             }
 

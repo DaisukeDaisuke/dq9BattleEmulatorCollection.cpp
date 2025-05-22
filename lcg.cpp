@@ -7,8 +7,8 @@
 #include <cmath>  // cmathヘッダーをインクルードする
 #include <iostream>
 
-// Define the size of the array
-const int ARRAY_SIZE = 7000;
+// 許可する最大乱数の数
+const int ARRAY_SIZE = 20000;
 
 double precalculatedValues[ARRAY_SIZE]; // 固定メモリ
 uint64_t seeds[ARRAY_SIZE];             // 固定メモリ
@@ -102,6 +102,10 @@ int lcg::intRangeRand(int *position, int min, int max) {
 uint64_t lcg::getSeed(int *position) {
     if (position == nullptr) {
         throw std::invalid_argument("Null pointer passed to incrementPosition.");
+    }
+    if ((*position) >= ARRAY_SIZE) {
+        std::cerr << "out of range!!!" << std::endl;
+        return 0;
     }
     GenerateifNeed((*position));
     uint64_t result = seeds[*position];
