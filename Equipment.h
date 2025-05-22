@@ -70,27 +70,27 @@ inline constexpr Equipment DarkShield("Dark shield", {
 
 //げんまのよろい
 inline constexpr Equipment EtherealArmour("Ethereal armour", {
-        {Attribute::Fire, 18},
-        {Attribute::Ice, 18},
-        {Attribute::Wind, 18},
-        {Attribute::ThunderExplosion, 18},
-        {Attribute::Darkness, 15},
-});
+                                              {Attribute::Fire, 18},
+                                              {Attribute::Ice, 18},
+                                              {Attribute::Wind, 18},
+                                              {Attribute::ThunderExplosion, 18},
+                                              {Attribute::Darkness, 15},
+                                          });
 
 //せいれいのこて
 inline constexpr Equipment EnchantedGloves("Enchanted gloves", {
-        {Attribute::Fire, 7},
-        {Attribute::Ice, 7},
-        {Attribute::Wind, 7},
-        {Attribute::ThunderExplosion, 7},
-        {Attribute::Darkness, 7},
-});
+                                               {Attribute::Fire, 7},
+                                               {Attribute::Ice, 7},
+                                               {Attribute::Wind, 7},
+                                               {Attribute::ThunderExplosion, 7},
+                                               {Attribute::Darkness, 7},
+                                           });
 
 //竜戦士のブーツ
 inline constexpr Equipment DragonWarriorBoots("Dragon warrior boots", {
-                                              {Attribute::Fire, 5},
-                                              {Attribute::Darkness, 5}
-                                          });
+                                                  {Attribute::Fire, 5},
+                                                  {Attribute::Darkness, 5}
+                                              });
 
 /**
  * すべての装備品を格納する定数配列です。
@@ -116,12 +116,14 @@ inline constexpr std::array<Equipment, 4> allEquipments = {
  * @note この関数はconstexprとして実行されるため、コンパイル時計算にも使用できます。
  * @attention 計算結果は1000倍された値で返され、後続の処理で任意精度計算に利用されます。
  */
-constexpr double PrivateCalculateTotalResistance(Attribute attribute) {//指定された倍率の
-    int totalResistance = 100;//100 = 0%軽減
-    for (const auto &equipment: allEquipments) {//各装備について
-        totalResistance -= equipment.resistances[static_cast<size_t>(attribute)];//軽減率を引く
+constexpr double PrivateCalculateTotalResistance(Attribute attribute) {
+    //指定された倍率の
+    int totalResistance = 100; //100 = 0%軽減
+    for (const auto &equipment: allEquipments) {
+        //各装備について
+        totalResistance -= equipment.resistances[static_cast<size_t>(attribute)]; //軽減率を引く
     }
-    return totalResistance * 1000;//実行時に小数点以下2桁の任意精度計算処理をするので1000倍にする
+    return totalResistance * 1000; //実行時に小数点以下2桁の任意精度計算処理をするので1000倍にする
 }
 
 class Equipments {
@@ -135,11 +137,12 @@ private:
      * @attention 耐性倍率には高精度な計算が行われ、結果は各属性に対応したインデックスに格納されます。
      */
     inline static constexpr std::array<double, static_cast<size_t>(Attribute::AttributeCount)> resistances = []() constexpr {
-        std::array<double, static_cast<size_t>(Attribute::AttributeCount)> res{};//exeに組み込めるようにstd::arrayを使う
-        for (size_t i = 0; i < res.size(); ++i) {//各属性について
-            res[i] = PrivateCalculateTotalResistance(static_cast<Attribute>(i));//任意精度計算処理に使う軽減倍率を計算
+        std::array<double, static_cast<size_t>(Attribute::AttributeCount)> res{}; //exeに組み込めるようにstd::arrayを使う
+        for (size_t i = 0; i < res.size(); ++i) {
+            //各属性について
+            res[i] = PrivateCalculateTotalResistance(static_cast<Attribute>(i)); //任意精度計算処理に使う軽減倍率を計算
         }
-        return res;//軽減倍率をexeに埋め込む
+        return res; //軽減倍率をexeに埋め込む
     }();
 
 
@@ -153,7 +156,7 @@ private:
      * @attention この関数は静的でconstexprであり、実行時でなくコンパイル時計算として使用できます。
      */
     inline static constexpr double calculateTotalResistance(const Attribute attribute) {
-        return resistances[static_cast<size_t>(attribute)];//事前に計算された、任意精度計算処理(小数点以下2桁精度)に使う属性の軽減率を取得
+        return resistances[static_cast<size_t>(attribute)]; //事前に計算された、任意精度計算処理(小数点以下2桁精度)に使う属性の軽減率を取得
     }
 
 public:
@@ -169,8 +172,8 @@ public:
      * 属性に対応する耐性倍率の事前定義が必要です。
      */
     static constexpr double applyDamageReduction(const double damage, const Attribute attr) {
-        const double multiplier = calculateTotalResistance(attr);//事前に計算されたdouble(ただし自然数)方式の倍率を取得
-        return damage * multiplier / 100000.0;//小数点以下2桁の任意精度計算処理
+        const double multiplier = calculateTotalResistance(attr); //事前に計算されたdouble(ただし自然数)方式の倍率を取得
+        return damage * multiplier / 100000.0; //小数点以下2桁の任意精度計算処理
     }
 };
 

@@ -119,7 +119,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                                  result, seed,
                                  nullptr, nullptr, -1, nowState);
 
-            if (currentGenome.turn >= 35) {
+            if (currentGenome.turn >= (turns+30)) {
                 continue;
             }
 
@@ -133,7 +133,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
                 break;
             }
         } else {
-            if (currentGenome.turn >= 35) {
+            if (currentGenome.turn >= (turns+30)) {
                 continue;
             }
 
