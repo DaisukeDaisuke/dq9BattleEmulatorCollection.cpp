@@ -233,7 +233,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
             uint8_t state = (*NowState) & 0xf;
             if (state == TYPE_2A) {
                 //TODO: 2回同じ行動が選択された時の挙動を調べる
-                const int table[6] = {
+                constexpr int table[6] = {
                     ATTACK_ENEMY, ULTRA_HIGH_SPEED_COMBO, SWITCH_2B, SWITCH_2C, LIGHTNING_STORM,
                     CRITICAL_ATTACK
                 };
@@ -272,7 +272,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     (*position) += 2;
                 }
             } else if (state == TYPE_2C) {
-                const int table[6] = {SKY_ATTACK, MERA_ZOMA, FREEZING_BLIZZARD, SWITCH_2A, LULLAB_EYE, SWITCH_2E};
+                constexpr int table[6] = {SKY_ATTACK, MERA_ZOMA, FREEZING_BLIZZARD, SWITCH_2A, LULLAB_EYE, SWITCH_2E};
                 enemyAction[counter] = table[ProcessEnemyRandomAction44(position)];
                 if (counter == 1 && enemyAction[0] == enemyAction[1]) {
                     if (preAction != SWITCH_2C) {
@@ -312,7 +312,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     (*position)++; //攻撃先決定
                 }
             } else if (state == TYPE_2B) {
-                const int attack[6] = {LAUGH, DISRUPTIVE_WAVE, BURNING_BREATH, DARK_BREATH, SWITCH_2C, SWITCH_2D};
+                constexpr int attack[6] = {LAUGH, DISRUPTIVE_WAVE, BURNING_BREATH, DARK_BREATH, SWITCH_2C, SWITCH_2D};
                 enemyAction[counter] = attack[FUN_0208aecc(position, NowState)];
                 preAction = enemyAction[counter];
                 if (enemyAction[counter] == SWITCH_2C) {
@@ -333,7 +333,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                     enemyAction[counter] = DARK_BREATH; //??????
                 }
             } else if (state == TYPE_2D) {
-                const int attack[6] = {
+                constexpr int attack[6] = {
                     PSYCHE_UP, ULTRA_HIGH_SPEED_COMBO, ATTACK_ENEMY, SKY_ATTACK, SWITCH_2A,
                     SWITCH_2B
                 };
@@ -360,7 +360,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                 }
             } else if (state == TYPE_2E) {
                 auto previousState = ((*NowState) >> 4) & 0xf;
-                const int table[6] = {MEDITATION, LAUGH, MAGIC_BURST, LULLAB_EYE, RESTORE_MP, SWITCH_2A};
+                constexpr int table[6] = {MEDITATION, LAUGH, MAGIC_BURST, LULLAB_EYE, RESTORE_MP, SWITCH_2A};
                 enemyAction[counter] = table[previousState];
                 preAction = enemyAction[counter];
                 previousState++;
@@ -566,7 +566,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 
                         players[0].sleepingTurn--;
                         if (players[0].sleepingTurn <= 0) {
-                            const int sleepTable[4] = {37, 62, 87, 100};
+                            constexpr int sleepTable[4] = {37, 62, 87, 100};
                             auto probability1 = sleepTable[std::abs(players[0].sleepingTurn)];
                             auto probability2 = lcg::getPercent(position, 100);
                             if (probability1 >= probability2) {
@@ -629,7 +629,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         //TODO: 順序調べる
                         players[0].MagicMirrorTurn--;
                         if (players[0].hasMagicMirror && players[0].MagicMirrorTurn <= 0) {
-                            const int probability[4] = {62, 75, 87, 100};
+                            constexpr int probability[4] = {62, 75, 87, 100};
                             auto probability1 = probability[std::abs(players[0].MagicMirrorTurn)];
                             auto probability2 = lcg::getPercent(position, 100);
                             if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
@@ -641,7 +641,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         players[0].AtkBuffTurn--;
                         if (players[0].AtkBuffLevel != 0 && players[0].AtkBuffTurn <= 0) {
                             //0x0215a804 ATK
-                            const int probability[4] = {62, 75, 87, 100};
+                            constexpr int probability[4] = {62, 75, 87, 100};
                             auto probability1 = probability[std::abs(players[0].AtkBuffTurn)];
                             auto probability2 = lcg::getPercent(position, 100);
                             if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
@@ -652,7 +652,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
                         players[0].BuffTurns--;
                         if (players[0].BuffLevel != 0 && players[0].BuffTurns <= 0) {
                             //0x0215a8a8 DEF
-                            const int probability[4] = {62, 75, 87, 100};
+                            constexpr int probability[4] = {62, 75, 87, 100};
                             auto probability1 = probability[std::abs(players[0].BuffTurns)];
                             auto probability2 = lcg::getPercent(position, 100);
                             if (probability1 >= (probability2 + (probability1 == 75 ? 1 : 0))) {
@@ -730,7 +730,7 @@ double BattleEmulator::FUN_021dbc04(int baseHp, double maxHp) {
 const int proportionTable2[9] = {90, 90, 64, 32, 16, 8, 4, 2, 1}; //最後の項目を調べるのは手動　P:\lua\isilyudaru\hissatuteki.lua
 const int proportionTable3[9] = {279, 248, 217, 186, 155, 124, 93, 62, 31}; //6ダメージ以下で0% 309
 // double proportionTable1[9] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 3.0, 0.2, 0.1};// 21/70が2.99999...になるから最初から20/70より大きい2.89にしちゃう
-const double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5}; //一部の敵は特殊テンションテーブルを倍率として使う
+constexpr double Enemy_TensionTable[4] = {1.3, 2.0, 3.0, 4.5}; //一部の敵は特殊テンションテーブルを倍率として使う
 
 
 int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, int attacker, int defender,
@@ -2150,14 +2150,14 @@ int BattleEmulator::FUN_0208aecc(int *position, uint64_t *NowState) {
     return static_cast<int>(r3_var12);
 }
 
-int BattleEmulator::CalculateMoreHealBase(Player *players) {
+int BattleEmulator::CalculateMoreHealBase(const Player *players) {
     //ベホイミ
     double tmp1 = (players[0].HealPower - 200) * 0.5194;
     auto tmp2 = static_cast<int>(floor(tmp1));
     return 185 + tmp2;
 }
 
-int BattleEmulator::CalculateMidHealBase(Player *players) {
+int BattleEmulator::CalculateMidHealBase(const Player *players) {
     //ｂ
     double tmp1 = (players[0].HealPower - 100) * 0.2392;
     auto tmp2 = static_cast<int>(floor(tmp1));
@@ -2183,7 +2183,7 @@ void BattleEmulator::RecalculateBuff(Player *players) {
     }
 }
 
-void BattleEmulator::ProcessRage(int *position, int baseDamage, Player *players) {
+void BattleEmulator::ProcessRage(int *position, int baseDamage, const Player *players) {
     auto percent1 = FUN_021dbc04(preHP[1] - baseDamage, players[1].maxHp);
     if (percent1 < 0.5) {
         double percent = FUN_021dbc04(preHP[1], players[1].maxHp);

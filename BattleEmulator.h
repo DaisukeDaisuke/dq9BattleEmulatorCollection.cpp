@@ -107,10 +107,10 @@ public:
     static int roundCustom(double value);
 private:
     static int ProcessMagicBurst(int * position);
-    static void ProcessRage(int * position, int baseDamage, Player players[2]);
+    static void ProcessRage(int * position, int baseDamage, const Player players[2]);
     static void RecalculateBuff(Player players[2]);
-    static int CalculateMoreHealBase(Player players[2]);
-    static int CalculateMidHealBase(Player players[2]);
+    static int CalculateMoreHealBase(const Player players[2]);
+    static int CalculateMidHealBase(const Player players[2]);
     static int FUN_0208aecc(int *position, uint64_t * NowState);
     static void resetCombo(uint64_t * NowState);
     static double processCombo(int32_t Id, double damage, uint64_t * NowState);
