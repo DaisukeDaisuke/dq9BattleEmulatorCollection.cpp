@@ -944,7 +944,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             } else {
                 tmp = baseDamage;
             }
-
             if (!players[0].paralysis && !players[0].sleeping) {
                 tmp *= players[0].defence;
             }
@@ -999,7 +998,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++; //ニセ回避 0x02157f58
             baseDamage = FUN_021e8458_typeD(position, 10, 65);
-            tmp = baseDamage * Equipments::calculateTotalResistance(Attribute::Darkness);
+            tmp = Equipments::applyDamageReduction(baseDamage, Attribute::Darkness);
 
             if (players[defender].TensionLevel == 4) {
                 tmp *= 0.5;
@@ -1184,8 +1183,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             }
             (*position)++; //ニセ回避 0x02157f58 100%
             baseDamage = FUN_021e8458_typeD(position, 15, 80);
-            tmp = baseDamage * Equipments::calculateTotalResistance(Attribute::ThunderExplosion);
-            baseDamage = static_cast<int>(floor(tmp));
+            tmp = Equipments::applyDamageReduction(baseDamage, Attribute::ThunderExplosion);
             if (tate) {
                 baseDamage = 0;
             } else {
@@ -1196,9 +1194,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                     players[0].sleepingTurn = -1;
                 }
                 if (players[defender].TensionLevel == 4) {
-                    tmp = baseDamage * 0.5;
-                } else {
-                    tmp = baseDamage;
+                    tmp *= 0.5;
                 }
                 if (!players[0].paralysis && !players[0].sleeping) {
                     tmp *= players[defender].defence;
@@ -1320,7 +1316,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 }
                 (*position)++; //ニセ回避 0x02157f58 100%
                 baseDamage = FUN_021e8458_typeD(position, 12, 116);
-                tmp = baseDamage * Equipments::calculateTotalResistance(Attribute::Fire);
+                tmp = Equipments::applyDamageReduction(baseDamage, Attribute::Fire);
                 if (players[defender].TensionLevel == 4) {
                     tmp *= 0.5;
                 }
@@ -1350,18 +1346,16 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             (*position)++; // 0x02157f58 ニセ回避
 
             baseDamage = FUN_021e8458_typeD(position, 15, 75);
-            baseDamage = static_cast<int>(floor(baseDamage * Equipments::calculateTotalResistance(Attribute::Ice)));
+            tmp = Equipments::applyDamageReduction(baseDamage, Attribute::Ice);
 
             if (!kaihi) {
                 (*position)++; //0x021e54fc 不明
             } else {
-                baseDamage = 0;
+                tmp = 0;
             }
             process7A8(position, baseDamage, players, defender);
             if (players[defender].TensionLevel == 4) {
-                tmp = baseDamage * 0.5;
-            } else {
-                tmp = baseDamage;
+                tmp *= 0.5;
             }
             if (!players[0].paralysis && !players[0].sleeping) {
                 tmp *= players[defender].defence;
