@@ -63,13 +63,13 @@ struct Equipment {
 // 装備の初期化
 //ダークシールド
 // グローバル変数を inline 変数として定義
-inline const Equipment DarkShield("Dark shield", {
-        {Attribute::Fire, 5},
-        {Attribute::Ice, 5}
-});
+inline constexpr Equipment DarkShield("Dark shield", {
+                                          {Attribute::Fire, 5},
+                                          {Attribute::Ice, 5}
+                                      });
 
 //げんまのよろい
-inline const Equipment EtherealArmour("Ethereal armour", {
+inline constexpr Equipment EtherealArmour("Ethereal armour", {
         {Attribute::Fire, 18},
         {Attribute::Ice, 18},
         {Attribute::Wind, 18},
@@ -78,7 +78,7 @@ inline const Equipment EtherealArmour("Ethereal armour", {
 });
 
 //せいれいのこて
-inline const Equipment EnchantedGloves("Enchanted gloves", {
+inline constexpr Equipment EnchantedGloves("Enchanted gloves", {
         {Attribute::Fire, 7},
         {Attribute::Ice, 7},
         {Attribute::Wind, 7},
@@ -87,10 +87,10 @@ inline const Equipment EnchantedGloves("Enchanted gloves", {
 });
 
 //竜戦士のブーツ
-inline const Equipment DragonWarriorBoots("Dragon warrior boots", {
-        {Attribute::Fire, 5},
-        {Attribute::Darkness, 5}
-});
+inline constexpr Equipment DragonWarriorBoots("Dragon warrior boots", {
+                                              {Attribute::Fire, 5},
+                                              {Attribute::Darkness, 5}
+                                          });
 
 /**
  * すべての装備品を格納する定数配列です。
@@ -102,7 +102,7 @@ inline const Equipment DragonWarriorBoots("Dragon warrior boots", {
  * @note 配列内の順序は、装備品管理や計算処理で一貫性を保つために重要です。
  */
 // 同様に、配列も inline 化
-inline const std::array<Equipment, 4> allEquipments = {
+inline constexpr std::array<Equipment, 4> allEquipments = {
     DarkShield, EtherealArmour, EnchantedGloves, DragonWarriorBoots
 };
 
