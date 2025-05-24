@@ -2089,31 +2089,26 @@ int BattleEmulator::FUN_0207564c(int *position, int atk, int def) {
 }
 
 void BattleEmulator::process7A8(int *position, int baseDamage, Player players[2], int defender) {
-    if (!players[defender].paralysis && !players[defender].sleeping) {
-        if (players[defender].hp > baseDamage) {
-            //hpが0以下の場合必殺チャージの判定は発生しない。
-            //必殺チャージ(敵)
-            if (!players[defender].specialCharge) {
-                auto percent_tmp = lcg::getPercent(position, 100);
-                double tmp = baseDamage;
-                if (!players[0].paralysis && !players[0].sleeping) {
-                    tmp *= players[defender].defence;
-                }
-                auto baseDamage_tmp = static_cast<int>(floor(tmp));
-                for (int i = 0; i < 9; ++i) {
-                    if (baseDamage_tmp >= proportionTable3[i]) {
-                        if (percent_tmp < proportionTable2[i]) {
-                            players[defender].specialCharge = true;
-                            players[defender].specialChargeTurn = 8;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    } /*else if (players[defender].sleeping) {
+    if (players[defender].paralysis || players[defender].sleeping || players[defender].specialCharge || players[defender].hp <= baseDamage) {
+        return;
+    }
+    if (baseDamage == 0) {
         (*position)++;
-    }*/
+        return;
+    }
+    auto percent_tmp = lcg::getPercent(position, 100);
+    double tmp = baseDamage;
+
+    auto baseDamage_tmp = static_cast<int>(floor(tmp));
+    for (int i = 0; i < 9; ++i) {
+        if (baseDamage_tmp >= proportionTable3[i]) {
+            if (percent_tmp < proportionTable2[i]) {
+                players[defender].specialCharge = true;
+                players[defender].specialChargeTurn = 8;
+            }
+            break;
+        }
+    }
 }
 
 int BattleEmulator::ProcessEnemyRandomAction2A(int *position) {
