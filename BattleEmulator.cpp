@@ -203,7 +203,7 @@ bool BattleEmulator::Main(int *position, int RunCount, const int32_t Gene[350], 
 #ifdef DEBUG2
         DEBUG_COUT2((*position));
         //THIS DEBUG CODE!
-        if ((*position) == 616) { //THIS DEBUG CODE!
+        if ((*position) == 701) { //THIS DEBUG CODE!
             std::cout << "!!" << std::endl;
         }
 #endif
@@ -1355,7 +1355,6 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             } else {
                 tmp = 0;
             }
-            process7A8(position, baseDamage, players, defender);
             if (players[defender].TensionLevel == 4) {
                 tmp *= 0.5;
             }
@@ -1363,6 +1362,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
                 tmp *= players[defender].defence;
             }
             baseDamage = static_cast<int>(floor(tmp));
+            process7A8(position, baseDamage, players, defender);
             resetCombo(NowState);
             break;
         case BattleEmulator::DOUBLE_UP:

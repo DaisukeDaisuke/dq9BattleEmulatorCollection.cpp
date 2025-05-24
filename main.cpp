@@ -302,7 +302,7 @@ int main() {
 #ifdef DEBUG2
     //THIS DEBUG CODE!
     //THIS DEBUG CODE
-    uint64_t time1 = 0x9adcc97;
+    uint64_t time1 = 0x932ca66;
 
     int dummy[100];
     lcg::init(time1);
@@ -325,7 +325,7 @@ int main() {
     Player players1[2];
     //int32_t gene1[350] = {0};
     //THIS DEBUG CODE!
-    int32_t gene1[350] = { 31, 46, 30, 30, 33, 38, 34, 50, 34, 30, 62, 62, 62, 53, 31, 53, 33, 62, 34, 34,  };
+    int32_t gene1[350] = {  30, 31, 62, 62, 50, 53, 62, 30, 31, 34, 53, 33, 31, 34, 34, 34, 34, 53,   };
     //gene1[19-1] = BattleEmulator::DEFENCE;
     int counter = 0;
 
@@ -700,7 +700,11 @@ void mainLoop(const Player copiedPlayers[2]) {
                 if (!SearchRequest(copiedPlayers, seed, aActions, true)) {
                     std::cout << "First search request failed!" << std::endl;
                     if (!SearchRequest(copiedPlayers, seed, aActions, false)) {
-                        std::cout << "Second search request failed!" << std::endl;
+                        std::cout << std::endl;
+                        std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
+                        std::cout << "      **YOU WILL NOW LOSE!**       " << std::endl;
+                        std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=" << std::endl;
+                        std::cout << std::endl;
                     }
                 }
             }
