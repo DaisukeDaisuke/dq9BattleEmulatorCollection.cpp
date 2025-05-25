@@ -1501,6 +1501,7 @@ int BattleEmulator::callAttackFun(int32_t Id, int *position, Player *players, in
             FUN_0207564c(position, players[attacker].atk, players[defender].def);
             baseDamage = static_cast<int>(floor(players[1].defaultATK * lcg::floatRand(position, 0.8500, 0.9500)));
 
+            //TODO: この処理を直す
             if (baseDamage != 0) {
                 players[0].sleeping = false;
                 players[0].sleepingTurn = -1;
