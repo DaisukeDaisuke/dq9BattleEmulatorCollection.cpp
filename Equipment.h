@@ -61,22 +61,19 @@ struct Equipment {
 };
 
 // 装備の初期化
-//まほうのたて
-constexpr Equipment DarkShield("Magic shield", {
+//ダークシールド
+constexpr Equipment DarkShield("Dark shield", {
                                    {Attribute::Fire, 5},
                                    {Attribute::Ice, 5},
-                                   {Attribute::Wind, 5},
-                                   {Attribute::ThunderExplosion, 5},
-                                   {Attribute::Darkness, 5},
                                });
 
-//せいれいのよろい
-constexpr Equipment EtherealArmour("Enchanted shield", {
-                                       {Attribute::Fire, 15},
-                                       {Attribute::Ice, 15},
-                                       {Attribute::Wind, 15},
-                                       {Attribute::ThunderExplosion, 15},
-                                       {Attribute::Darkness, 12},
+//げんまのよろい
+constexpr Equipment EtherealArmour("Ethereal armour", {
+                                       {Attribute::Fire, 18},
+                                       {Attribute::Ice, 18},
+                                       {Attribute::Wind, 18},
+                                       {Attribute::ThunderExplosion, 18},
+                                       {Attribute::Darkness, 15},
                                    });
 
 //せいれいのこて
@@ -87,7 +84,17 @@ constexpr Equipment EnchantedGloves("Enchanted gloves", {
                                         {Attribute::ThunderExplosion, 7},
                                         {Attribute::Darkness, 7},
                                     });
+//レッドタイツ
+constexpr Equipment RedTights("Red tights", {
+                                  {Attribute::Fire, 7},
+                                  {Attribute::ThunderExplosion, 7},
+                              });
 
+//竜戦士のブーツ
+constexpr Equipment DragonWarriorBoots("Red tights", {
+                                  {Attribute::Fire, 5},
+                                  {Attribute::Darkness, 5},
+                              });
 
 /**
  * すべての装備品を格納する定数配列です。
@@ -98,8 +105,8 @@ constexpr Equipment EnchantedGloves("Enchanted gloves", {
  * @note この配列はconstexprとして定義されているため、コンパイル時に初期化され、実行時に変更することはできません。
  * @note 配列内の順序は、装備品管理や計算処理で一貫性を保つために重要です。
  */
-constexpr std::array<Equipment, 3> allEquipments = {
-    DarkShield, EtherealArmour, EnchantedGloves
+constexpr std::array<Equipment, 5> allEquipments = {
+    DarkShield, EtherealArmour, EnchantedGloves, RedTights, DragonWarriorBoots
 };
 
 /**

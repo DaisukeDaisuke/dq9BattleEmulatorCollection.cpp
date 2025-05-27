@@ -82,20 +82,20 @@ namespace {
     constexpr Player BasePlayers[2] = {
         // プレイヤー1
         {
-            143, 143.0, 220, 220, 155, 155, 114, 114, 138, 88, // 最初のメンバー
-            88, false, false, 0, false, 0, -1,
+            305, 305.0, 322, 322, 292, 292, 190, 190, 230, 100, // 最初のメンバー
+            100, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             6, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1
+            false, -1, 0, -1, 0, false, 1, 1, 1, -1, 0, -1, false, 2, false, -1, false
         }, // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
 
         // プレイヤー2
         {
-            1680, 1680.0, 160, 160, 170, 170, 125, 125, 0, 255, // 最初のメンバー
+            3098, 3098.0, 238, 238, 288, 288, 160, 160, 0, 255, // 最初のメンバー
             255, false, false, 0, false, 0, -1,
             // specialCharge, dirtySpecialCharge, specialChargeTurn, inactive, paralysis, paralysisLevel, paralysisTurns
             0, 1.0, false, -1, 0, -1, // SpecialMedicineCount, defence, sleeping, sleepingTurn, BuffLevel, BuffTurns
-            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1
+            false, -1, 0, -1, 0, false, 0, 0, 0, -1, 0, -1, false, 2, false, -1, false
         } // hasMagicMirror, MagicMirrorTurn, AtkBuffLevel, AtkBuffTurn, TensionLevel
     };
 #endif
@@ -857,12 +857,14 @@ actions: 30, 25, 30, 62, 62, 50, 62, 62, 33, 30, 34,
 
 
     //AI Warning: This is code related to debug2
-    uint64_t time1 = 0x1001;
+    uint64_t time1 = 0x9207e38;
 
     int dummy[100];
     lcg::init(time1, false);
     int *position1 = new int(1);
 
+
+    //0x9207e38: 30, 37, 37, 32, 62, 38, 25, 53, 47, 31, 30, 30, 62, 62, 62, 31, 33, 34, 34, 34, 
     /*
     ver: v8.0.6_vG_v2, atk: 220, def: 155, seed: 0x1000
 actions: 30, 30, 50, 62, 53, 62, 62, 62, 33, 34,
