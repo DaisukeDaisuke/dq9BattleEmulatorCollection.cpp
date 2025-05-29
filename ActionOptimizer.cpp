@@ -273,8 +273,7 @@ Genome ActionOptimizer::RunAlgorithm(const Player players[2], uint64_t seed, int
         //if (!skip) {
 
         //50%の確率でテンションを上げる行動有効化して、テンションシステムに依存しない最適解も生成できるようにする。
-        if (tension_enable && !Bans.is_action_banned(BattleEmulator::SPECIAL_MEDICINE, turns) && AllyPlayerPre.SpecialMedicineCount
-            > 0) {
+        if (tension_enable && !Bans.is_action_banned(BattleEmulator::SPECIAL_MEDICINE, turns) && AllyPlayerPre.SpecialMedicineCount > 1) {
             action = BattleEmulator::SPECIAL_MEDICINE;
             if (tmpgenomu.Visited >= 1) {
                 currentGenome.fitness = baseFitness; // 固定値に
