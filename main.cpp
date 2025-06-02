@@ -644,7 +644,6 @@ namespace {
         FoundSeed = 0;
 
         int totalSeconds = hours * 3600 + minutes * 60 + seconds;
-        totalSeconds = totalSeconds - 15;
         auto time1 = static_cast<uint64_t>(floor((totalSeconds - 8.5) * (1 / 0.12515)));
         time1 = (time1 & 0xffff) << 16;
 
