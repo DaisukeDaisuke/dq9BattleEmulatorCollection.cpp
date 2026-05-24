@@ -3,6 +3,10 @@
 dq9のRTA用バトルエミュレーター
 
 > [!WARNING]
+> This repository has been superseded and archived by DQIX/BattleEmulator  
+> https://github.com/DQIX/BattleEmulator  
+
+> [!WARNING]
 > 現在Githubリリースで公開されている版は、最新版ではありません。  
 > 配布先が変更(Dropbox)され、Githubリリースでの配布はすでに放棄されています。  
 > なお、ここで公開されているソースコード類はすべて最新です。  
